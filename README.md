@@ -47,22 +47,25 @@
             }
         
             @ProcessNode(processor = "node1Processor")      // 处理节点（一种节点类型）
-            public String node1() {
+            public String node1(String processResult) {     // processResult类型需要满足能被处理器返回值进行赋值就可以
+                // 根据处理器返回结果判断需要执行的下一个节点
+                // 这里为简单演示，直接返回下一个节点
                 return "node2";
             }
         
             @StateNode(processor = "node2Processor")        // 状态节点
-            public String node2() {
+            public String node2(String processResult) {
                 return "node3";
             }
         
             @WaitNode(processor = "node3Processor")         // 等待节点
             public String node3(){
+                // 也可以没有processResult入参
                 return "node4";
             }
         
             @ProcessNode(processor = "node4Processor")
-            public String node4() {
+            public String node4(String processResult) {
                 return "end";
             }
         
