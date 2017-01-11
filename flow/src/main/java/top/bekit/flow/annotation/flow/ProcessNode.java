@@ -29,9 +29,9 @@ public @interface ProcessNode {
     String name() default "";
 
     /**
-     * 节点处理器
+     * 节点处理器（默认不执行处理器）
      */
     @AliasFor(annotation = Node.class, attribute = "processor")
-    String processor();
+    String processor() default "";
 
 }
