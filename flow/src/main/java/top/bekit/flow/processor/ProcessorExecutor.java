@@ -42,10 +42,10 @@ public class ProcessorExecutor {
 
     /**
      * 执行处理器
-     * （顺序：@Before->@Execute->@After->@End；如果执行@Before、@Execute、@After发生异常，则会在执行@End之前执行@Error）
+     * （顺序：@Before、@Execute、@After、@End；如果执行@Before、@Execute、@After发生异常，则会在执行@End之前执行@Error）
      *
      * @param targetContext 目标上下文
-     * @return @Execute方法返回的结果
+     * @return Execute类型方法返回的结果
      * @throws Throwable 执行过程中发生任何异常都后会往外抛
      */
     public Object execute(TargetContext targetContext) throws Throwable {

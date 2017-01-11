@@ -23,7 +23,7 @@
         <dependency>
             <groupId>top.bekit</groupId>
             <artifactId>flow</artifactId>
-            <version>1.0</version>
+            <version>1.0.0.RELEASE</version>
         </dependency>
 
 2. 如果是spring-boot项目则只需要在application.properties中加入配置：
