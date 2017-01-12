@@ -10,7 +10,7 @@ package top.bekit.flow.listener;
 
 import org.springframework.util.ClassUtils;
 import top.bekit.flow.annotation.listener.FlowListener;
-import top.bekit.flow.annotation.listener.ListenDecideNode;
+import top.bekit.flow.annotation.listener.ListenNodeDecide;
 import top.bekit.flow.engine.TargetContext;
 import top.bekit.flow.listener.FlowListenerExecutor.ListenMethodExecutor;
 
@@ -32,9 +32,9 @@ public class FlowListenerParser {
         // 创建流程监听器执行器
         FlowListenerExecutor flowListenerExecutor = new FlowListenerExecutor(flowListenerAnnotation.flow(), flowListener);
         for (Method method : flowListener.getClass().getDeclaredMethods()) {
-            if (method.isAnnotationPresent(ListenDecideNode.class)) {
-                // 添加监听节点选择执行器
-                flowListenerExecutor.addListenDecideNodeExecutor(parseListenMethod(method.getAnnotation(ListenDecideNode.class).nodeExpression(), method));
+            if (method.isAnnotationPresent(ListenNodeDecide.class)) {
+                // 添加监听节点选择事件执行器
+                flowListenerExecutor.addListenNodeDecideExecutor(parseListenMethod(method.getAnnotation(ListenNodeDecide.class).nodeExpression(), method));
             }
         }
         flowListenerExecutor.validate();

@@ -25,8 +25,8 @@ public class FlowListenerExecutor {
     private String flow;
     // 流程监听器
     private Object flowListener;
-    // 监听选择节点执行器List
-    private List<ListenMethodExecutor> listenDecideNodeExecutors = new ArrayList<ListenMethodExecutor>();
+    // 监听节点选择事件执行器List
+    private List<ListenMethodExecutor> listenNodeDecideExecutors = new ArrayList<ListenMethodExecutor>();
 
     public FlowListenerExecutor(String flow, Object flowListener) {
         this.flow = flow;
@@ -41,7 +41,7 @@ public class FlowListenerExecutor {
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
     public void listenNodeDecide(String node, TargetContext targetContext) throws Throwable {
-        for (ListenMethodExecutor listenMethodExecutor : listenDecideNodeExecutors) {
+        for (ListenMethodExecutor listenMethodExecutor : listenNodeDecideExecutors) {
             if (listenMethodExecutor.isFit(node)) {
                 listenMethodExecutor.execute(flowListener, node, targetContext);
             }
@@ -49,12 +49,12 @@ public class FlowListenerExecutor {
     }
 
     /**
-     * 添加监听选择节点执行器
+     * 添加监听节点选择事件执行器
      *
      * @param listenMethodExecutor 监听方法执行器
      */
-    public void addListenDecideNodeExecutor(ListenMethodExecutor listenMethodExecutor) {
-        listenDecideNodeExecutors.add(listenMethodExecutor);
+    public void addListenNodeDecideExecutor(ListenMethodExecutor listenMethodExecutor) {
+        listenNodeDecideExecutors.add(listenMethodExecutor);
     }
 
     /**

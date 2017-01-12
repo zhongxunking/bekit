@@ -11,16 +11,16 @@ package top.bekit.flow.annotation.listener;
 import java.lang.annotation.*;
 
 /**
- * 监听选择节点事件
- * （监听选择节点事件主要是用来更新节点状态到目标对象，实现更新目标对象状态和定义流程那部分代码分离）
+ * 监听节点选择事件
+ * （监听节点选择事件主要是用来更新目标对象的状态，实现更新目标对象状态和流程定义分离）
  */
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ListenDecideNode {
+public @interface ListenNodeDecide {
 
     /**
-     * 匹配被选择节点的表达式（正则表达式）
+     * 匹配被选择节点名称的表达式（正则表达式）
      */
     String nodeExpression();
 
