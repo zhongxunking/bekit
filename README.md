@@ -173,12 +173,12 @@
 
 3. 流程监听器
 
-        流程监听器的职责就是监听某一个流程内发生的事件，目前只有一种类型事件————选择节点事件（这种事件一般的作用就是用来更新目标对象的状态）
+        流程监听器的职责就是监听某一个流程内发生的事件，目前只有一种类型事件————节点选择事件（这种事件一般的作用就是用来更新目标对象的状态）
 
         @FlowListener(flow = "demoFlow")  // 流程监听器注解，属性flow指定被监听的流程名称
         public class DenoFlowListener {
         
-            @ListenDecideNode(nodeExpression = "node1")     // 监听选择节点事件，nodeExpression是需要被监听节点的正则表达式
+            @ListenNodeDecide(nodeExpression = "node1")     // 监听节点选择事件，nodeExpression是需要被监听节点的正则表达式
             public void listenNode1(String node, TargetContext targetContext) { // node是被选择的节点名称，targetContext是目标上下文
                 // 监听流程节点中的节点选择方法被执行后的返回值
                 // 一般监听节点选择事件的目的是用来更新目标对象的状态，
@@ -188,7 +188,7 @@
                 // 本监听方法只有在被选择节点是node1时才会执行
             }
         
-            @ListenDecideNode(nodeExpression = ".*")     // 监听选择节点事件，正则表达式“.*”表示监听所有的节点选择事件
+            @ListenNodeDecide(nodeExpression = ".*")     // 监听节点选择事件，正则表达式“.*”表示监听所有的节点选择事件
             public void listenAllNode(String node, TargetContext targetContext) {
                 // 本监听方法在所有节点被选择是都会执行
             }
