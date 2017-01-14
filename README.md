@@ -221,7 +221,7 @@
             @InsertTarget   // 插入目标对象，可选
             public Trade insertTarget(TargetContext targetContext) {
                 // 插入目标对象到数据库具体代码
-                // 必须返回插入后的目标对象
+                // 必须返回插入后的目标对象，流程引擎需要将它更新到目标上下文
             }
         }
 
