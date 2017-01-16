@@ -65,7 +65,7 @@
         public class DemoFlow {
         
             @StartNode      // 开始节点，一个流程必须得有一个开始节点
-            public String start()
+            public String start() {
                 // 返回下一个节点名称。节点名称默认情况下就是对应的方法名，不过也可以在节点注解上指定name属性，自己指定名称
                 return "node1";
             }
