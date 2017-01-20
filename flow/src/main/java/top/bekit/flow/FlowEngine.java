@@ -8,6 +8,7 @@
  */
 package top.bekit.flow;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Map;
 
 /**
@@ -20,9 +21,11 @@ public interface FlowEngine {
      *
      * @param flow   流程名称
      * @param target 目标对象
-     * @throws RuntimeException 执行过程中发生任何异常都会往外抛，但如果是非运行时异常则会包装成RuntimeException异常，目的是让客户代码不用每次调用时都需要catch
+     * @return 流程执行结束后的目标对象（可能和传入的目标对象不同）
+     * @throws UndeclaredThrowableException 执行过程中发生任何异常都会往外抛，但如果是非运行时异常则会包装成UndeclaredThrowableException异常，
+     *                                      目的是让客户代码不用每次调用时都需要catch
      */
-    void start(String flow, Object target);
+    <T> T start(String flow, Object target);
 
     /**
      * 执行流程
@@ -30,9 +33,11 @@ public interface FlowEngine {
      * @param flow       流程名称
      * @param target     目标对象
      * @param attachment 附件（为null的话则会自动生成一个空Map作为附件）
-     * @throws RuntimeException 执行过程中发生任何异常都会往外抛，但如果是非运行时异常则会包装成RuntimeException异常，目的是让客户代码不用每次调用时都需要catch
+     * @return 流程执行结束后的目标对象（可能和传入的目标对象不同）
+     * @throws UndeclaredThrowableException 执行过程中发生任何异常都会往外抛，但如果是非运行时异常则会包装成UndeclaredThrowableException异常，
+     *                                      目的是让客户代码不用每次调用时都需要catch
      */
-    void start(String flow, Object target, Map<Object, Object> attachment);
+    <T> T start(String flow, Object target, Map<Object, Object> attachment);
 
     /**
      * 以新事务插入目标对象到数据库并提交，然后执行流程
@@ -40,8 +45,10 @@ public interface FlowEngine {
      * @param flow       流程名称
      * @param target     目标对象
      * @param attachment 附件（为null的话则会自动生成一个空Map作为附件）
-     * @throws RuntimeException 执行过程中发生任何异常都会往外抛，但如果是非运行时异常则会包装成RuntimeException异常，目的是让客户代码不用每次调用时都需要catch
+     * @return 流程执行结束后的目标对象（可能和传入的目标对象不同）
+     * @throws UndeclaredThrowableException 执行过程中发生任何异常都会往外抛，但如果是非运行时异常则会包装成UndeclaredThrowableException异常，
+     *                                      目的是让客户代码不用每次调用时都需要catch
      */
-    void insertTargetAndStart(String flow, Object target, Map<Object, Object> attachment);
+    <T> T insertTargetAndStart(String flow, Object target, Map<Object, Object> attachment);
 
 }

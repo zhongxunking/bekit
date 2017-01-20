@@ -48,10 +48,12 @@
         private FlowEngine flowEngine;
 
 
-    然后就可以调用执行流程方法：
+    然后就可以执行流程：
     
         // demoFlow是需要执行的流程名称，trade是这个流程需要执行的目标对象（可以是订单、交易记录等等）
-        flowEngine.start("demoFlow", trade);
+        trade = flowEngine.start("demoFlow", trade);
+        // 注意：start方法返回的目标是最新的目标对象，和入参目标对象可能不是同一个（因为锁目标对象和插入目标对象方法执行后会更新目标对象）
+        // 对执行结果进行判断（可通过trade的状态来判断），接下来就可以构造返回结果或继续进行之后的业务
     
 ### 2. 一个简单的流程定义样例：
 一个完整的流程应该具备：流程编排（@Flow）、处理器（@Processor）、流程监听器（@FlowListener）、流程事务（@FlowTx）

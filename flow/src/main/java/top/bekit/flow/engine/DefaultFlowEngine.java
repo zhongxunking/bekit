@@ -8,6 +8,7 @@
  */
 package top.bekit.flow.engine;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import top.bekit.flow.FlowEngine;
 import top.bekit.flow.flow.FlowExecutor;
@@ -26,45 +27,47 @@ public class DefaultFlowEngine implements FlowEngine {
     private FlowTxHolder flowTxHolder;
 
     @Override
-    public void start(String flow, Object target) {
-        start(flow, target, null);
+    public <T> T start(String flow, Object target) {
+        return start(flow, target, null);
     }
 
     @Override
-    public void start(String flow, Object target, Map<Object, Object> attachment) {
-        try {
-            // 构造目标上下文
-            TargetContext targetContext = new TargetContext(target, attachment);
-            // 获取流程执行器
-            FlowExecutor flowExecutor = flowHolder.getRequiredFlowExecutor(flow);
-            // 执行流程
-            flowExecutor.execute(targetContext);
-        } catch (Throwable e) {
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            }
-            // 包装异常为RuntimeException异常，让外部不用每次调用时都需要catch
-            throw new RuntimeException(e);
-        }
+    public <T> T start(String flow, Object target, Map<Object, Object> attachment) {
+        // 构造目标上下文
+        TargetContext targetContext = new TargetContext(target, attachment);
+        // 执行流程
+        executeFlow(flow, targetContext);
+
+        return targetContext.getTarget();
     }
 
     @Override
-    public void insertTargetAndStart(String flow, Object target, Map<Object, Object> attachment) {
+    public <T> T insertTargetAndStart(String flow, Object target, Map<Object, Object> attachment) {
+        // 构造目标上下文
+        TargetContext targetContext = new TargetContext(target, attachment);
         try {
-            // 构造目标上下文
-            TargetContext targetContext = new TargetContext(target, attachment);
             //以新事务插入目标对象到数据库并提交
             flowTxHolder.getRequiredFlowTxExecutor(flow).insertTarget(targetContext);
+            // 执行流程
+            executeFlow(flow, targetContext);
+        } catch (Throwable e) {
+            // 非运行时异常包装成UndeclaredThrowableException异常，让外部不用每次调用时都需要catch
+            ExceptionUtils.wrapAndThrow(e);
+        }
+        return targetContext.getTarget();
+    }
+
+    // 执行流程
+    private void executeFlow(String flow, TargetContext targetContext) {
+        try {
             // 获取流程执行器
             FlowExecutor flowExecutor = flowHolder.getRequiredFlowExecutor(flow);
             // 执行流程
             flowExecutor.execute(targetContext);
         } catch (Throwable e) {
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            }
-            // 包装异常为RuntimeException异常，让外部不用每次调用时都需要catch
-            throw new RuntimeException(e);
+            // 非运行时异常包装成UndeclaredThrowableException异常，让外部不用每次调用时都需要catch
+            ExceptionUtils.wrapAndThrow(e);
         }
     }
+
 }
