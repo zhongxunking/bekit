@@ -36,6 +36,7 @@
 
     <modules>
         <module>flow</module>
+        <module>event</module>
     </modules>
 
     <licenses>
