@@ -22,7 +22,7 @@ import java.util.Map;
 public class EventBusHolder {
     @Autowired
     private ListenerHolder listenerHolder;
-    // 事件总线Map（key：总线的类型）
+    // 事件总线Map（key：总线类型）
     private Map<Class, EventBus> eventBusMap = new HashMap<Class, EventBus>();
 
     // 初始化（根据监听器类型创建相应类型的事件总线，spring自动执行）
