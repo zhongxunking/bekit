@@ -19,7 +19,7 @@ public class EventBus {
     // 监听器执行器
     private List<ListenerExecutor> listenerExecutors = new ArrayList<ListenerExecutor>();
     // 监听器执行器缓存
-    private Map<Class, List<ListenerExecutor>> listenerExecutorsCache;
+    private Map<Class, List<ListenerExecutor>> listenerExecutorsCache = new HashMap<Class, List<ListenerExecutor>>();
 
     /**
      * 注册监听器
