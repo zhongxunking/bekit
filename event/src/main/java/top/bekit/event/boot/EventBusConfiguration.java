@@ -14,7 +14,7 @@ import top.bekit.event.EventPublisher;
 import top.bekit.event.annotation.BizListener;
 import top.bekit.event.bus.EventBusHolder;
 import top.bekit.event.listener.ListenerHolder;
-import top.bekit.event.publish.DefaultEventPublisher;
+import top.bekit.event.publisher.DefaultEventPublisher;
 
 /**
  * 事件总线配置类

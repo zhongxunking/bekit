@@ -38,7 +38,7 @@ public class EventBus {
      * @param event 事件
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
-    public void dispatche(Object event) throws Throwable {
+    public void dispatch(Object event) throws Throwable {
         List<ListenerExecutor> cachedListenerExecutors = listenerExecutorsCache.get(event.getClass());
         if (cachedListenerExecutors != null) {
             for (ListenerExecutor listenerExecutor : cachedListenerExecutors) {
@@ -51,12 +51,12 @@ public class EventBus {
     private void refreshListenerCache() {
         listenerExecutorsCache = new HashMap<Class, List<ListenerExecutor>>();
         // 获取本总线所有的事件类型
-        Set<Class> allEventType = new HashSet<Class>();
+        Set<Class> eventTypes = new HashSet<Class>();
         for (ListenerExecutor listenerExecutor : listenerExecutors) {
-            allEventType.addAll(listenerExecutor.getEventTypes());
+            eventTypes.addAll(listenerExecutor.getEventTypes());
         }
         // 根据事件类型设置缓存
-        for (Class eventType : allEventType) {
+        for (Class eventType : eventTypes) {
             // 获取指定事件类型的监听器
             List<ListenerExecutor> cachedListenerExecutors = new ArrayList<ListenerExecutor>();
             for (ListenerExecutor listenerExecutor : listenerExecutors) {

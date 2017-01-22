@@ -24,7 +24,7 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
     private Class type;
     // 优先级
     private int priority;
-    // 监听执行器map（key：事件类型）
+    // 监听执行器map（key：被监听的事件类型）
     private Map<Class, ListenExecutor> listenExecutorMap = new HashMap<Class, ListenExecutor>();
 
     public ListenerExecutor(Object listener, Class type, int priority) {
@@ -34,7 +34,7 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
     }
 
     /**
-     * 执行监听
+     * 执行监听事件
      *
      * @param event 事件
      * @throws Throwable 执行过程中发生任何异常都会往外抛

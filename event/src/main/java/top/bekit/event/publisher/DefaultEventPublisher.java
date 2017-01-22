@@ -6,7 +6,7 @@
  * 修订记录:
  * @author 钟勋 2016-12-16 01:14 创建
  */
-package top.bekit.event.publish;
+package top.bekit.event.publisher;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import top.bekit.event.EventPublisher;
@@ -26,9 +26,7 @@ public class DefaultEventPublisher implements EventPublisher {
     @Override
     public void publish(Object event) {
         try {
-            if (eventBus != null) {
-                eventBus.dispatche(event);
-            }
+            eventBus.dispatch(event);
         } catch (Throwable e) {
             // 非运行时异常包装成UndeclaredThrowableException异常，让外部不用每次调用时都需要catch
             ExceptionUtils.wrapAndThrow(e);

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import top.bekit.event.listener.ListenerExecutor;
 import top.bekit.event.listener.ListenerHolder;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ public class EventBusHolder {
     private Map<Class, EventBus> eventBusMap = new HashMap<Class, EventBus>();
 
     // 初始化（根据监听器类型创建相应类型的事件总线，spring自动执行）
+    @PostConstruct
     public void init() {
         for (Class type : listenerHolder.getTypes()) {
             // 构造事件总线
@@ -39,11 +41,14 @@ public class EventBusHolder {
 
     /**
      * 获取事件总线
+     * （如果不存在该类型的事件总线，则新创建一个）
      *
      * @param type 总线类型
-     * @return null 如果该类型的总线不存在
      */
-    public EventBus getEventBus(Class type) {
+    public synchronized EventBus getEventBus(Class type) {
+        if (!eventBusMap.containsKey(type)) {
+            eventBusMap.put(type, new EventBus());
+        }
         return eventBusMap.get(type);
     }
 }
