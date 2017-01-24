@@ -15,6 +15,7 @@ import top.bekit.event.annotation.listener.Listener;
 import top.bekit.event.listener.ListenerExecutor.ListenExecutor;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * 监听器解析器
@@ -44,6 +45,10 @@ public class ListenerParser {
 
     // 解析监听方法
     private static ListenExecutor parseListen(Method method) {
+        // 校验方法类型
+        if (!Modifier.isPublic(method.getModifiers())) {
+            throw new IllegalArgumentException("监听方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
+        }
         // 校验入参
         Class[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length != 1) {
