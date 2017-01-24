@@ -8,6 +8,8 @@
  */
 package top.bekit.event.listener;
 
+import org.springframework.util.ClassUtils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -54,7 +56,7 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
      */
     public void addListenExecutor(ListenExecutor listenExecutor) {
         if (listenExecutorMap.containsKey(listenExecutor.getEventType())) {
-            throw new IllegalStateException("监听器" + listener.getClass().getSimpleName() + "存在多个监听" + listenExecutor.getEventType().getSimpleName() + "事件的方法");
+            throw new IllegalStateException("监听器" + ClassUtils.getShortName(listener.getClass()) + "存在多个监听" + ClassUtils.getShortName(listenExecutor.getEventType()) + "事件的方法");
         }
         listenExecutorMap.put(listenExecutor.getEventType(), listenExecutor);
     }
