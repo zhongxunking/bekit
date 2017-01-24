@@ -15,6 +15,7 @@ import top.bekit.flow.engine.TargetContext;
 import top.bekit.flow.transaction.FlowTxExecutor.FlowTxMethodExecutor;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * 流程事务解析器
@@ -36,7 +37,7 @@ public class FlowTxParser {
             for (Class clazz : FlowTxExecutor.FLOW_TX_METHOD_ANNOTATIONS) {
                 if (method.isAnnotationPresent(clazz)) {
                     // 设置流程事务方法执行器
-                    flowTxExecutor.setMethodExecutor(clazz, parseFlowTxMethod(clazz, method));
+                    flowTxExecutor.setMethodExecutor(clazz, parseFlowTxMethod(method));
                     break;
                 }
             }
@@ -47,7 +48,11 @@ public class FlowTxParser {
     }
 
     // 解析流程事务方法
-    private static FlowTxMethodExecutor parseFlowTxMethod(Class clazz, Method method) {
+    private static FlowTxMethodExecutor parseFlowTxMethod(Method method) {
+        // 校验方法类型
+        if (!Modifier.isPublic(method.getModifiers())) {
+            throw new IllegalArgumentException("流程事务方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
+        }
         // 校验入参
         Class[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length != 1) {

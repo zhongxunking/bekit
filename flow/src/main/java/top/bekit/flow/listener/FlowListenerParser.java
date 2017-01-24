@@ -15,6 +15,7 @@ import top.bekit.flow.engine.TargetContext;
 import top.bekit.flow.listener.FlowListenerExecutor.ListenMethodExecutor;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * 流程监听器解析器
@@ -44,6 +45,10 @@ public class FlowListenerParser {
 
     // 解析监听方法
     private static ListenMethodExecutor parseListenMethod(String expression, Method listenMethod) {
+        // 校验方法类型
+        if (!Modifier.isPublic(listenMethod.getModifiers())) {
+            throw new IllegalArgumentException("流程监听方法" + ClassUtils.getQualifiedMethodName(listenMethod) + "必须是public类型");
+        }
         boolean hasParameter;
         // 判断是否有入参+校验入参
         Class[] parameterTypes = listenMethod.getParameterTypes();

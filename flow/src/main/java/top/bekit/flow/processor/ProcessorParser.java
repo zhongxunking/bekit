@@ -16,6 +16,7 @@ import top.bekit.flow.engine.TargetContext;
 import top.bekit.flow.processor.ProcessorExecutor.ProcessorMethodExecutor;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * 处理器解析器
@@ -54,6 +55,10 @@ public class ProcessorParser {
      * 解析处理器方法
      */
     private static ProcessorMethodExecutor parseProcessorMethod(Class clazz, Method method) {
+        // 校验方法类型
+        if (!Modifier.isPublic(method.getModifiers())) {
+            throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
+        }
         boolean hasParameter;
         // 判断是否有入参+校验入参
         Class[] parameterTypes = method.getParameterTypes();

@@ -334,7 +334,7 @@ public class FlowExecutor {
             }
 
             /**
-             * 执行选择下个节点方法
+             * 执行下个节点选择方法
              *
              * @param flow          流程
              * @param processResult 节点处理器执行结果

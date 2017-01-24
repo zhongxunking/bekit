@@ -21,6 +21,7 @@ import top.bekit.flow.processor.ProcessorHolder;
 import top.bekit.flow.transaction.FlowTxHolder;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * 流程解析器
@@ -89,15 +90,19 @@ public class FlowParser {
         }
         // 新建节点执行器
         NodeExecutor nodeExecutor = new NodeExecutor(nodeName, processorExecutor, nodeAnnotation.autoExecute(), nodeAnnotation.commitTransaction());
-        // 设置选择下个节点方法执行器
+        // 设置下个节点选择方法执行器
         nodeExecutor.setNextNodeDecideExecutor(parseNextNodeDecide(method, processorExecutor));
         nodeExecutor.validate();
 
         return nodeExecutor;
     }
 
-    // 解析选择下个节点方法
+    // 解析下个节点选择方法
     private static NextNodeDecideExecutor parseNextNodeDecide(Method method, ProcessorExecutor processorExecutor) {
+        // 校验方法类型
+        if (!Modifier.isPublic(method.getModifiers())) {
+            throw new IllegalArgumentException("下个节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
+        }
         boolean hasParameter;
         // 判断是否有入参+校验入参类型
         Class[] parameterTypes = method.getParameterTypes();
@@ -130,6 +135,10 @@ public class FlowParser {
 
     // 解析目标对象映射方法
     private static TargetMappingExecutor parseTargetMapping(Method method) {
+        // 校验方法类型
+        if (!Modifier.isPublic(method.getModifiers())) {
+            throw new IllegalArgumentException("目标对象映射方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
+        }
         // 校验入参
         Class[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length != 1) {
