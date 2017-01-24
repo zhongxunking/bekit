@@ -1,7 +1,7 @@
 # bekit工具箱
 1. 简介
 
-> 本来想叫框架，但现在还上升不到那样的高度，就暂时称之为工具箱。本项目致力于解决在应用开发中公共性问题，规范开发者代码，节省开发者时间，让开发者把更多精力放在自己的业务上。目前已完成“流程引擎”功能模块，后续会陆续增加其他功能。
+> 本来想叫框架，但现在还上升不到那样的高度，就暂时称之为工具箱。本项目致力于解决在应用开发中公共性问题，规范开发者代码，节省开发者时间，让开发者把更多精力放在自己的业务上。目前已完成“事件总线”、“流程引擎”功能模块，后续会陆续增加其他功能。
 
 2. 环境要求：
 
@@ -15,7 +15,74 @@
 
 > 感谢大神@李根的ADK框架，很多灵感和想法是从ADK上获取到的。
 
-## 流程引擎
+## 1. 事件总线
+事件总线用于在一个应用内发布事件和监听事件
+> 诞生原因：当一个事件发生后，如果是由事件发布者直接调用事件监听器，那么事件发布者就必须知道有哪些事件监听器并且他们各自监听哪些事件，这样就增加了事件发布者的复杂性。从职责划分上，事件发布者并不需要关心有哪些监听器，它只负责发布事件；至于事件是怎么路由到监听器的则是时间总线的职责。
+
+### 1. 将事件总线引入进你的系统
+
+1. 引入事件总线依赖
+
+        <dependency>
+            <groupId>top.bekit</groupId>
+            <artifactId>event</artifactId>
+            <version>1.0.0.RELEASE</version>
+        </dependency>
+
+2. 如果是spring-boot项目则不需要进行任何配置。
+
+    如果是非spring-boot项目则需要手动引入事件总线配置类EventBusConfiguration，比如：
+    
+        @Configuration
+        @Import(EventBusConfiguration.class)
+        public class MyImport {
+        }
+
+3. 在需要发布事件的地方注入事件发布器EventPublisher：
+
+        @Autowired
+        private EventPublisher eventPublisher;
+    
+    然后就可以发布事件：
+    
+        // AddUserEvent是自定义的事件类型
+        eventPublisher.publish(new AddUserEvent("张三"));
+
+### 2. 一个简单的事件总线使用样例：
+一个完整的对事件总线的使用应该包括：定义事件类型、定义监听器、发布事件。
+#### 1. 定义事件类型
+
+        // 添加用户事件
+        public class AddUserEvent {
+            private String userName;
+        
+            public AddUserEvent(String userName) {
+                this.userName = userName;
+            }
+        
+            public String getUserName() {
+                return userName;
+            }
+        }
+
+#### 2. 定义监听器
+
+        // 用户监听器
+        @BizListener  // 业务事件监听器注解（这种类型的监听器只能监听你自己发布的事件），注解里priority属性表示优先级（值越小，优先级越高）
+        public class UserListener {
+            @Listen
+            public void listenAddUser(AddUserEvent event) {
+                // 监听到事件后，执行具体业务
+            }
+        }
+
+#### 3. 发布事件
+
+        eventPublisher.publish(new AddUserEvent("张三"));
+
+> 一个监听器内可以监听多种类型的事件，不同监听器可以监听同一种事件，执行顺序是按照监听器注解的属性priority从小到大执行；但是一个监听器内不能对同一种事件进行多次监听，原因是：1、如果一个监听器内对同一种事件进行多次监听，那么监听执行顺序怎么确定；2、基本不存在“一个监听器内对同一种事件进行多次监听”这种场景。
+
+## 2. 流程引擎
 流程引擎比较适合订单类业务场景，功能包含流程编排和事务控制。
 > 诞生原因：在订单类业务场景中，一条订单从创建到最后完成期间，往往会经历很多个状态，状态我将之称为节点，状态和状态的流转我将它称之为流程。在开发的时候，我们往往是将流程嵌入到处理过程代码中。这样做的缺点就是会将流程和处理过程耦合在一起，既不方便查看整个流程，也不方便维护处理过程。当一种新流程需要相同的处理过程时，那么这个处理过程里面就嵌入了两种流程，这样就更
 不好维护了。
