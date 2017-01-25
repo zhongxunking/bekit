@@ -39,6 +39,7 @@ public class ListenerParser {
                 listenerExecutor.addListenExecutor(listenExecutor);
             }
         }
+        listenerExecutor.validate();
 
         return listenerExecutor;
     }
