@@ -34,7 +34,7 @@ public class FlowExecutor {
     // 结束节点
     private String endNode;
     // 节点执行器Map（key：节点名称）
-    private Map<String, NodeExecutor> nodeExecutorMap = new HashMap<String, NodeExecutor>();
+    private Map<String, NodeExecutor> nodeExecutorMap = new HashMap<>();
     // 目标对象映射执行器
     private TargetMappingExecutor mappingExecutor;
     // 流程事务执行器
@@ -388,7 +388,7 @@ public class FlowExecutor {
          */
         public String execute(Object flow, TargetContext targetContext) throws Throwable {
             try {
-                return (String) targetMethod.invoke(flow, targetContext.getTarget());
+                return (String) targetMethod.invoke(flow, (Object) targetContext.getTarget());
             } catch (InvocationTargetException e) {
                 // 抛出原始异常
                 throw e.getTargetException();

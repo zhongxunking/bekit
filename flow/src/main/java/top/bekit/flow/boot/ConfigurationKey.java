@@ -9,8 +9,7 @@
 package top.bekit.flow.boot;
 
 /**
- * 配置属性key定义类
- * (目前只定义了流程引擎，以后开发其他框架后也会在此定义)
+ * 流程引擎配置属性key定义类
  */
 public final class ConfigurationKey {
 

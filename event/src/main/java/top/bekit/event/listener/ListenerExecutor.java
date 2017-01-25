@@ -27,7 +27,7 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
     // 优先级
     private int priority;
     // 监听执行器map（key：被监听的事件类型）
-    private Map<Class, ListenExecutor> listenExecutorMap = new HashMap<Class, ListenExecutor>();
+    private Map<Class, ListenExecutor> listenExecutorMap = new HashMap<>();
 
     public ListenerExecutor(Object listener, Class type, int priority) {
         this.listener = listener;

@@ -17,9 +17,9 @@ import java.util.*;
  */
 public class EventBus {
     // 监听器执行器
-    private List<ListenerExecutor> listenerExecutors = new ArrayList<ListenerExecutor>();
+    private List<ListenerExecutor> listenerExecutors = new ArrayList<>();
     // 监听器执行器缓存
-    private Map<Class, List<ListenerExecutor>> listenerExecutorsCache = new HashMap<Class, List<ListenerExecutor>>();
+    private Map<Class, List<ListenerExecutor>> listenerExecutorsCache = new HashMap<>();
 
     /**
      * 注册监听器
@@ -49,16 +49,16 @@ public class EventBus {
 
     // 刷新监听器缓存
     private void refreshListenerCache() {
-        listenerExecutorsCache = new HashMap<Class, List<ListenerExecutor>>();
+        listenerExecutorsCache = new HashMap<>();
         // 获取本总线所有的事件类型
-        Set<Class> eventTypes = new HashSet<Class>();
+        Set<Class> eventTypes = new HashSet<>();
         for (ListenerExecutor listenerExecutor : listenerExecutors) {
             eventTypes.addAll(listenerExecutor.getEventTypes());
         }
         // 根据事件类型设置缓存
         for (Class eventType : eventTypes) {
             // 获取指定事件类型的监听器
-            List<ListenerExecutor> cachedListenerExecutors = new ArrayList<ListenerExecutor>();
+            List<ListenerExecutor> cachedListenerExecutors = new ArrayList<>();
             for (ListenerExecutor listenerExecutor : listenerExecutors) {
                 if (listenerExecutor.getEventTypes().contains(eventType)) {
                     cachedListenerExecutors.add(listenerExecutor);

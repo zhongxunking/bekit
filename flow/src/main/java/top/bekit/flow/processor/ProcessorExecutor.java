@@ -33,7 +33,7 @@ public class ProcessorExecutor {
     // 处理器
     private Object processor;
     // 处理器方法执行器Map（key：处理器方法注解的Class）
-    private Map<Class, ProcessorMethodExecutor> methodExecutorMap = new HashMap<Class, ProcessorMethodExecutor>();
+    private Map<Class, ProcessorMethodExecutor> methodExecutorMap = new HashMap<>();
 
     public ProcessorExecutor(String processorName, Object processor) {
         this.processorName = processorName;

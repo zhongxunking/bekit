@@ -27,7 +27,7 @@ public class TargetContext {
         this.target = target;
         this.attachment = attachment;
         if (this.attachment == null) {
-            this.attachment = new HashMap<Object, Object>();
+            this.attachment = new HashMap<>();
         }
     }
 

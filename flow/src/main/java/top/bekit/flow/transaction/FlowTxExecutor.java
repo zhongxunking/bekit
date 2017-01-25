@@ -39,11 +39,11 @@ public class FlowTxExecutor {
     // 流程事务
     private Object flowTx;
     // 流程事务方法执行器Map（key：流程事务方法注解的Class）
-    private Map<Class, FlowTxMethodExecutor> flowTxMethodExecutorMap = new HashMap<Class, FlowTxMethodExecutor>();
+    private Map<Class, FlowTxMethodExecutor> flowTxMethodExecutorMap = new HashMap<>();
     // 事务管理器
     private PlatformTransactionManager txManager;
     // 事务持有器
-    private ThreadLocal<TransactionStatus> txStatusHolder = new ThreadLocal<TransactionStatus>();
+    private ThreadLocal<TransactionStatus> txStatusHolder = new ThreadLocal<>();
 
     public FlowTxExecutor(String flow, Object flowTx, PlatformTransactionManager txManager) {
         this.flow = flow;

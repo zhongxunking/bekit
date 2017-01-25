@@ -25,7 +25,7 @@ public class FlowListenerHolder {
     @Autowired
     private ApplicationContext applicationContext;
     // 流程监听器执行器Map（key：被监听的流程名称）
-    private Map<String, List<FlowListenerExecutor>> flowListenerExecutorsMap = new HashMap<String, List<FlowListenerExecutor>>();
+    private Map<String, List<FlowListenerExecutor>> flowListenerExecutorsMap = new HashMap<>();
 
     // 初始化（查询spring容器中所有的@FlowListener流程监听器并解析，spring自动执行）
     @PostConstruct
@@ -37,7 +37,7 @@ public class FlowListenerHolder {
             // 将执行器放入持有器中
             List<FlowListenerExecutor> flowListenerExecutors = flowListenerExecutorsMap.get(flowListenerExecutor.getFlow());
             if (flowListenerExecutors == null) {
-                flowListenerExecutors = new ArrayList<FlowListenerExecutor>();
+                flowListenerExecutors = new ArrayList<>();
             }
             flowListenerExecutors.add(flowListenerExecutor);
             flowListenerExecutorsMap.put(flowListenerExecutor.getFlow(), flowListenerExecutors);
@@ -52,7 +52,7 @@ public class FlowListenerHolder {
      */
     public List<FlowListenerExecutor> getFlowListenerExecutors(String flow) {
         if (!flowListenerExecutorsMap.containsKey(flow)) {
-            return new ArrayList<FlowListenerExecutor>();
+            return new ArrayList<>();
         }
         return flowListenerExecutorsMap.get(flow);
     }

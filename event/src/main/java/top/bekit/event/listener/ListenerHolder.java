@@ -22,7 +22,7 @@ public class ListenerHolder {
     @Autowired
     private ApplicationContext applicationContext;
     // 监听器执行器Map（key：监听器的类型）
-    private Map<Class, List<ListenerExecutor>> listenerExecutorsMap = new HashMap<Class, List<ListenerExecutor>>();
+    private Map<Class, List<ListenerExecutor>> listenerExecutorsMap = new HashMap<>();
 
     // 初始化（查询spring容器中所有的@Listener监听器并解析，spring自动执行）
     @PostConstruct
@@ -34,7 +34,7 @@ public class ListenerHolder {
             // 将执行器放入持有器中
             List<ListenerExecutor> listenerExecutors = listenerExecutorsMap.get(listenerExecutor.getType());
             if (listenerExecutors == null) {
-                listenerExecutors = new ArrayList<ListenerExecutor>();
+                listenerExecutors = new ArrayList<>();
             }
             listenerExecutors.add(listenerExecutor);
             listenerExecutorsMap.put(listenerExecutor.getType(), listenerExecutors);
@@ -56,7 +56,7 @@ public class ListenerHolder {
      */
     public List<ListenerExecutor> getListenerExecutors(Class type) {
         if (!listenerExecutorsMap.containsKey(type)) {
-            return new ArrayList<ListenerExecutor>();
+            return new ArrayList<>();
         }
         return listenerExecutorsMap.get(type);
     }

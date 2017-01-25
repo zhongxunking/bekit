@@ -26,7 +26,7 @@ public class FlowListenerExecutor {
     // 流程监听器
     private Object flowListener;
     // 监听节点选择事件执行器List
-    private List<ListenMethodExecutor> listenNodeDecideExecutors = new ArrayList<ListenMethodExecutor>();
+    private List<ListenMethodExecutor> listenNodeDecideExecutors = new ArrayList<>();
 
     public FlowListenerExecutor(String flow, Object flowListener) {
         this.flow = flow;

@@ -26,7 +26,7 @@ public class FlowTxHolder {
     @Autowired(required = false)
     private PlatformTransactionManager txManager;
     // 流程事务执行器Map（key：流程事务对应的流程名称）
-    private Map<String, FlowTxExecutor> flowTxExecutorMap = new HashMap<String, FlowTxExecutor>();
+    private Map<String, FlowTxExecutor> flowTxExecutorMap = new HashMap<>();
 
     // 初始化（查询spring容器中所有的@FlowTx流程事务并解析，spring自动执行）
     @PostConstruct
