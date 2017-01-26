@@ -34,6 +34,7 @@
     <modules>
         <module>flow</module>
         <module>event</module>
+        <module>service</module>
     </modules>
 
     <licenses>
