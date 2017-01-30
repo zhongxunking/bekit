@@ -11,6 +11,7 @@ package top.bekit.service.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
+import top.bekit.event.bus.EventBusHolder;
 import top.bekit.service.annotation.service.Service;
 
 import javax.annotation.PostConstruct;
@@ -25,6 +26,8 @@ public class ServiceHolder {
     private ApplicationContext applicationContext;
     @Autowired(required = false)
     private PlatformTransactionManager txManager;
+    @Autowired
+    private EventBusHolder eventBusHolder;
     // 服务执行器Map（key：服务名称）
     private Map<String, ServiceExecutor> serviceExecutorMap = new HashMap<>();
 
@@ -34,7 +37,7 @@ public class ServiceHolder {
         String[] beanNames = applicationContext.getBeanNamesForAnnotation(Service.class);
         for (String beanName : beanNames) {
             // 解析服务
-            ServiceExecutor serviceExecutor = ServiceParser.parseService(applicationContext.getBean(beanName), txManager);
+            ServiceExecutor serviceExecutor = ServiceParser.parseService(applicationContext.getBean(beanName), eventBusHolder, txManager);
             if (serviceExecutorMap.containsKey(serviceExecutor.getServiceName())) {
                 throw new RuntimeException("存在重名的服务：" + serviceExecutor.getServiceName());
             }

@@ -30,7 +30,7 @@ public class ServiceExecutor {
     /**
      * 服务方法注解
      */
-    private static final Class[] SERVICE_METHOD_ANNOTATIONS = {ServiceCheck.class, ServiceExecute.class};
+    public static final Class[] SERVICE_METHOD_ANNOTATIONS = {ServiceCheck.class, ServiceExecute.class};
 
     // 服务名称
     private String serviceName;
