@@ -66,7 +66,7 @@ public class ServiceExecutor {
             }
         } catch (Throwable e) {
             eventPublisher.publish(new ServiceCheckExceptionEvent(serviceName, serviceContext, e));
-            throw e;
+            return;
         }
         // 执行服务执行方法
         if (enableTx) {
@@ -78,15 +78,10 @@ public class ServiceExecutor {
                 txExecutor.commitTx();
             }
         } catch (Throwable e) {
-            try {
-                if (enableTx) {
-                    txExecutor.rollbackTx();
-                }
-            } catch (Throwable throwable) {
-                // 回滚数据库异常
+            if (enableTx) {
+                txExecutor.rollbackTx();
             }
             eventPublisher.publish(new ServiceCheckExceptionEvent(serviceName, serviceContext, e));
-            throw e;
         }
     }
 
