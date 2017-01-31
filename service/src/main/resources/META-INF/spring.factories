@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  top.bekit.service.boot.ServiceEngineAutoConfiguration
