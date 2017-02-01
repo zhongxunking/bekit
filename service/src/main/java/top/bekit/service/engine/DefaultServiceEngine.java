@@ -28,12 +28,14 @@ import javax.annotation.PostConstruct;
 public class DefaultServiceEngine implements ServiceEngine {
     @Autowired
     private ServiceHolder serviceHolder;
+    @Autowired
+    private EventBusHolder eventBusHolder;
     // 服务事件发布器
     private EventPublisher eventPublisher;
 
     // 初始化（创建服务事件发布器，spring自动执行）
     @PostConstruct
-    public void init(EventBusHolder eventBusHolder) {
+    public void init() {
         eventPublisher = new DefaultEventPublisher(eventBusHolder.getEventBus(ServiceListener.class));
     }
 
