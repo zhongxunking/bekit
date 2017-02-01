@@ -8,15 +8,18 @@
  */
 package top.bekit.service.boot;
 
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import top.bekit.event.boot.EventBusAutoConfiguration;
 
 /**
  * 服务引擎自动配置类
  */
 @Configuration
 @ConditionalOnProperty(name = ConfigurationKey.SERVICE_ENABLE_KEY, havingValue = "true")
+@AutoConfigureAfter(EventBusAutoConfiguration.class)
 @Import(ServiceEngineConfiguration.class)
 public class ServiceEngineAutoConfiguration {
     // 服务引擎由ServiceEngineConfiguration进行配置
