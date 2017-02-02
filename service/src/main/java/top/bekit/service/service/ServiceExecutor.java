@@ -14,7 +14,7 @@ import top.bekit.event.EventPublisher;
 import top.bekit.service.annotation.service.ServiceCheck;
 import top.bekit.service.annotation.service.ServiceExecute;
 import top.bekit.service.engine.ServiceContext;
-import top.bekit.service.event.ServiceCheckExceptionEvent;
+import top.bekit.service.event.ServiceExceptionEvent;
 import top.bekit.service.transaction.TxExecutor;
 
 import java.lang.reflect.InvocationTargetException;
@@ -58,42 +58,41 @@ public class ServiceExecutor {
      * @param serviceContext 服务上下文
      */
     public void execute(ServiceContext serviceContext) {
-        // 执行服务校验方法（如果存在）
         try {
+            // 执行服务校验方法（如果存在）
             if (methodExecutorMap.containsKey(ServiceCheck.class)) {
                 methodExecutorMap.get(ServiceCheck.class).execute(service, serviceContext);
             }
+            try {
+                if (enableTx) {
+                    // 开启事务
+                    txExecutor.createTx();
+                }
+                // 执行服务执行方法
+                methodExecutorMap.get(ServiceExecute.class).execute(service, serviceContext);
+                if (enableTx) {
+                    // 提交事务
+                    txExecutor.commitTx();
+                }
+            } catch (Throwable e) {
+                if (e instanceof Error) {
+                    // 对于Error异常往外抛
+                    throw (Error) e;
+                }
+                if (enableTx) {
+                    // 回滚事务
+                    txExecutor.rollbackTx();
+                }
+                // 发布服务执行异常事件
+                eventPublisher.publish(new ServiceExceptionEvent(serviceName, serviceContext, e));
+            }
         } catch (Throwable e) {
             if (e instanceof Error) {
                 // 对于Error异常往外抛
                 throw (Error) e;
-            }
-            // 发布服务校验异常事件
-            eventPublisher.publish(new ServiceCheckExceptionEvent(serviceName, serviceContext, e));
-            return;
-        }
-        // 执行服务执行方法
-        if (enableTx) {
-            // 开启事务
-            txExecutor.createTx();
-        }
-        try {
-            methodExecutorMap.get(ServiceExecute.class).execute(service, serviceContext);
-            if (enableTx) {
-                // 提交事务
-                txExecutor.commitTx();
-            }
-        } catch (Throwable e) {
-            if (e instanceof Error) {
-                // 对于Error异常往外抛
-                throw (Error) e;
-            }
-            if (enableTx) {
-                // 回滚事务
-                txExecutor.rollbackTx();
             }
             // 发布服务执行异常事件
-            eventPublisher.publish(new ServiceCheckExceptionEvent(serviceName, serviceContext, e));
+            eventPublisher.publish(new ServiceExceptionEvent(serviceName, serviceContext, e));
         }
     }
 

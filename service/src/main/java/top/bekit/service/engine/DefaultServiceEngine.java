@@ -16,7 +16,6 @@ import top.bekit.service.ServiceEngine;
 import top.bekit.service.annotation.listener.ServiceListener;
 import top.bekit.service.event.ServiceApplyEvent;
 import top.bekit.service.event.ServiceFinishEvent;
-import top.bekit.service.event.ServiceOtherExceptionEvent;
 import top.bekit.service.service.ServiceExecutor;
 import top.bekit.service.service.ServiceHolder;
 
@@ -50,13 +49,6 @@ public class DefaultServiceEngine implements ServiceEngine {
             eventPublisher.publish(new ServiceApplyEvent(service, serviceContext));
             // 执行服务
             serviceExecutor.execute(serviceContext);
-        } catch (Throwable e) {
-            if (e instanceof Error) {
-                // 对于Error异常往外抛
-                throw (Error) e;
-            }
-            // 发布异常事件
-            eventPublisher.publish(new ServiceOtherExceptionEvent(service, serviceContext, e));
         } finally {
             // 发布服务结束事件
             eventPublisher.publish(new ServiceFinishEvent(service, serviceContext));

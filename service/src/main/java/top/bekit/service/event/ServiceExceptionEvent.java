@@ -11,9 +11,9 @@ package top.bekit.service.event;
 import top.bekit.service.engine.ServiceContext;
 
 /**
- * 服务其他异常事件
+ * 服务异常事件
  */
-public class ServiceOtherExceptionEvent {
+public class ServiceExceptionEvent {
     // 服务名称
     private String serviceName;
     // 服务上下文
@@ -21,7 +21,7 @@ public class ServiceOtherExceptionEvent {
     // 目标异常
     private Throwable targetException;
 
-    public ServiceOtherExceptionEvent(String serviceName, ServiceContext serviceContext, Throwable targetException) {
+    public ServiceExceptionEvent(String serviceName, ServiceContext serviceContext, Throwable targetException) {
         this.serviceName = serviceName;
         this.serviceContext = serviceContext;
         this.targetException = targetException;
