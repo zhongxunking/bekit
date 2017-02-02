@@ -40,7 +40,7 @@ public class DefaultServiceEngine implements ServiceEngine {
     }
 
     @Override
-    public <O, R> R execute(String service, O order, R result) throws Throwable {
+    public <O, R> R execute(String service, O order, R result) {
         // 构建服务上下文
         ServiceContext serviceContext = new ServiceContext(order, result);
         try {
@@ -51,6 +51,10 @@ public class DefaultServiceEngine implements ServiceEngine {
             // 执行服务
             serviceExecutor.execute(serviceContext);
         } catch (Throwable e) {
+            if (e instanceof Error) {
+                // 对于Error异常往外抛
+                throw (Error) e;
+            }
             // 发布异常事件
             eventPublisher.publish(new ServiceOtherExceptionEvent(service, serviceContext, e));
         } finally {
