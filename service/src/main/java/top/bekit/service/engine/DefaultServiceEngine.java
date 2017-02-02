@@ -40,7 +40,7 @@ public class DefaultServiceEngine implements ServiceEngine {
     }
 
     @Override
-    public <T> T execute(String service, Object order, Object result) throws Throwable {
+    public <O, R> R execute(String service, O order, R result) throws Throwable {
         // 构建服务上下文
         ServiceContext serviceContext = new ServiceContext(order, result);
         try {
@@ -57,6 +57,6 @@ public class DefaultServiceEngine implements ServiceEngine {
             // 发布服务结束事件
             eventPublisher.publish(new ServiceFinishEvent(service, serviceContext));
         }
-        return (T) serviceContext.getResult();
+        return (R) serviceContext.getResult();
     }
 }

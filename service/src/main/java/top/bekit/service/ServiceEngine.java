@@ -21,6 +21,6 @@ public interface ServiceEngine {
      * @param result  结果
      * @return 结果（和参数result是同一个对象）
      */
-    <T> T execute(String service, Object order, Object result) throws Throwable;
+    <O, R> R execute(String service, O order, R result) throws Throwable;
 
 }
