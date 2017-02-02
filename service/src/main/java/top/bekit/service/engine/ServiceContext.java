@@ -11,22 +11,22 @@ package top.bekit.service.engine;
 /**
  * 服务上下文
  */
-public class ServiceContext {
+public class ServiceContext<O, R> {
     // 入参
-    private Object order;
+    private O order;
     // 结果
-    private Object result;
+    private R result;
 
-    public ServiceContext(Object order, Object result) {
+    public ServiceContext(O order, R result) {
         this.order = order;
         this.result = result;
     }
 
-    public Object getOrder() {
+    public O getOrder() {
         return order;
     }
 
-    public Object getResult() {
+    public R getResult() {
         return result;
     }
 }
