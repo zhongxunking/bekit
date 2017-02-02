@@ -63,11 +63,11 @@ public class ServiceExecutor {
             if (methodExecutorMap.containsKey(ServiceCheck.class)) {
                 methodExecutorMap.get(ServiceCheck.class).execute(service, serviceContext);
             }
+            if (enableTx) {
+                // 开启事务
+                txExecutor.createTx();
+            }
             try {
-                if (enableTx) {
-                    // 开启事务
-                    txExecutor.createTx();
-                }
                 // 执行服务执行方法
                 methodExecutorMap.get(ServiceExecute.class).execute(service, serviceContext);
                 if (enableTx) {
