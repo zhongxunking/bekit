@@ -13,6 +13,7 @@ import org.springframework.util.ClassUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -87,10 +88,19 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
     }
 
     /**
-     * 获取监听的所有事件类型
+     * 获取指定优先级顺序的监听事件类型
+     *
+     * @param priorityAsc 是否优先级升序（true：升序，false：降序）
      */
-    public Set<Class> getEventTypes() {
-        return listenExecutorMap.keySet();
+    public Set<Class> getEventTypes(boolean priorityAsc) {
+        Set<Class> eventTypes = new HashSet<>();
+        for (Class eventType : listenExecutorMap.keySet()) {
+            ListenExecutor listenExecutor = listenExecutorMap.get(eventType);
+            if (listenExecutor.isPriorityAsc() == priorityAsc) {
+                eventTypes.add(eventType);
+            }
+        }
+        return eventTypes;
     }
 
     @Override
@@ -102,12 +112,15 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
      * 监听执行器
      */
     public static class ListenExecutor {
+        // 是否优先级升序
+        private boolean priorityAsc;
         // 目标方法
         private Method targetMethod;
         // 事件类型
         private Class eventType;
 
-        public ListenExecutor(Method targetMethod, Class eventType) {
+        public ListenExecutor(boolean priorityAsc, Method targetMethod, Class eventType) {
+            this.priorityAsc = priorityAsc;
             this.targetMethod = targetMethod;
             this.eventType = eventType;
         }
@@ -144,6 +157,13 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
          */
         public Class getEventType() {
             return eventType;
+        }
+
+        /**
+         * 是否是优先级升序
+         */
+        public boolean isPriorityAsc() {
+            return priorityAsc;
         }
     }
 }

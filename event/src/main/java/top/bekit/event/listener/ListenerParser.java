@@ -34,8 +34,9 @@ public class ListenerParser {
         // 创建监听器执行器
         ListenerExecutor listenerExecutor = new ListenerExecutor(listener, listenerAnnotation.type(), listenerAnnotation.priority());
         for (Method method : listener.getClass().getDeclaredMethods()) {
-            if (method.isAnnotationPresent(Listen.class)) {
-                ListenExecutor listenExecutor = parseListen(method);
+            Listen listenAnnotation = method.getAnnotation(Listen.class);
+            if (listenAnnotation != null) {
+                ListenExecutor listenExecutor = parseListen(listenAnnotation, method);
                 listenerExecutor.addListenExecutor(listenExecutor);
             }
         }
@@ -45,7 +46,7 @@ public class ListenerParser {
     }
 
     // 解析监听方法
-    private static ListenExecutor parseListen(Method method) {
+    private static ListenExecutor parseListen(Listen listenAnnotation, Method method) {
         // 校验方法类型
         if (!Modifier.isPublic(method.getModifiers())) {
             throw new IllegalArgumentException("监听方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
@@ -60,6 +61,6 @@ public class ListenerParser {
             throw new IllegalArgumentException("监听方法" + ClassUtils.getQualifiedMethodName(method) + "的返回必须是void");
         }
 
-        return new ListenExecutor(method, parameterTypes[0]);
+        return new ListenExecutor(listenAnnotation.priorityAsc(), method, parameterTypes[0]);
     }
 }
