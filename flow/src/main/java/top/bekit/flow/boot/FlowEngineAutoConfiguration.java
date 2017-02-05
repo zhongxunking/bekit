@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Import;
  * 流程引擎自动配置类
  */
 @Configuration
-@ConditionalOnProperty(name = ConfigurationKey.FLOW_ENABLE)
+@ConditionalOnProperty(name = ConfigurationKey.FLOW_ENABLE, havingValue = "true")
 @Import(FlowEngineConfiguration.class)
 public class FlowEngineAutoConfiguration {
     // 流程引擎由FlowEngineConfiguration进行配置
