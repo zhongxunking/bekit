@@ -164,7 +164,7 @@
 #### 2. 定义监听器
 
         // 用户监听器
-        @BizListener(priority = 1)  // 业务事件监听器注解（这种类型的监听器只能监听你自己发布的事件），属性priority表示优先级（值越小，优先级越高）
+        @BizListener(priority = 1)  // 业务事件监听器注解（这种类型的监听器只能监听你自己发布的事件），属性priority表示优先级（具体执行顺序需要结合@Listen注解的priorityAsc属性共同决定）
         public class UserListener {
             @Listen // 监听注解
             public void listenAddUser(AddUserEvent event) {
