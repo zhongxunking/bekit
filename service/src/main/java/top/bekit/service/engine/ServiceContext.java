@@ -8,6 +8,9 @@
  */
 package top.bekit.service.engine;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 服务上下文
  */
@@ -16,17 +19,39 @@ public class ServiceContext<O, R> {
     private O order;
     // 结果
     private R result;
+    // 附件（可往里面设值，可用于@ServiceCheck和@ServiceExecute之间通信）
+    private Map<Object, Object> attachment = new HashMap<>();
 
     public ServiceContext(O order, R result) {
         this.order = order;
         this.result = result;
     }
 
+    /**
+     * 获取order
+     */
     public O getOrder() {
         return order;
     }
 
+    /**
+     * 获取result
+     */
     public R getResult() {
         return result;
+    }
+
+    /**
+     * 获取附件属性
+     */
+    public <T> T getAttachmentAttribute(Object key) {
+        return (T) attachment.get(key);
+    }
+
+    /**
+     * 设值附件属性
+     */
+    public void setAttachmentAttribute(Object key, Object value) {
+        attachment.put(key, value);
     }
 }
