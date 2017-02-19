@@ -21,7 +21,7 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Node(autoExecute = false, commitTransaction = true)
+@Node(autoExecute = false, commitTx = true)
 public @interface WaitNode {
 
     /**

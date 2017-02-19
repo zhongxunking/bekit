@@ -70,7 +70,7 @@ public class FlowExecutor {
                     // 发送节点选择事件
                     flowEventListener.listenNodeDecide(flowName, nextNode, targetContext);
                     // 判断是否提交事务
-                    if (enableFlowTx && nodeExecutor.isCommitTransaction()) {
+                    if (enableFlowTx && nodeExecutor.isCommitTx()) {
                         afterStep();
                         // 获取即将执行的节点（防止事务提交后目标对象被其他线程抢占被执行到其他节点，此处就是更新到最新节点）
                         nextNode = beforeStep(targetContext);
@@ -248,15 +248,15 @@ public class FlowExecutor {
         // 是否自动执行本节点
         private boolean autoExecute;
         // 本节点执行完后是否提交事务
-        private boolean commitTransaction;
+        private boolean commitTx;
         // 下个节点选择执行器
         private NextNodeDecideExecutor nextNodeDecideExecutor;
 
-        public NodeExecutor(String nodeName, ProcessorExecutor processorExecutor, boolean autoExecute, boolean commitTransaction) {
+        public NodeExecutor(String nodeName, ProcessorExecutor processorExecutor, boolean autoExecute, boolean commitTx) {
             this.nodeName = nodeName;
             this.processorExecutor = processorExecutor;
             this.autoExecute = autoExecute;
-            this.commitTransaction = commitTransaction;
+            this.commitTx = commitTx;
         }
 
         /**
@@ -297,8 +297,8 @@ public class FlowExecutor {
         /**
          * 本节点执行完后是否提交事务
          */
-        public boolean isCommitTransaction() {
-            return commitTransaction;
+        public boolean isCommitTx() {
+            return commitTx;
         }
 
         /**

@@ -37,6 +37,6 @@ public @interface Node {
     /**
      * 本节点实行完后是否提交事务（默认不提交）
      */
-    boolean commitTransaction() default false;
+    boolean commitTx() default false;
 
 }

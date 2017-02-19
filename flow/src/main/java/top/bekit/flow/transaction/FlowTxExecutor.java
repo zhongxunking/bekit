@@ -9,10 +9,8 @@
 package top.bekit.flow.transaction;
 
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.util.ClassUtils;
+import top.bekit.common.transaction.TxExecutor;
 import top.bekit.flow.annotation.transaction.InsertTarget;
 import top.bekit.flow.annotation.transaction.LockTarget;
 import top.bekit.flow.engine.TargetContext;
@@ -26,13 +24,11 @@ import java.util.Map;
 /**
  * 流程事务执行器
  */
-public class FlowTxExecutor {
+public class FlowTxExecutor extends TxExecutor {
     /**
      * 流程事务方法注解
      */
     public static final Class[] FLOW_TX_METHOD_ANNOTATIONS = {LockTarget.class, InsertTarget.class};
-    // 流程事务定义（传播行为是REQUIRES_NEW，即每次都开启一个新事务）
-    private static final TransactionDefinition FLOW_TX_DEFINITION = new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 
     // 对应的流程名称
     private String flow;
@@ -40,53 +36,11 @@ public class FlowTxExecutor {
     private Object flowTx;
     // 流程事务方法执行器Map（key：流程事务方法注解的Class）
     private Map<Class, FlowTxMethodExecutor> flowTxMethodExecutorMap = new HashMap<>();
-    // 事务管理器
-    private PlatformTransactionManager txManager;
-    // 事务持有器
-    private ThreadLocal<TransactionStatus> txStatusHolder = new ThreadLocal<>();
 
     public FlowTxExecutor(String flow, Object flowTx, PlatformTransactionManager txManager) {
+        super(txManager);
         this.flow = flow;
         this.flowTx = flowTx;
-        this.txManager = txManager;
-    }
-
-    /**
-     * 创建事务
-     *
-     * @throws IllegalStateException 如果已存在事务
-     */
-    public void createTx() {
-        if (txStatusHolder.get() != null) {
-            throw new IllegalStateException("流程" + flow + "事务已存在，不能同时创建多个事务");
-        }
-        txStatusHolder.set(txManager.getTransaction(FLOW_TX_DEFINITION));
-    }
-
-    /**
-     * 提交事务
-     *
-     * @throws IllegalStateException 如果不存在事务
-     */
-    public void commitTx() {
-        if (txStatusHolder.get() == null) {
-            throw new IllegalStateException("流程" + flow + "事务不存在，无法提交");
-        }
-        txManager.commit(txStatusHolder.get());
-        txStatusHolder.remove();
-    }
-
-    /**
-     * 回滚事务
-     *
-     * @throws IllegalStateException 如果不存在事务
-     */
-    public void rollbackTx() {
-        if (txStatusHolder.get() == null) {
-            throw new IllegalStateException("流程" + flow + "事务不存在，无法回滚");
-        }
-        txManager.rollback(txStatusHolder.get());
-        txStatusHolder.remove();
     }
 
     /**
@@ -154,8 +108,10 @@ public class FlowTxExecutor {
      *
      * @throws IllegalStateException 如果校验不通过
      */
+    @Override
     public void validate() {
-        if (flow == null || flowTx == null || txManager == null) {
+        super.validate();
+        if (flow == null || flowTx == null) {
             throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTx.getClass()) + "内部要素不全");
         }
         if (!flowTxMethodExecutorMap.containsKey(LockTarget.class)) {

@@ -6,7 +6,7 @@
  * 修订记录:
  * @author 钟勋 2016-12-16 01:14 创建
  */
-package top.bekit.service.transaction;
+package top.bekit.common.transaction;
 
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -36,7 +36,7 @@ public class TxExecutor {
      */
     public void createTx() {
         if (txStatusHolder.get() != null) {
-            throw new IllegalStateException("事务已存在，不能同时创建多个事务");
+            throw new IllegalStateException("本线程事务已存在，不能同时创建多个事务");
         }
         txStatusHolder.set(txManager.getTransaction(TX_DEFINITION));
     }
@@ -48,7 +48,7 @@ public class TxExecutor {
      */
     public void commitTx() {
         if (txStatusHolder.get() == null) {
-            throw new IllegalStateException("事务不存在，无法提交");
+            throw new IllegalStateException("事务不存在，无法提交事务");
         }
         txManager.commit(txStatusHolder.get());
         txStatusHolder.remove();
@@ -61,10 +61,20 @@ public class TxExecutor {
      */
     public void rollbackTx() {
         if (txStatusHolder.get() == null) {
-            throw new IllegalStateException("事务不存在，无法回滚");
+            throw new IllegalStateException("事务不存在，无法回滚事务");
         }
         txManager.rollback(txStatusHolder.get());
         txStatusHolder.remove();
     }
 
+    /**
+     * 校验事务执行器是否有效
+     *
+     * @throws IllegalStateException 如果校验不通过
+     */
+    public void validate() {
+        if (txManager == null) {
+            throw new IllegalStateException("事务执行器内部要素不全");
+        }
+    }
 }

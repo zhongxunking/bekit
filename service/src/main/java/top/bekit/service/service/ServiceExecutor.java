@@ -10,12 +10,12 @@ package top.bekit.service.service;
 
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
+import top.bekit.common.transaction.TxExecutor;
 import top.bekit.event.EventPublisher;
 import top.bekit.service.annotation.service.ServiceCheck;
 import top.bekit.service.annotation.service.ServiceExecute;
 import top.bekit.service.engine.ServiceContext;
 import top.bekit.service.event.ServiceExceptionEvent;
-import top.bekit.service.transaction.TxExecutor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -127,6 +127,7 @@ public class ServiceExecutor {
             if (txExecutor == null) {
                 throw new IllegalStateException("服务" + serviceName + "的enableTx属性为开启状态，但未设置事务执行器");
             }
+            txExecutor.validate();
         } else {
             if (txExecutor != null) {
                 throw new IllegalStateException("服务" + serviceName + "的enableTx属性为关闭状态，但设置了事务执行器");

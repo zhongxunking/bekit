@@ -11,4 +11,12 @@
 
     <artifactId>common</artifactId>
     <name>common</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>

@@ -19,7 +19,7 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Node(commitTransaction = true)
+@Node(commitTx = true)
 public @interface StateNode {
 
     /**
