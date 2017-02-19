@@ -16,13 +16,13 @@ import java.util.Map;
 /**
  * 目标上下文
  */
-public class TargetContext {
+public class TargetContext<T> {
     // 目标实体
-    private Object target;
+    private T target;
     // 附件（一般存的是target不包含的信息，但在流程执行中又需要用到的信息）
     private Map<Object, Object> attachment;
 
-    public TargetContext(Object target, Map<Object, Object> attachment) {
+    public TargetContext(T target, Map<Object, Object> attachment) {
         Assert.notNull(target, "目标对象不能为null");
         this.target = target;
         this.attachment = attachment;
@@ -34,8 +34,8 @@ public class TargetContext {
     /**
      * 获取目标实体
      */
-    public <T> T getTarget() {
-        return (T) target;
+    public T getTarget() {
+        return target;
     }
 
     /**
@@ -43,7 +43,7 @@ public class TargetContext {
      *
      * @param target 目标对象（会替换掉目标上下文中原有的目标对象）
      */
-    public void refreshTarget(Object target) {
+    public void refreshTarget(T target) {
         Assert.notNull(target, "目标对象不能为null");
         this.target = target;
     }
@@ -51,8 +51,8 @@ public class TargetContext {
     /**
      * 获取附件属性
      */
-    public <T> T getAttachmentAttribute(Object key) {
-        return (T) attachment.get(key);
+    public <V> V getAttachmentAttribute(Object key) {
+        return (V) attachment.get(key);
     }
 
     /**

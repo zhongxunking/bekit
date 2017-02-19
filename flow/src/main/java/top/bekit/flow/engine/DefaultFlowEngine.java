@@ -27,14 +27,14 @@ public class DefaultFlowEngine implements FlowEngine {
     private FlowTxHolder flowTxHolder;
 
     @Override
-    public <T> T start(String flow, Object target) {
+    public <T> T start(String flow, T target) {
         return start(flow, target, null);
     }
 
     @Override
-    public <T> T start(String flow, Object target, Map<Object, Object> attachment) {
+    public <T> T start(String flow, T target, Map<Object, Object> attachment) {
         // 构造目标上下文
-        TargetContext targetContext = new TargetContext(target, attachment);
+        TargetContext<T> targetContext = new TargetContext(target, attachment);
         // 执行流程
         executeFlow(flow, targetContext);
 
@@ -42,9 +42,9 @@ public class DefaultFlowEngine implements FlowEngine {
     }
 
     @Override
-    public <T> T insertTargetAndStart(String flow, Object target, Map<Object, Object> attachment) {
+    public <T> T insertTargetAndStart(String flow, T target, Map<Object, Object> attachment) {
         // 构造目标上下文
-        TargetContext targetContext = new TargetContext(target, attachment);
+        TargetContext<T> targetContext = new TargetContext(target, attachment);
         try {
             //以新事务插入目标对象到数据库并提交
             flowTxHolder.getRequiredFlowTxExecutor(flow).insertTarget(targetContext);

@@ -25,7 +25,7 @@ public interface FlowEngine {
      * @throws UndeclaredThrowableException 执行过程中发生任何异常都会往外抛，但如果是非运行时异常则会包装成UndeclaredThrowableException异常，
      *                                      目的是让客户代码不用每次调用时都需要catch
      */
-    <T> T start(String flow, Object target);
+    <T> T start(String flow, T target);
 
     /**
      * 执行流程
@@ -37,7 +37,7 @@ public interface FlowEngine {
      * @throws UndeclaredThrowableException 执行过程中发生任何异常都会往外抛，但如果是非运行时异常则会包装成UndeclaredThrowableException异常，
      *                                      目的是让客户代码不用每次调用时都需要catch
      */
-    <T> T start(String flow, Object target, Map<Object, Object> attachment);
+    <T> T start(String flow, T target, Map<Object, Object> attachment);
 
     /**
      * 以新事务插入目标对象到数据库并提交，然后执行流程
@@ -49,6 +49,6 @@ public interface FlowEngine {
      * @throws UndeclaredThrowableException 执行过程中发生任何异常都会往外抛，但如果是非运行时异常则会包装成UndeclaredThrowableException异常，
      *                                      目的是让客户代码不用每次调用时都需要catch
      */
-    <T> T insertTargetAndStart(String flow, Object target, Map<Object, Object> attachment);
+    <T> T insertTargetAndStart(String flow, T target, Map<Object, Object> attachment);
 
 }
