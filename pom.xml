@@ -32,8 +32,9 @@
     </dependencyManagement>
 
     <modules>
-        <module>flow</module>
+        <module>common</module>
         <module>event</module>
+        <module>flow</module>
         <module>service</module>
     </modules>
 
