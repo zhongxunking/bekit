@@ -324,31 +324,31 @@
         public class Node1Processor {
             
             @Before  // 业务前置处理，可选    
-            public void before(TargetContext targetContext) { // TargetContext叫做目标上下文，可以通过他获取你传给流程引擎的目标对象（targetContext.getTarget()）
+            public void before(TargetContext<Trade> targetContext) { // TargetContext叫做目标上下文，可以通过他获取你传给流程引擎的目标对象（targetContext.getTarget()）
                 // 最先执行
                 // 可以做一些检查之类的操作
             }
         
             @Execute  // 业务处理，必选
-            public String execute(TargetContext targetContext) {
+            public String execute(TargetContext<Trade> targetContext) {
                 // 在@before类型方法之后执行
                 // 这个是处理器的主体方法，一般就是真正干活的方法，它的返回值会成为整个处理器的返回值，然后传给流程节点中的下个节点选择方法
                 return "success";
             }
         
             @After  // 业务后置处理，可选
-            public void after(TargetContext targetContext) {
+            public void after(TargetContext<Trade> targetContext) {
                 // 在@Execute类型方法之后执行
                 // 可以做一些结果校验之类的
             }
         
             @End    // 业务结束处理，可选
-            public void end(TargetContext targetContext) {
+            public void end(TargetContext<Trade> targetContext) {
                 // 最后执行（即使发生异常也会执行）
             }
         
             @Error   // 异常处理，可选
-            public void error(TargetContext targetContext) {
+            public void error(TargetContext<Trade> targetContext) {
                 // 当@before、@execute、@after类型方法任何一个发生异常后会执行
             }
         }
@@ -371,7 +371,7 @@
         public class DenoFlowListener {
         
             @ListenNodeDecide(nodeExpression = "node1")     // 监听节点选择事件，nodeExpression是需要被监听节点的正则表达式
-            public void listenNode1(String node, TargetContext targetContext) { // node是被选择的节点名称，targetContext是目标上下文
+            public void listenNode1(String node, TargetContext<Trade> targetContext) { // node是被选择的节点名称，targetContext是目标上下文
                 // 监听流程节点中的节点选择方法被执行后的返回值
                 // 一般监听节点选择事件的目的是用来更新目标对象的状态，
                 // 因为当节点选择事件发生时，就表明已经执行完当前节点，即将进入到下一个节点，
@@ -381,7 +381,7 @@
             }
         
             @ListenNodeDecide(nodeExpression = ".*")     // 监听节点选择事件，正则表达式“.*”表示监听所有的节点选择事件
-            public void listenAllNode(String node, TargetContext targetContext) {
+            public void listenAllNode(String node, TargetContext<Trade> targetContext) {
                 // 本监听方法在所有节点被选择是都会执行
             }
         }
@@ -400,7 +400,7 @@
         public class DemoFlowTx {
         
             @LockTarget     // 锁目标对象，必选
-            public Trade lockTarget(TargetContext targetContext) { // 目标上下文
+            public Trade lockTarget(TargetContext<Trade> targetContext) { // 目标上下文
                 // 因为在并发情况下需要锁住目标对象下才能保证不会出错，
                 // 流程引擎知道什么时候应该锁目标对象，但是流程引擎并不知道怎么锁住目标对象（不知道数据库表等信息）
                 // 所以需要你在这儿指定锁目标对象的具体代码
@@ -410,7 +410,7 @@
             }
         
             @InsertTarget   // 插入目标对象，可选
-            public Trade insertTarget(TargetContext targetContext) {
+            public Trade insertTarget(TargetContext<Trade> targetContext) {
                 // 插入目标对象到数据库具体代码
                 // 必须返回插入后的目标对象，流程引擎需要将它更新到目标上下文
             }
