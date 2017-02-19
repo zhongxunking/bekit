@@ -281,7 +281,7 @@
             }
             
             @TargetMapping      // 目标对象映射
-            public String targetMapping(Object target){ // 入参target是你传给流程引擎的那个目标对象
+            public String targetMapping(Trade target){ // 入参target是你传给流程引擎的那个目标对象
                 // 将目标对象（比如订单）映射到需要执行的节点
                 
                 // 流程引擎并不知道当前这个目标对象应该从哪个节点开始执行（是从开始节点，还是从node1，还是从node2等等）。
