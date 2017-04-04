@@ -8,15 +8,18 @@
  */
 package top.bekit.flow.boot;
 
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import top.bekit.event.boot.EventBusAutoConfiguration;
 
 /**
  * 流程引擎自动配置类
  */
 @Configuration
 @ConditionalOnProperty(name = ConfigurationKey.FLOW_ENABLE, havingValue = "true")
+@AutoConfigureAfter(EventBusAutoConfiguration.class)
 @Import(FlowEngineConfiguration.class)
 public class FlowEngineAutoConfiguration {
     // 流程引擎由FlowEngineConfiguration进行配置

@@ -10,11 +10,13 @@ package top.bekit.flow.boot;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import top.bekit.event.boot.EventBusConfiguration;
 import top.bekit.flow.FlowEngine;
 import top.bekit.flow.engine.DefaultFlowEngine;
 import top.bekit.flow.flow.FlowHolder;
-import top.bekit.flow.listener.FlowEventListener;
-import top.bekit.flow.listener.FlowListenerHolder;
+import top.bekit.flow.listener.DefaultFlowEventListener;
+import top.bekit.flow.listener.TheFlowListenerHolder;
 import top.bekit.flow.processor.ProcessorHolder;
 import top.bekit.flow.transaction.FlowTxHolder;
 
@@ -23,6 +25,7 @@ import top.bekit.flow.transaction.FlowTxHolder;
  * （非spring-boot项目需手动引入本配置类完成流程引擎配置）
  */
 @Configuration
+@Import(EventBusConfiguration.class)
 public class FlowEngineConfiguration {
 
     // 流程引擎
@@ -49,15 +52,16 @@ public class FlowEngineConfiguration {
         return new FlowTxHolder();
     }
 
-    // 流程事件监听器
+    // 默认的流程事件监听器
     @Bean
-    public FlowEventListener flowEventListener() {
-        return new FlowEventListener();
+    public DefaultFlowEventListener defaultFlowEventListener() {
+        return new DefaultFlowEventListener();
     }
 
-    // 流程监听器持有器
+    // 特定流程监听器持有期
     @Bean
-    public FlowListenerHolder flowListenerHolder() {
-        return new FlowListenerHolder();
+    public TheFlowListenerHolder theFlowListenerHolder() {
+        return new TheFlowListenerHolder();
     }
+
 }

@@ -12,16 +12,10 @@ import java.lang.annotation.*;
 
 /**
  * 监听节点选择事件
- * （监听节点选择事件主要是用来更新目标对象的状态，实现更新目标对象状态和流程定义分离）
+ * （配合TheFlowListener一起使用；流程执行过程中，当每次发生节点选择事件时都会调用注入本注解对应的方法，主要是用来更新目标对象的状态，实现更新目标对象状态和流程定义分离）
  */
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ListenNodeDecide {
-
-    /**
-     * 匹配被选择节点名称的表达式（正则表达式）
-     */
-    String nodeExpression();
-
 }

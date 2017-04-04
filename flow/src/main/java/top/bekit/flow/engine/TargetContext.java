@@ -17,7 +17,7 @@ import java.util.Map;
  * 目标上下文
  */
 public class TargetContext<T> {
-    // 目标实体
+    // 目标对象
     private T target;
     // 附件（一般存的是target不包含的信息，但在流程执行中又需要用到的信息）
     private Map<Object, Object> attachment;
@@ -32,7 +32,7 @@ public class TargetContext<T> {
     }
 
     /**
-     * 获取目标实体
+     * 获取目标对象
      */
     public T getTarget() {
         return target;

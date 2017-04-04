@@ -11,11 +11,13 @@ package top.bekit.flow.flow;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ClassUtils;
+import top.bekit.event.bus.EventBusHolder;
+import top.bekit.event.publisher.DefaultEventPublisher;
 import top.bekit.flow.annotation.flow.*;
+import top.bekit.flow.annotation.listener.FlowListener;
 import top.bekit.flow.flow.FlowExecutor.NodeExecutor;
 import top.bekit.flow.flow.FlowExecutor.NodeExecutor.NextNodeDecideExecutor;
 import top.bekit.flow.flow.FlowExecutor.TargetMappingExecutor;
-import top.bekit.flow.listener.FlowEventListener;
 import top.bekit.flow.processor.ProcessorExecutor;
 import top.bekit.flow.processor.ProcessorHolder;
 import top.bekit.flow.transaction.FlowTxHolder;
@@ -29,15 +31,13 @@ import java.lang.reflect.Modifier;
 public class FlowParser {
 
     /**
-     * 解析流程
-     *
-     * @param flow              流程
-     * @param processorHolder   处理器持有器
-     * @param flowTxHolder      流程事务持有器
-     * @param flowEventListener 流程事件监听器
+     * @param flow            流程
+     * @param processorHolder 处理器持有器
+     * @param flowTxHolder    流程事务持有器
+     * @param eventBusHolder  事件总线持有器
      * @return 流程执行器
      */
-    public static FlowExecutor parseFlow(Object flow, ProcessorHolder processorHolder, FlowTxHolder flowTxHolder, FlowEventListener flowEventListener) {
+    public static FlowExecutor parseFlow(Object flow, ProcessorHolder processorHolder, FlowTxHolder flowTxHolder, EventBusHolder eventBusHolder) {
         Flow flowAnnotation = flow.getClass().getAnnotation(Flow.class);
         // 获取流程名称
         String flowName = flowAnnotation.name();
@@ -45,11 +45,10 @@ public class FlowParser {
             flowName = ClassUtils.getShortNameAsProperty(flow.getClass());
         }
         // 新建流程执行器
-        FlowExecutor flowExecutor = new FlowExecutor(flowName, flowAnnotation.enableFlowTx(), flow);
+        FlowExecutor flowExecutor = new FlowExecutor(flowName, flowAnnotation.enableFlowTx(), flow, new DefaultEventPublisher(eventBusHolder.getEventBus(FlowListener.class)));
         if (flowAnnotation.enableFlowTx()) {
             flowExecutor.setFlowTxExecutor(flowTxHolder.getRequiredFlowTxExecutor(flowName));
         }
-        flowExecutor.setFlowEventListener(flowEventListener);
         for (Method method : flow.getClass().getDeclaredMethods()) {
             // 此处得到的@Node是已经经过@AliasFor属性别名进行属性同步后的结果
             Node nodeAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, Node.class);

@@ -9,8 +9,10 @@
 package top.bekit.flow.flow;
 
 import org.apache.commons.lang3.StringUtils;
+import top.bekit.event.EventPublisher;
 import top.bekit.flow.engine.TargetContext;
-import top.bekit.flow.listener.FlowEventListener;
+import top.bekit.flow.event.FlowExceptionEvent;
+import top.bekit.flow.event.NodeDecideEvent;
 import top.bekit.flow.processor.ProcessorExecutor;
 import top.bekit.flow.transaction.FlowTxExecutor;
 
@@ -39,13 +41,14 @@ public class FlowExecutor {
     private TargetMappingExecutor mappingExecutor;
     // 流程事务执行器
     private FlowTxExecutor flowTxExecutor;
-    // 流程事件监听器
-    private FlowEventListener flowEventListener;
+    // 事件发布器
+    private EventPublisher eventPublisher;
 
-    public FlowExecutor(String flowName, boolean enableFlowTx, Object flow) {
+    public FlowExecutor(String flowName, boolean enableFlowTx, Object flow, EventPublisher eventPublisher) {
         this.flowName = flowName;
         this.enableFlowTx = enableFlowTx;
         this.flow = flow;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -68,7 +71,7 @@ public class FlowExecutor {
                         throw new RuntimeException("流程" + flowName + "不存在下一个节点" + nextNode);
                     }
                     // 发送节点选择事件
-                    flowEventListener.listenNodeDecide(flowName, nextNode, targetContext);
+                    eventPublisher.publish(new NodeDecideEvent(flowName, nextNode, targetContext));
                     // 判断是否提交事务
                     if (enableFlowTx && nodeExecutor.isCommitTx()) {
                         afterStep();
@@ -81,7 +84,7 @@ public class FlowExecutor {
             }
             afterStep();
         } catch (Throwable e) {
-            afterThrowing();
+            afterThrowing(e, targetContext);
             throw e;
         }
     }
@@ -107,11 +110,12 @@ public class FlowExecutor {
     }
 
     // 在发生异常后执行
-    private void afterThrowing() {
+    private void afterThrowing(Throwable throwable, TargetContext targetContext) {
         if (enableFlowTx) {
             // 回滚事务
             flowTxExecutor.rollbackTx();
         }
+        eventPublisher.publish(new FlowExceptionEvent(flowName, throwable, targetContext));
     }
 
     // 目标对象映射到节点
@@ -192,25 +196,12 @@ public class FlowExecutor {
     }
 
     /**
-     * 设置流程事件监听器
-     *
-     * @param flowEventListener 流程事件监听器
-     * @throws IllegalArgumentException 如果流程事件监听器已经被设置
-     */
-    public void setFlowEventListener(FlowEventListener flowEventListener) {
-        if (this.flowEventListener != null) {
-            throw new IllegalStateException("流程" + flowName + "的流程时间监听器已被设置，不能重复设置");
-        }
-        this.flowEventListener = flowEventListener;
-    }
-
-    /**
      * 校验流程执行器是否有效
      *
      * @throws IllegalStateException 如果校验不通过
      */
     public void validate() {
-        if (flowName == null || flow == null || flowEventListener == null) {
+        if (flowName == null || flow == null || eventPublisher == null) {
             throw new IllegalStateException("流程" + flowName + "内部要素不全");
         }
         if (startNode == null || endNode == null) {

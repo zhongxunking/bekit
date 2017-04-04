@@ -10,8 +10,8 @@ package top.bekit.flow.flow;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import top.bekit.event.bus.EventBusHolder;
 import top.bekit.flow.annotation.flow.Flow;
-import top.bekit.flow.listener.FlowEventListener;
 import top.bekit.flow.processor.ProcessorHolder;
 import top.bekit.flow.transaction.FlowTxHolder;
 
@@ -30,7 +30,7 @@ public class FlowHolder {
     @Autowired
     private FlowTxHolder flowTxHolder;
     @Autowired
-    private FlowEventListener flowEventListener;
+    private EventBusHolder eventBusHolder;
     // 流程执行器Map（key：流程名称）
     private Map<String, FlowExecutor> flowExecutorMap = new HashMap<>();
 
@@ -40,7 +40,7 @@ public class FlowHolder {
         String[] beanNames = applicationContext.getBeanNamesForAnnotation(Flow.class);
         for (String beanName : beanNames) {
             // 解析流程
-            FlowExecutor flowExecutor = FlowParser.parseFlow(applicationContext.getBean(beanName), processorHolder, flowTxHolder, flowEventListener);
+            FlowExecutor flowExecutor = FlowParser.parseFlow(applicationContext.getBean(beanName), processorHolder, flowTxHolder, eventBusHolder);
             if (flowExecutorMap.containsKey(flowExecutor.getFlowName())) {
                 throw new RuntimeException("存在重名的流程" + flowExecutor.getFlowName());
             }
