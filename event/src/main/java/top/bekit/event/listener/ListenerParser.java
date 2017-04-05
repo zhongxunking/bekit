@@ -61,6 +61,6 @@ public class ListenerParser {
             throw new IllegalArgumentException("监听方法" + ClassUtils.getQualifiedMethodName(method) + "的返回必须是void");
         }
 
-        return new ListenExecutor(listenAnnotation.priorityAsc(), method, parameterTypes[0]);
+        return new ListenExecutor(listenAnnotation.priorityAsc(), method);
     }
 }

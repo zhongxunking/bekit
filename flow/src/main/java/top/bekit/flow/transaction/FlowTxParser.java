@@ -56,10 +56,10 @@ public class FlowTxParser {
         // 校验入参
         Class[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length != 1) {
-            throw new IllegalArgumentException("流程事务方法" + ClassUtils.getQualifiedMethodName(method) + "的入参只能有一个");
+            throw new IllegalArgumentException("流程事务方法" + ClassUtils.getQualifiedMethodName(method) + "的入参必须是（TargetContext）");
         }
         if (parameterTypes[0] != TargetContext.class) {
-            throw new IllegalArgumentException("流程事务方法" + ClassUtils.getQualifiedMethodName(method) + "的入参只能是TargetContext类型");
+            throw new IllegalArgumentException("流程事务方法" + ClassUtils.getQualifiedMethodName(method) + "的入参必须是（TargetContext）");
         }
         // 校验返回参数
         if (method.getReturnType() == void.class) {

@@ -9,11 +9,11 @@
 package top.bekit.flow.processor;
 
 import org.springframework.util.ClassUtils;
+import top.bekit.common.method.MethodExecutor;
 import top.bekit.flow.annotation.processor.*;
 import top.bekit.flow.annotation.processor.Error;
 import top.bekit.flow.engine.TargetContext;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -126,15 +126,10 @@ public class ProcessorExecutor {
     /**
      * 处理器方法执行器
      */
-    public static class ProcessorMethodExecutor {
-        // 目标方法
-        private Method targetMethod;
-        // 该方法是否有参数（有参数的话也仅支持一个TargetContext类型的参数）
-        private boolean hasParameter;
+    public static class ProcessorMethodExecutor extends MethodExecutor {
 
-        public ProcessorMethodExecutor(Method targetMethod, boolean hasParameter) {
-            this.targetMethod = targetMethod;
-            this.hasParameter = hasParameter;
+        public ProcessorMethodExecutor(Method targetMethod) {
+            super(targetMethod);
         }
 
         /**
@@ -145,23 +140,7 @@ public class ProcessorExecutor {
          * @throws Throwable 执行过程中发生任何异常都会往外抛
          */
         public Object execute(Object processor, TargetContext targetContext) throws Throwable {
-            try {
-                if (hasParameter) {
-                    return targetMethod.invoke(processor, targetContext);
-                } else {
-                    return targetMethod.invoke(processor);
-                }
-            } catch (InvocationTargetException e) {
-                // 抛出原始异常
-                throw e.getTargetException();
-            }
-        }
-
-        /**
-         * 获取返回类型
-         */
-        public Class getReturnType() {
-            return targetMethod.getReturnType();
+            return execute(processor, new Object[]{targetContext});
         }
     }
 }

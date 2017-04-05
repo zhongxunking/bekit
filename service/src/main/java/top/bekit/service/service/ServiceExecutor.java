@@ -10,6 +10,7 @@ package top.bekit.service.service;
 
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
+import top.bekit.common.method.MethodExecutor;
 import top.bekit.common.transaction.TxExecutor;
 import top.bekit.event.EventPublisher;
 import top.bekit.service.annotation.service.ServiceCheck;
@@ -17,7 +18,6 @@ import top.bekit.service.annotation.service.ServiceExecute;
 import top.bekit.service.engine.ServiceContext;
 import top.bekit.service.event.ServiceExceptionEvent;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -163,12 +163,10 @@ public class ServiceExecutor {
     /**
      * 服务方法执行器
      */
-    public static class ServiceMethodExecutor {
-        // 目标方法
-        private Method targetMethod;
+    public static class ServiceMethodExecutor extends MethodExecutor {
 
         public ServiceMethodExecutor(Method targetMethod) {
-            this.targetMethod = targetMethod;
+            super(targetMethod);
         }
 
         /**
@@ -179,11 +177,7 @@ public class ServiceExecutor {
          * @throws Throwable 执行过程中发生任何异常都会往外抛
          */
         public void execute(Object service, ServiceContext serviceContext) throws Throwable {
-            try {
-                targetMethod.invoke(service, serviceContext);
-            } catch (InvocationTargetException e) {
-                throw e.getTargetException();
-            }
+            execute(service, new Object[]{serviceContext});
         }
     }
 }

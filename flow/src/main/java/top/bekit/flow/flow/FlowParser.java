@@ -102,20 +102,16 @@ public class FlowParser {
         if (!Modifier.isPublic(method.getModifiers())) {
             throw new IllegalArgumentException("下个节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
         }
-        boolean hasParameter;
         // 判断是否有入参+校验入参类型
         Class[] parameterTypes = method.getParameterTypes();
-        if (parameterTypes.length == 0) {
-            hasParameter = false;
-        } else if (parameterTypes.length == 1) {
+        if (parameterTypes.length == 1) {
             if (processorExecutor == null) {
                 throw new IllegalArgumentException("下个节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "不能有入参，因为这个节点没有处理器");
             }
             if (!parameterTypes[0].isAssignableFrom(processorExecutor.getReturnType())) {
                 throw new IllegalArgumentException("下个节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "的入参类型必须能被其处理器返回类型赋值");
             }
-            hasParameter = true;
-        } else {
+        } else if (parameterTypes.length != 0) {
             throw new IllegalArgumentException("下个节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "最多只能有一个入参");
         }
         // 校验返回类型
@@ -129,7 +125,7 @@ public class FlowParser {
             }
         }
 
-        return new NextNodeDecideExecutor(method, hasParameter);
+        return new NextNodeDecideExecutor(method);
     }
 
     // 解析目标对象映射方法

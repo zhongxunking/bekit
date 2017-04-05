@@ -72,7 +72,7 @@ public class ServiceParser {
         // 校验入参
         Class[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length != 1 || parameterTypes[0] != ServiceContext.class) {
-            throw new IllegalArgumentException("服务方法" + ClassUtils.getQualifiedMethodName(method) + "的入参必须是一位，且必须是ServiceContext类型");
+            throw new IllegalArgumentException("服务方法" + ClassUtils.getQualifiedMethodName(method) + "的入参必须是（ServiceContext）");
         }
         // 校验返回类型
         if (method.getReturnType() != void.class) {

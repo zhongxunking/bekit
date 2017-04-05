@@ -9,8 +9,8 @@
 package top.bekit.event.listener;
 
 import org.springframework.util.ClassUtils;
+import top.bekit.common.method.MethodExecutor;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -111,18 +111,16 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
     /**
      * 监听执行器
      */
-    public static class ListenExecutor {
+    public static class ListenExecutor extends MethodExecutor {
         // 是否优先级升序
         private boolean priorityAsc;
-        // 目标方法
-        private Method targetMethod;
         // 事件类型
         private Class eventType;
 
-        public ListenExecutor(boolean priorityAsc, Method targetMethod, Class eventType) {
+        public ListenExecutor(boolean priorityAsc, Method targetMethod) {
+            super(targetMethod);
             this.priorityAsc = priorityAsc;
-            this.targetMethod = targetMethod;
-            this.eventType = eventType;
+            this.eventType = getParameterTypes()[0];
         }
 
         /**
@@ -133,23 +131,7 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
          * @throws Throwable 执行过程中发生任何异常都会往外抛
          */
         public void execute(Object listener, Object event) throws Throwable {
-            try {
-                targetMethod.invoke(listener, event);
-            } catch (InvocationTargetException e) {
-                // 抛出原始异常
-                throw e.getTargetException();
-            }
-        }
-
-        /**
-         * 校验监听执行器是否有效
-         *
-         * @throws IllegalStateException 如果校验不通过
-         */
-        public void validate() {
-            if (targetMethod == null || eventType == null) {
-                throw new IllegalStateException("监听方法内部要素不全");
-            }
+            execute(listener, new Object[]{event});
         }
 
         /**

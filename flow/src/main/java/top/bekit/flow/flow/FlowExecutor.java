@@ -9,6 +9,7 @@
 package top.bekit.flow.flow;
 
 import org.apache.commons.lang3.StringUtils;
+import top.bekit.common.method.MethodExecutor;
 import top.bekit.event.EventPublisher;
 import top.bekit.flow.engine.TargetContext;
 import top.bekit.flow.event.FlowExceptionEvent;
@@ -16,7 +17,6 @@ import top.bekit.flow.event.NodeDecideEvent;
 import top.bekit.flow.processor.ProcessorExecutor;
 import top.bekit.flow.transaction.FlowTxExecutor;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -317,15 +317,10 @@ public class FlowExecutor {
         /**
          * 下个节点选择方法执行器
          */
-        public static class NextNodeDecideExecutor {
-            // 目标方法
-            private Method targetMethod;
-            // 是否有入参（有入参也只能有一个入参，且是能被处理器返回参数赋值）
-            private boolean hasParameter;
+        public static class NextNodeDecideExecutor extends MethodExecutor {
 
-            public NextNodeDecideExecutor(Method targetMethod, boolean hasParameter) {
-                this.targetMethod = targetMethod;
-                this.hasParameter = hasParameter;
+            public NextNodeDecideExecutor(Method targetMethod) {
+                super(targetMethod);
             }
 
             /**
@@ -337,27 +332,7 @@ public class FlowExecutor {
              * @throws Throwable 执行过程中发生任何异常都会往外抛
              */
             public String execute(Object flow, Object processResult) throws Throwable {
-                try {
-                    if (hasParameter) {
-                        return (String) targetMethod.invoke(flow, processResult);
-                    } else {
-                        return (String) targetMethod.invoke(flow);
-                    }
-                } catch (InvocationTargetException e) {
-                    // 抛出原始异常
-                    throw e.getTargetException();
-                }
-            }
-
-            /**
-             * 校验下个节点方法执行器是否有效
-             *
-             * @throws IllegalStateException 如果校验不通过
-             */
-            public void validate() {
-                if (targetMethod == null) {
-                    throw new IllegalStateException("下个节点选择方法内部要素不全");
-                }
+                return (String) execute(flow, new Object[]{processResult});
             }
         }
     }
@@ -365,12 +340,10 @@ public class FlowExecutor {
     /**
      * 目标对象映射执行器
      */
-    public static class TargetMappingExecutor {
-        // 目标方法（此方法只能有一个入参，这个入参类型应该是目标对象的类型）
-        private Method targetMethod;
+    public static class TargetMappingExecutor extends MethodExecutor {
 
         public TargetMappingExecutor(Method targetMethod) {
-            this.targetMethod = targetMethod;
+            super(targetMethod);
         }
 
         /**
@@ -382,23 +355,7 @@ public class FlowExecutor {
          * @throws Throwable 执行过程中发生任何异常都会往外抛
          */
         public String execute(Object flow, TargetContext targetContext) throws Throwable {
-            try {
-                return (String) targetMethod.invoke(flow, (Object) targetContext.getTarget());
-            } catch (InvocationTargetException e) {
-                // 抛出原始异常
-                throw e.getTargetException();
-            }
-        }
-
-        /**
-         * 校验目标对象映射执行器是否有效
-         *
-         * @throws IllegalStateException 如果校验不通过
-         */
-        public void validate() {
-            if (targetMethod == null) {
-                throw new IllegalStateException("目标对象映射内部要素不全");
-            }
+            return (String) execute(flow, new Object[]{targetContext.getTarget()});
         }
     }
 }

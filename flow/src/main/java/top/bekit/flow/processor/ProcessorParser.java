@@ -59,24 +59,20 @@ public class ProcessorParser {
         if (!Modifier.isPublic(method.getModifiers())) {
             throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
         }
-        boolean hasParameter;
         // 判断是否有入参+校验入参
         Class[] parameterTypes = method.getParameterTypes();
-        if (parameterTypes.length == 0) {
-            hasParameter = false;
-        } else if (parameterTypes.length == 1) {
+        if (parameterTypes.length == 1) {
             if (parameterTypes[0] != TargetContext.class) {
-                throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "的入参必须是TargetContext类型");
+                throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "要么没入参，要么入参必须是（TargetContext）");
             }
-            hasParameter = true;
-        } else {
-            throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "最多只能有一个入参且必须是TargetContext类型");
+        } else if (parameterTypes.length != 0) {
+            throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "要么没入参，要么入参必须是（TargetContext）");
         }
         // 校验返回类型
         if (clazz != Execute.class && method.getReturnType() != void.class) {
             throw new IllegalArgumentException("非@Execute类型的处理器方法" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是void");
         }
 
-        return new ProcessorMethodExecutor(method, hasParameter);
+        return new ProcessorMethodExecutor(method);
     }
 }

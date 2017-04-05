@@ -10,12 +10,12 @@ package top.bekit.flow.transaction;
 
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
+import top.bekit.common.method.MethodExecutor;
 import top.bekit.common.transaction.TxExecutor;
 import top.bekit.flow.annotation.transaction.InsertTarget;
 import top.bekit.flow.annotation.transaction.LockTarget;
 import top.bekit.flow.engine.TargetContext;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -129,12 +129,10 @@ public class FlowTxExecutor extends TxExecutor {
     /**
      * 流程事务方法执行器
      */
-    public static class FlowTxMethodExecutor {
-        // 目标方法
-        private Method targetMethod;
+    public static class FlowTxMethodExecutor extends MethodExecutor {
 
         public FlowTxMethodExecutor(Method targetMethod) {
-            this.targetMethod = targetMethod;
+            super(targetMethod);
         }
 
         /**
@@ -146,12 +144,7 @@ public class FlowTxExecutor extends TxExecutor {
          * @throws Throwable 执行过程中发生任何异常都会往外抛
          */
         public Object execute(Object flowTx, TargetContext targetContext) throws Throwable {
-            try {
-                return targetMethod.invoke(flowTx, targetContext);
-            } catch (InvocationTargetException e) {
-                // 抛出原始异常
-                throw e.getTargetException();
-            }
+            return execute(flowTx, new Object[]{targetContext});
         }
     }
 }
