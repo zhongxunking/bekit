@@ -84,13 +84,13 @@ public class TheFlowListenerExecutor {
      */
     public void setListenMethodExecutor(Class clazz, MethodExecutor methodExecutor) {
         if (!LISTEN_METHOD_EXECUTOR_MAP.containsKey(clazz)) {
-            throw new IllegalArgumentException("特定流程监听方法类型" + ClassUtils.getShortName(clazz) + "不合法");
+            throw new IllegalArgumentException("流程监听方法类型" + ClassUtils.getShortName(clazz) + "不合法");
         }
         if (methodExecutor.getClass() != LISTEN_METHOD_EXECUTOR_MAP.get(clazz)) {
-            throw new IllegalArgumentException("特定流程监听方法处理器" + ClassUtils.getShortName(methodExecutor.getClass()) + "不合法");
+            throw new IllegalArgumentException("流程监听方法处理器" + ClassUtils.getShortName(methodExecutor.getClass()) + "不合法");
         }
         if (methodExecutorMap.containsKey(clazz)) {
-            throw new IllegalStateException("存在多个@" + ClassUtils.getShortName(clazz) + "类型的特定流程监听方法");
+            throw new IllegalStateException("特定流程监听器" + ClassUtils.getShortName(theFlowListener.getClass()) + "存在多个@" + ClassUtils.getShortName(clazz) + "类型的流程监听方法");
         }
         methodExecutorMap.put(clazz, methodExecutor);
     }
