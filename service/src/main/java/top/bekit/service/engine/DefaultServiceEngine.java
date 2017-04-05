@@ -10,17 +10,12 @@ package top.bekit.service.engine;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import top.bekit.event.EventPublisher;
-import top.bekit.event.bus.EventBusHolder;
-import top.bekit.event.publisher.DefaultEventPublisher;
 import top.bekit.service.ServiceEngine;
-import top.bekit.service.annotation.listener.ServiceListener;
 import top.bekit.service.event.ServiceApplyEvent;
 import top.bekit.service.event.ServiceExceptionEvent;
 import top.bekit.service.event.ServiceFinishEvent;
 import top.bekit.service.service.ServiceExecutor;
 import top.bekit.service.service.ServiceHolder;
-
-import javax.annotation.PostConstruct;
 
 /**
  * 服务引擎默认实现类
@@ -28,15 +23,11 @@ import javax.annotation.PostConstruct;
 public class DefaultServiceEngine implements ServiceEngine {
     @Autowired
     private ServiceHolder serviceHolder;
-    @Autowired
-    private EventBusHolder eventBusHolder;
     // 服务事件发布器
     private EventPublisher eventPublisher;
 
-    // 初始化（创建服务事件发布器，spring自动执行）
-    @PostConstruct
-    public void init() {
-        eventPublisher = new DefaultEventPublisher(eventBusHolder.getEventBus(ServiceListener.class));
+    public DefaultServiceEngine(EventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
     }
 
     @Override

@@ -12,7 +12,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import top.bekit.event.boot.EventBusConfiguration;
+import top.bekit.event.bus.EventBusHolder;
+import top.bekit.event.publisher.DefaultEventPublisher;
 import top.bekit.service.ServiceEngine;
+import top.bekit.service.annotation.listener.ServiceListener;
 import top.bekit.service.engine.DefaultServiceEngine;
 import top.bekit.service.service.ServiceHolder;
 
@@ -26,8 +29,8 @@ public class ServiceEngineConfiguration {
 
     // 服务引擎
     @Bean
-    public ServiceEngine serviceEngine() {
-        return new DefaultServiceEngine();
+    public ServiceEngine serviceEngine(EventBusHolder eventBusHolder) {
+        return new DefaultServiceEngine(new DefaultEventPublisher(eventBusHolder.getEventBus(ServiceListener.class)));
     }
 
     // 服务持有器
