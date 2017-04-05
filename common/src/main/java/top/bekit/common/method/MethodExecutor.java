@@ -41,6 +41,7 @@ public abstract class MethodExecutor {
                 return targetMethod.invoke(obj);
             }
         } catch (InvocationTargetException e) {
+            // 抛出原始异常
             throw e.getTargetException();
         }
     }

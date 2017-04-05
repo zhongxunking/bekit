@@ -32,7 +32,6 @@ public class TheFlowListenerParser {
      * @return 特定流程监听器执行器
      */
     public static TheFlowListenerExecutor parseTheFlowListener(Object theFlowListener) {
-        // 获取被监听的流程名称
         TheFlowListener theFlowListenerAnnotation = theFlowListener.getClass().getAnnotation(TheFlowListener.class);
         // 创建特定流程监听器执行器
         TheFlowListenerExecutor theFlowListenerExecutor = new TheFlowListenerExecutor(theFlowListenerAnnotation.flow(), theFlowListener);
@@ -54,7 +53,7 @@ public class TheFlowListenerParser {
     private static MethodExecutor parseListenMethodExecutor(Class clazz, Method method) {
         // 校验方法类型
         if (!Modifier.isPublic(method.getModifiers())) {
-            throw new IllegalArgumentException("监听节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
+            throw new IllegalArgumentException("特定流程监听方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
         }
         // 校验返回类型
         if (method.getReturnType() != void.class) {
@@ -68,31 +67,29 @@ public class TheFlowListenerParser {
             checkListenFlowExceptionMethodParameterTypes(method);
             return new ListenFlowExceptionMethodExecutor(method);
         } else {
-            throw new IllegalArgumentException("非法的特定流程监听器监听方法类型" + ClassUtils.getShortName(clazz));
+            throw new IllegalArgumentException("非法的特定流程监听方法类型" + ClassUtils.getShortName(clazz));
         }
     }
 
     // 校验监听节点选择方法入参类型
     private static void checkListenNodeDecideMethodParameterTypes(Method method) {
         Class[] parameterTypes = method.getParameterTypes();
-        if (parameterTypes.length == 2) {
-            if (parameterTypes[0] != String.class || parameterTypes[1] != TargetContext.class) {
-                throw new RuntimeException("监听节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "要么没有入参，要么入参是（String, TargetContext）");
-            }
-        } else if (parameterTypes.length != 0) {
-            throw new RuntimeException("监听节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "要么没有入参，要么入参是（String, TargetContext）");
+        if (parameterTypes.length != 2) {
+            throw new RuntimeException("监听节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "入参必须是（String, TargetContext）");
+        }
+        if (parameterTypes[0] != String.class || parameterTypes[1] != TargetContext.class) {
+            throw new RuntimeException("监听节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "入参必须是（String, TargetContext）");
         }
     }
 
     // 校验监听流程异常方法入参类型
     private static void checkListenFlowExceptionMethodParameterTypes(Method method) {
         Class[] parameterTypes = method.getParameterTypes();
-        if (parameterTypes.length == 2) {
-            if (parameterTypes[0] != Throwable.class || parameterTypes[1] != TargetContext.class) {
-                throw new RuntimeException("监听流程异常方法" + ClassUtils.getQualifiedMethodName(method) + "要么没有入参，要么入参是（Throwable, TargetContext）");
-            }
-        } else if (parameterTypes.length != 0) {
-            throw new RuntimeException("监听流程异常方法" + ClassUtils.getQualifiedMethodName(method) + "要么没有入参，要么入参是（Throwable, TargetContext）");
+        if (parameterTypes.length != 2) {
+            throw new RuntimeException("监听流程异常方法" + ClassUtils.getQualifiedMethodName(method) + "入参必须是（Throwable, TargetContext）");
+        }
+        if (parameterTypes[0] != Throwable.class || parameterTypes[1] != TargetContext.class) {
+            throw new RuntimeException("监听流程异常方法" + ClassUtils.getQualifiedMethodName(method) + "入参必须是（Throwable, TargetContext）");
         }
     }
 }

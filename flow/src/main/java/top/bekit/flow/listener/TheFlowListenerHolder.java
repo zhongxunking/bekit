@@ -44,7 +44,7 @@ public class TheFlowListenerHolder {
      * 获取特定流程监听器执行器
      *
      * @param flow 流程名称
-     * @return null 不存在对应的特定流程监听器执行器
+     * @return null 如果不存在对应的特定流程监听器执行器
      */
     public TheFlowListenerExecutor getTheFlowListenerExecutor(String flow) {
         return theFlowListenerExecutorMap.get(flow);

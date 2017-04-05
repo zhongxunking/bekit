@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 
 /**
  * 特定流程监听器
- * （监听的是某一个流程发生的事件，一个流程最多只能有一个特定流程监听器，配合@ListenNodeDecide、@ListenFlowException一起使用）
+ * （监听的是某一个特定流程发生的事件，一个流程最多只能有一个特定流程监听器，配合@ListenNodeDecide、@ListenFlowException一起使用）
  */
 @Documented
 @Target(ElementType.TYPE)

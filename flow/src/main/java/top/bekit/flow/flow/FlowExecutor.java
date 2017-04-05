@@ -111,11 +111,15 @@ public class FlowExecutor {
 
     // 在发生异常后执行
     private void afterThrowing(Throwable throwable, TargetContext targetContext) {
-        if (enableFlowTx) {
-            // 回滚事务
-            flowTxExecutor.rollbackTx();
+        try {
+            if (enableFlowTx) {
+                // 回滚事务
+                flowTxExecutor.rollbackTx();
+            }
+        } finally {
+            // 发送流程异常事件
+            eventPublisher.publish(new FlowExceptionEvent(flowName, throwable, targetContext));
         }
-        eventPublisher.publish(new FlowExceptionEvent(flowName, throwable, targetContext));
     }
 
     // 目标对象映射到节点
