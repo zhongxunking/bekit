@@ -11,9 +11,6 @@ package top.bekit.service.service;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
-import top.bekit.event.bus.EventBusHolder;
-import top.bekit.event.publisher.DefaultEventPublisher;
-import top.bekit.service.annotation.listener.ServiceListener;
 import top.bekit.service.annotation.service.Service;
 import top.bekit.service.engine.ServiceContext;
 import top.bekit.service.service.ServiceExecutor.ServiceMethodExecutor;
@@ -29,12 +26,11 @@ public class ServiceParser {
     /**
      * 解析服务
      *
-     * @param service        服务
-     * @param eventBusHolder 事件总线持有器
-     * @param txManager      事务管理器
+     * @param service   服务
+     * @param txManager 事务管理器
      * @return 服务执行器
      */
-    public static ServiceExecutor parseService(Object service, EventBusHolder eventBusHolder, PlatformTransactionManager txManager) {
+    public static ServiceExecutor parseService(Object service, PlatformTransactionManager txManager) {
         Service serviceAnnotation = service.getClass().getAnnotation(Service.class);
         // 获取服务名称
         String serviceName = serviceAnnotation.name();
@@ -42,7 +38,7 @@ public class ServiceParser {
             serviceName = ClassUtils.getShortNameAsProperty(service.getClass());
         }
         // 创建服务执行器
-        ServiceExecutor serviceExecutor = new ServiceExecutor(serviceName, serviceAnnotation.enableTx(), service, new DefaultEventPublisher(eventBusHolder.getEventBus(ServiceListener.class)));
+        ServiceExecutor serviceExecutor = new ServiceExecutor(serviceName, serviceAnnotation.enableTx(), service);
         if (serviceAnnotation.enableTx()) {
             if (txManager == null) {
                 throw new IllegalArgumentException("服务" + serviceAnnotation.name() + "的enableTx属性为开启状态，但不存在事务管理器（PlatformTransactionManager），请检查是否有配置spring事务管理器");

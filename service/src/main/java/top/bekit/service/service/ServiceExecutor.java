@@ -12,11 +12,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
 import top.bekit.common.method.MethodExecutor;
 import top.bekit.common.transaction.TxExecutor;
-import top.bekit.event.EventPublisher;
 import top.bekit.service.annotation.service.ServiceCheck;
 import top.bekit.service.annotation.service.ServiceExecute;
 import top.bekit.service.engine.ServiceContext;
-import top.bekit.service.event.ServiceExceptionEvent;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -42,57 +40,41 @@ public class ServiceExecutor {
     private Map<Class, ServiceMethodExecutor> methodExecutorMap = new HashMap<>();
     // 事务执行器
     private TxExecutor txExecutor;
-    // 事件发布器
-    private EventPublisher eventPublisher;
 
-    public ServiceExecutor(String serviceName, boolean enableTx, Object service, EventPublisher eventPublisher) {
+    public ServiceExecutor(String serviceName, boolean enableTx, Object service) {
         this.serviceName = serviceName;
         this.enableTx = enableTx;
         this.service = service;
-        this.eventPublisher = eventPublisher;
     }
 
     /**
      * 执行服务
      *
      * @param serviceContext 服务上下文
+     * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
-    public void execute(ServiceContext serviceContext) {
+    public void execute(ServiceContext serviceContext) throws Throwable {
+        // 执行服务校验方法（如果存在）
+        if (methodExecutorMap.containsKey(ServiceCheck.class)) {
+            methodExecutorMap.get(ServiceCheck.class).execute(service, serviceContext);
+        }
+        if (enableTx) {
+            // 开启事务
+            txExecutor.createTx();
+        }
         try {
-            // 执行服务校验方法（如果存在）
-            if (methodExecutorMap.containsKey(ServiceCheck.class)) {
-                methodExecutorMap.get(ServiceCheck.class).execute(service, serviceContext);
-            }
+            // 执行服务执行方法
+            methodExecutorMap.get(ServiceExecute.class).execute(service, serviceContext);
             if (enableTx) {
-                // 开启事务
-                txExecutor.createTx();
-            }
-            try {
-                // 执行服务执行方法
-                methodExecutorMap.get(ServiceExecute.class).execute(service, serviceContext);
-                if (enableTx) {
-                    // 提交事务
-                    txExecutor.commitTx();
-                }
-            } catch (Throwable e) {
-                if (e instanceof Error) {
-                    // 对于Error异常往外抛
-                    throw (Error) e;
-                }
-                if (enableTx) {
-                    // 回滚事务
-                    txExecutor.rollbackTx();
-                }
-                // 发布服务执行异常事件
-                eventPublisher.publish(new ServiceExceptionEvent(serviceName, serviceContext, e));
+                // 提交事务
+                txExecutor.commitTx();
             }
         } catch (Throwable e) {
-            if (e instanceof Error) {
-                // 对于Error异常往外抛
-                throw (Error) e;
+            if (enableTx) {
+                // 回滚事务
+                txExecutor.rollbackTx();
             }
-            // 发布服务执行异常事件
-            eventPublisher.publish(new ServiceExceptionEvent(serviceName, serviceContext, e));
+            throw e;
         }
     }
 
@@ -120,7 +102,7 @@ public class ServiceExecutor {
      * @throws IllegalStateException 校验不通过
      */
     public void validate() {
-        if (serviceName == null || service == null || eventPublisher == null) {
+        if (serviceName == null || service == null) {
             throw new IllegalStateException("服务" + serviceName + "内部要素不全");
         }
         if (enableTx) {

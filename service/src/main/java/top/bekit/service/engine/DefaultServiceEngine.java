@@ -15,6 +15,7 @@ import top.bekit.event.publisher.DefaultEventPublisher;
 import top.bekit.service.ServiceEngine;
 import top.bekit.service.annotation.listener.ServiceListener;
 import top.bekit.service.event.ServiceApplyEvent;
+import top.bekit.service.event.ServiceExceptionEvent;
 import top.bekit.service.event.ServiceFinishEvent;
 import top.bekit.service.service.ServiceExecutor;
 import top.bekit.service.service.ServiceHolder;
@@ -43,12 +44,15 @@ public class DefaultServiceEngine implements ServiceEngine {
         // 构建服务上下文
         ServiceContext serviceContext = new ServiceContext(order, result);
         try {
-            // 获取服务执行器
-            ServiceExecutor serviceExecutor = serviceHolder.getRequiredServiceExecutor(service);
             // 发布服务申请事件
             eventPublisher.publish(new ServiceApplyEvent(service, serviceContext));
+            // 获取服务执行器
+            ServiceExecutor serviceExecutor = serviceHolder.getRequiredServiceExecutor(service);
             // 执行服务
             serviceExecutor.execute(serviceContext);
+        } catch (Throwable e) {
+            // 发布服务执行异常事件
+            eventPublisher.publish(new ServiceExceptionEvent(service, serviceContext, e));
         } finally {
             // 发布服务结束事件
             eventPublisher.publish(new ServiceFinishEvent(service, serviceContext));
