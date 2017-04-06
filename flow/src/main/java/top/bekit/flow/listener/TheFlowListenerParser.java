@@ -8,6 +8,8 @@
  */
 package top.bekit.flow.listener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.ClassUtils;
 import top.bekit.common.method.MethodExecutor;
 import top.bekit.flow.annotation.listener.ListenFlowException;
@@ -24,6 +26,8 @@ import java.lang.reflect.Modifier;
  * 特定流程监听器解析器
  */
 public class TheFlowListenerParser {
+    // 日志记录器
+    private static final Logger logger = LoggerFactory.getLogger(TheFlowListenerParser.class);
 
     /**
      * 解析特定流程监听器
@@ -32,6 +36,7 @@ public class TheFlowListenerParser {
      * @return 特定流程监听器执行器
      */
     public static TheFlowListenerExecutor parseTheFlowListener(Object theFlowListener) {
+        logger.info("解析特定流程监听器：{}", theFlowListener);
         TheFlowListener theFlowListenerAnnotation = theFlowListener.getClass().getAnnotation(TheFlowListener.class);
         // 创建特定流程监听器执行器
         TheFlowListenerExecutor theFlowListenerExecutor = new TheFlowListenerExecutor(theFlowListenerAnnotation.flow(), theFlowListener);
@@ -51,6 +56,7 @@ public class TheFlowListenerParser {
 
     // 解析监听方法
     private static MethodExecutor parseListenMethodExecutor(Class clazz, Method method) {
+        logger.debug("解析流程监听方法：{}", method);
         // 校验方法类型
         if (!Modifier.isPublic(method.getModifiers())) {
             throw new IllegalArgumentException("流程监听方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");

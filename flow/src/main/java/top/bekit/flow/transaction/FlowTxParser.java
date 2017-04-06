@@ -8,6 +8,8 @@
  */
 package top.bekit.flow.transaction;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
 import top.bekit.flow.annotation.transaction.FlowTx;
@@ -21,6 +23,8 @@ import java.lang.reflect.Modifier;
  * 流程事务解析器
  */
 public class FlowTxParser {
+    // 日志记录器
+    private static final Logger logger = LoggerFactory.getLogger(FlowTxParser.class);
 
     /**
      * 解析流程事务
@@ -30,6 +34,7 @@ public class FlowTxParser {
      * @return 流程事务执行器
      */
     public static FlowTxExecutor parseFlowTx(Object flowTx, PlatformTransactionManager txManager) {
+        logger.info("解析流程事务：{}", flowTx);
         FlowTx flowTxAnnotation = flowTx.getClass().getAnnotation(FlowTx.class);
         // 创建流程事务执行器
         FlowTxExecutor flowTxExecutor = new FlowTxExecutor(flowTxAnnotation.flow(), flowTx, txManager);
@@ -49,6 +54,7 @@ public class FlowTxParser {
 
     // 解析流程事务方法
     private static FlowTxMethodExecutor parseFlowTxMethod(Method method) {
+        logger.debug("解析流程事务方法：{}", method);
         // 校验方法类型
         if (!Modifier.isPublic(method.getModifiers())) {
             throw new IllegalArgumentException("流程事务方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");

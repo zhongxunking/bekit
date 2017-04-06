@@ -9,6 +9,8 @@
 package top.bekit.flow.processor;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.ClassUtils;
 import top.bekit.flow.annotation.processor.Execute;
 import top.bekit.flow.annotation.processor.Processor;
@@ -22,6 +24,8 @@ import java.lang.reflect.Modifier;
  * 处理器解析器
  */
 public class ProcessorParser {
+    // 日志记录器
+    private static final Logger logger = LoggerFactory.getLogger(ProcessorParser.class);
 
     /**
      * 解析处理器
@@ -30,6 +34,7 @@ public class ProcessorParser {
      * @return 处理器执行器
      */
     public static ProcessorExecutor parseProcessor(Object processor) {
+        logger.info("解析处理器：{}", processor);
         // 获取处理器名称
         String processorName = processor.getClass().getAnnotation(Processor.class).name();
         if (StringUtils.isEmpty(processorName)) {
@@ -55,6 +60,7 @@ public class ProcessorParser {
      * 解析处理器方法
      */
     private static ProcessorMethodExecutor parseProcessorMethod(Class clazz, Method method) {
+        logger.debug("解析处理器方法：{}", method);
         // 校验方法类型
         if (!Modifier.isPublic(method.getModifiers())) {
             throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");

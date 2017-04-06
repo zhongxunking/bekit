@@ -8,6 +8,8 @@
  */
 package top.bekit.event.listener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ClassUtils;
 import top.bekit.event.annotation.listener.Listen;
@@ -21,6 +23,8 @@ import java.lang.reflect.Modifier;
  * 监听器解析器
  */
 public class ListenerParser {
+    // 日志记录器
+    private static final Logger logger = LoggerFactory.getLogger(ListenerParser.class);
 
     /**
      * 解析监听器
@@ -29,6 +33,7 @@ public class ListenerParser {
      * @return 监听器执行器
      */
     public static ListenerExecutor parseListener(Object listener) {
+        logger.info("解析监听器：{}", listener);
         // 此处得到的@Listener是已经经过@AliasFor属性别名进行属性同步后的结果
         Listener listenerAnnotation = AnnotatedElementUtils.findMergedAnnotation(listener.getClass(), Listener.class);
         // 创建监听器执行器
@@ -47,6 +52,7 @@ public class ListenerParser {
 
     // 解析监听方法
     private static ListenExecutor parseListen(Listen listenAnnotation, Method method) {
+        logger.debug("解析监听方法：{}", method);
         // 校验方法类型
         if (!Modifier.isPublic(method.getModifiers())) {
             throw new IllegalArgumentException("监听方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");

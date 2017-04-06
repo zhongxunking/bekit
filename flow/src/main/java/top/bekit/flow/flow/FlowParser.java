@@ -9,6 +9,8 @@
 package top.bekit.flow.flow;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ClassUtils;
 import top.bekit.event.bus.EventBusHolder;
@@ -29,6 +31,8 @@ import java.lang.reflect.Modifier;
  * 流程解析器
  */
 public class FlowParser {
+    // 日志记录器
+    private static final Logger logger = LoggerFactory.getLogger(FlowParser.class);
 
     /**
      * @param flow            流程
@@ -38,6 +42,7 @@ public class FlowParser {
      * @return 流程执行器
      */
     public static FlowExecutor parseFlow(Object flow, ProcessorHolder processorHolder, FlowTxHolder flowTxHolder, EventBusHolder eventBusHolder) {
+        logger.info("解析流程：{}", flow);
         Flow flowAnnotation = flow.getClass().getAnnotation(Flow.class);
         // 获取流程名称
         String flowName = flowAnnotation.name();
@@ -77,6 +82,7 @@ public class FlowParser {
 
     // 解析节点
     private static NodeExecutor parseNode(Node nodeAnnotation, Method method, ProcessorHolder processorHolder) {
+        logger.debug("解析流程节点：node={}，method={}", nodeAnnotation, method);
         // 获取节点名称
         String nodeName = nodeAnnotation.name();
         if (StringUtils.isEmpty(nodeName)) {
@@ -98,6 +104,7 @@ public class FlowParser {
 
     // 解析下个节点选择方法
     private static NextNodeDecideExecutor parseNextNodeDecide(Method method, ProcessorExecutor processorExecutor) {
+        logger.debug("解析下个节点选择方法：{}", method);
         // 校验方法类型
         if (!Modifier.isPublic(method.getModifiers())) {
             throw new IllegalArgumentException("下个节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
@@ -130,6 +137,7 @@ public class FlowParser {
 
     // 解析目标对象映射方法
     private static TargetMappingExecutor parseTargetMapping(Method method) {
+        logger.debug("解析目标对象映射方法：{}", method);
         // 校验方法类型
         if (!Modifier.isPublic(method.getModifiers())) {
             throw new IllegalArgumentException("目标对象映射方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");

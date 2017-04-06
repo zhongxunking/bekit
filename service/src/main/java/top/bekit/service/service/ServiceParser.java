@@ -9,6 +9,8 @@
 package top.bekit.service.service;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
 import top.bekit.service.annotation.service.Service;
@@ -22,6 +24,8 @@ import java.lang.reflect.Modifier;
  * 服务解析器
  */
 public class ServiceParser {
+    // 日志记录器
+    private static final Logger logger = LoggerFactory.getLogger(ServiceParser.class);
 
     /**
      * 解析服务
@@ -31,6 +35,7 @@ public class ServiceParser {
      * @return 服务执行器
      */
     public static ServiceExecutor parseService(Object service, PlatformTransactionManager txManager) {
+        logger.info("解析服务：{}", service);
         Service serviceAnnotation = service.getClass().getAnnotation(Service.class);
         // 获取服务名称
         String serviceName = serviceAnnotation.name();
@@ -61,6 +66,7 @@ public class ServiceParser {
 
     // 解析服务方法
     private static ServiceMethodExecutor parseServiceMethod(Method method) {
+        logger.debug("解析服务方法：{}", method);
         // 校验方法类型
         if (!Modifier.isPublic(method.getModifiers())) {
             throw new IllegalArgumentException("服务方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
