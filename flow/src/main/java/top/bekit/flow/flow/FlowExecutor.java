@@ -8,7 +8,6 @@
  */
 package top.bekit.flow.flow;
 
-import org.apache.commons.lang3.StringUtils;
 import top.bekit.common.method.MethodExecutor;
 import top.bekit.event.EventPublisher;
 import top.bekit.flow.engine.TargetContext;
@@ -19,7 +18,9 @@ import top.bekit.flow.transaction.FlowTxExecutor;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 流程执行器
@@ -34,7 +35,9 @@ public class FlowExecutor {
     // 开始节点
     private String startNode;
     // 结束节点
-    private String endNode;
+    private Set<String> endNodes = new HashSet<>();
+    // 等待节点（结束节点也属于等待节点）
+    private Set<String> waitNodes = new HashSet<>();
     // 节点执行器Map（key：节点名称）
     private Map<String, NodeExecutor> nodeExecutorMap = new HashMap<>();
     // 目标对象映射执行器
@@ -61,7 +64,7 @@ public class FlowExecutor {
         try {
             // 获取即将执行的节点
             String node = beforeStep(targetContext);
-            if (!StringUtils.equals(node, endNode)) {
+            if (!endNodes.contains(node)) {
                 // 获取节点执行器
                 NodeExecutor nodeExecutor = nodeExecutorMap.get(node);
                 do {
@@ -77,7 +80,7 @@ public class FlowExecutor {
                     // 发送节点选择事件
                     eventPublisher.publish(new NodeDecideEvent(flowName, nextNode, targetContext));
                     // 判断是否提交事务
-                    if (enableFlowTx && nodeExecutor.isCommitTx()) {
+                    if (enableFlowTx && nodeExecutor.isCommitTx() && !waitNodes.contains(nextNode)) {
                         afterStep();
                         // 获取即将执行的节点（防止事务提交后目标对象被其他线程抢占被执行到其他节点，此处就是更新到最新节点）
                         nextNode = beforeStep(targetContext);
@@ -148,6 +151,9 @@ public class FlowExecutor {
             throw new IllegalStateException("流程" + flowName + "存在同名的节点" + nodeExecutor.getNodeName());
         }
         nodeExecutorMap.put(nodeExecutor.getNodeName(), nodeExecutor);
+        if (!nodeExecutor.isAutoExecute()) {
+            waitNodes.add(nodeExecutor.getNodeName());
+        }
     }
 
     /**
@@ -163,15 +169,10 @@ public class FlowExecutor {
     }
 
     /**
-     * 设置结束节点
-     *
-     * @throws IllegalStateException 如果结束节点已存在
+     * 添加结束节点
      */
-    public void setEndNode(String endNode) {
-        if (this.endNode != null) {
-            throw new IllegalStateException("流程" + flowName + "存在多个结束节点");
-        }
-        this.endNode = endNode;
+    public void addEndNode(String endNode) {
+        endNodes.add(endNode);
     }
 
     /**
@@ -212,8 +213,11 @@ public class FlowExecutor {
         if (flowName == null || flow == null || eventPublisher == null) {
             throw new IllegalStateException("流程" + flowName + "内部要素不全");
         }
-        if (startNode == null || endNode == null) {
-            throw new IllegalStateException("流程" + flowName + "缺少开始节点或结束节点");
+        if (startNode == null) {
+            throw new IllegalStateException("流程" + flowName + "缺少开始节点");
+        }
+        if (endNodes.isEmpty()) {
+            throw new IllegalStateException("流程" + flowName + "没有结束节点");
         }
         if (mappingExecutor == null) {
             throw new IllegalStateException("流程" + flowName + "缺少目标对象映射方法（@TargetMapping类型方法）");

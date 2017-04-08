@@ -19,7 +19,7 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Node
+@Node(commitTx = true)
 public @interface StartNode {
 
     /**
@@ -27,5 +27,11 @@ public @interface StartNode {
      */
     @AliasFor(annotation = Node.class, attribute = "name")
     String name() default "";
+
+    /**
+     * 节点处理器（默认不执行处理器）
+     */
+    @AliasFor(annotation = Node.class, attribute = "processor")
+    String processor() default "";
 
 }

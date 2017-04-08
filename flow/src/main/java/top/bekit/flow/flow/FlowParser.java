@@ -69,7 +69,7 @@ public class FlowParser {
                 }
                 // 校验是否为结束节点
                 if (method.isAnnotationPresent(EndNode.class)) {
-                    flowExecutor.setEndNode(nodeExecutor.getNodeName());
+                    flowExecutor.addEndNode(nodeExecutor.getNodeName());
                 }
             } else if (method.isAnnotationPresent(TargetMapping.class)) {
                 // 设置目标对象映射执行器
