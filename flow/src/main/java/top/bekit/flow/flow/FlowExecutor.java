@@ -347,7 +347,7 @@ public class FlowExecutor {
             public String execute(Object flow, Object processResult, TargetContext targetContext) throws Throwable {
                 switch (parametersType) {
                     case NONE:
-                        return (String) execute(flow, (Object[]) null);
+                        return (String) execute(flow, new Object[]{});
                     case ONLY_PROCESS_RESULT:
                         return (String) execute(flow, new Object[]{processResult});
                     default:

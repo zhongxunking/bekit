@@ -146,7 +146,7 @@ public class ProcessorExecutor {
             if (hasParameter) {
                 return execute(processor, new Object[]{targetContext});
             } else {
-                return execute(processor, (Object[]) null);
+                return execute(processor, new Object[]{});
             }
         }
     }
