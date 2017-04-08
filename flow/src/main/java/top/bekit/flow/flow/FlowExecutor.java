@@ -67,6 +67,10 @@ public class FlowExecutor {
                 do {
                     // 执行节点
                     String nextNode = nodeExecutor.execute(flow, targetContext);
+                    // 判断是否中断流程
+                    if (nextNode == null) {
+                        break;
+                    }
                     if (!nodeExecutorMap.containsKey(nextNode)) {
                         throw new RuntimeException("流程" + flowName + "不存在下一个节点" + nextNode);
                     }
