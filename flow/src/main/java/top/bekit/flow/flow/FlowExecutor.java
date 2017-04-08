@@ -325,18 +325,9 @@ public class FlowExecutor {
             // 参数类型
             private ParametersType parametersType;
 
-            public NextNodeDecideExecutor(Method targetMethod) {
+            public NextNodeDecideExecutor(Method targetMethod, ParametersType parametersType) {
                 super(targetMethod);
-                switch (getParameterTypes().length) {
-                    case 0:
-                        parametersType = ParametersType.NONE;
-                        break;
-                    case 1:
-                        parametersType = ParametersType.ONLY_PROCESS_RESULT;
-                        break;
-                    default:
-                        parametersType = ParametersType.PROCESS_RESULT_AND_TARGET_CONTEXT;
-                }
+                this.parametersType = parametersType;
             }
 
             /**
@@ -354,18 +345,34 @@ public class FlowExecutor {
                         return (String) execute(flow, new Object[]{});
                     case ONLY_PROCESS_RESULT:
                         return (String) execute(flow, new Object[]{processResult});
-                    default:
+                    case ONLY_TARGET_CONTEXT:
+                        return (String) execute(flow, new Object[]{targetContext});
+                    case PROCESS_RESULT_AND_TARGET_CONTEXT:
                         return (String) execute(flow, new Object[]{processResult, targetContext});
+                    default:
+                        throw new IllegalStateException("下个节点选择方法执行器内部状态不对");
                 }
             }
 
-            // 下个节点选择方法参数类型
-            private enum ParametersType {
-                // 无参数
+            /**
+             * 下个节点选择方法参数类型
+             */
+            public enum ParametersType {
+                /**
+                 * 无参数
+                 */
                 NONE,
-                // 只有处理结果参数
+                /**
+                 * 只有处理结果参数
+                 */
                 ONLY_PROCESS_RESULT,
-                // 处理结果和目标上下文都有
+                /**
+                 * 只有目标上下文
+                 */
+                ONLY_TARGET_CONTEXT,
+                /**
+                 * 处理结果和目标上下文都有
+                 */
                 PROCESS_RESULT_AND_TARGET_CONTEXT,;
             }
         }
