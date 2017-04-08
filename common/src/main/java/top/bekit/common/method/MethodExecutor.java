@@ -17,12 +17,9 @@ import java.lang.reflect.Method;
 public abstract class MethodExecutor {
     // 目标方法
     private Method targetMethod;
-    // 是否有入参
-    private boolean hasParameter;
 
     public MethodExecutor(Method targetMethod) {
         this.targetMethod = targetMethod;
-        this.hasParameter = targetMethod.getParameterTypes().length > 0;
     }
 
     /**
@@ -35,11 +32,7 @@ public abstract class MethodExecutor {
      */
     protected Object execute(Object obj, Object[] args) throws Throwable {
         try {
-            if (hasParameter) {
-                return targetMethod.invoke(obj, args);
-            } else {
-                return targetMethod.invoke(obj);
-            }
+            return targetMethod.invoke(obj, args);
         } catch (InvocationTargetException e) {
             // 抛出原始异常
             throw e.getTargetException();

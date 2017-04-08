@@ -127,9 +127,12 @@ public class ProcessorExecutor {
      * 处理器方法执行器
      */
     public static class ProcessorMethodExecutor extends MethodExecutor {
+        // 是否有入参
+        private boolean hasParameter;
 
         public ProcessorMethodExecutor(Method targetMethod) {
             super(targetMethod);
+            this.hasParameter = getParameterTypes().length > 0;
         }
 
         /**
@@ -140,7 +143,11 @@ public class ProcessorExecutor {
          * @throws Throwable 执行过程中发生任何异常都会往外抛
          */
         public Object execute(Object processor, TargetContext targetContext) throws Throwable {
-            return execute(processor, new Object[]{targetContext});
+            if (hasParameter) {
+                return execute(processor, new Object[]{targetContext});
+            } else {
+                return execute(processor, (Object[]) null);
+            }
         }
     }
 }

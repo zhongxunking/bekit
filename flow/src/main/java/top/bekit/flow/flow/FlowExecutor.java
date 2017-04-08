@@ -269,7 +269,7 @@ public class FlowExecutor {
                 processResult = processorExecutor.execute(targetContext);
             }
             // 选择下个节点
-            return nextNodeDecideExecutor.execute(flow, processResult);
+            return nextNodeDecideExecutor.execute(flow, processResult, targetContext);
         }
 
         /**
@@ -318,9 +318,21 @@ public class FlowExecutor {
          * 下个节点选择方法执行器
          */
         public static class NextNodeDecideExecutor extends MethodExecutor {
+            // 参数类型
+            private ParametersType parametersType;
 
             public NextNodeDecideExecutor(Method targetMethod) {
                 super(targetMethod);
+                switch (getParameterTypes().length) {
+                    case 0:
+                        parametersType = ParametersType.NONE;
+                        break;
+                    case 1:
+                        parametersType = ParametersType.ONLY_PROCESS_RESULT;
+                        break;
+                    default:
+                        parametersType = ParametersType.PROCESS_RESULT_AND_TARGET_CONTEXT;
+                }
             }
 
             /**
@@ -328,11 +340,29 @@ public class FlowExecutor {
              *
              * @param flow          流程
              * @param processResult 节点处理器执行结果
+             * @param targetContext 目标上下文
              * @return 下个节点
              * @throws Throwable 执行过程中发生任何异常都会往外抛
              */
-            public String execute(Object flow, Object processResult) throws Throwable {
-                return (String) execute(flow, new Object[]{processResult});
+            public String execute(Object flow, Object processResult, TargetContext targetContext) throws Throwable {
+                switch (parametersType) {
+                    case NONE:
+                        return (String) execute(flow, (Object[]) null);
+                    case ONLY_PROCESS_RESULT:
+                        return (String) execute(flow, new Object[]{processResult});
+                    default:
+                        return (String) execute(flow, new Object[]{processResult, targetContext});
+                }
+            }
+
+            // 下个节点选择方法参数类型
+            private enum ParametersType {
+                // 无参数
+                NONE,
+                // 只有处理结果参数
+                ONLY_PROCESS_RESULT,
+                // 处理结果和目标上下文都有
+                PROCESS_RESULT_AND_TARGET_CONTEXT,;
             }
         }
     }
