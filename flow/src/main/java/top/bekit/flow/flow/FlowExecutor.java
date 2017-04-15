@@ -252,8 +252,8 @@ public class FlowExecutor {
         private boolean autoExecute;
         // 本节点执行完后是否提交事务
         private boolean commitTx;
-        // 下个节点选择执行器
-        private NextNodeDecideExecutor nextNodeDecideExecutor;
+        // 节点决策器执行器
+        private NodeDeciderExecutor nodeDeciderExecutor;
 
         public NodeExecutor(String nodeName, ProcessorExecutor processorExecutor, boolean autoExecute, boolean commitTx) {
             this.nodeName = nodeName;
@@ -276,18 +276,18 @@ public class FlowExecutor {
                 // 执行节点处理器
                 processResult = processorExecutor.execute(targetContext);
             }
-            // 选择下个节点
-            return nextNodeDecideExecutor.execute(flow, processResult, targetContext);
+            // 执行节点决策器
+            return nodeDeciderExecutor.execute(flow, processResult, targetContext);
         }
 
         /**
-         * 设置下个节点选择执行器
+         * 设置节点决策器执行器
          */
-        public void setNextNodeDecideExecutor(NextNodeDecideExecutor nextNodeDecideExecutor) {
-            if (this.nextNodeDecideExecutor != null) {
-                throw new IllegalStateException("节点" + nodeName + "已设置下个节点选择方法执行器，不能重复设置");
+        public void setNodeDeciderExecutor(NodeDeciderExecutor nodeDeciderExecutor) {
+            if (this.nodeDeciderExecutor != null) {
+                throw new IllegalStateException("节点" + nodeName + "已设置节点决策器执行器，不能重复设置");
             }
-            this.nextNodeDecideExecutor = nextNodeDecideExecutor;
+            this.nodeDeciderExecutor = nodeDeciderExecutor;
         }
 
         /**
@@ -310,7 +310,7 @@ public class FlowExecutor {
          * @throws IllegalStateException 如果校验不通过
          */
         public void validate() {
-            if (nodeName == null || nextNodeDecideExecutor == null) {
+            if (nodeName == null || nodeDeciderExecutor == null) {
                 throw new IllegalStateException("节点" + nodeName + "内部要素不全");
             }
         }
@@ -323,24 +323,24 @@ public class FlowExecutor {
         }
 
         /**
-         * 下个节点选择方法执行器
+         * 节点决策器执行器（选出下个节点）
          */
-        public static class NextNodeDecideExecutor extends MethodExecutor {
+        public static class NodeDeciderExecutor extends MethodExecutor {
             // 参数类型
             private ParametersType parametersType;
 
-            public NextNodeDecideExecutor(Method targetMethod, ParametersType parametersType) {
+            public NodeDeciderExecutor(Method targetMethod, ParametersType parametersType) {
                 super(targetMethod);
                 this.parametersType = parametersType;
             }
 
             /**
-             * 执行下个节点选择方法
+             * 执行
              *
              * @param flow          流程
-             * @param processResult 节点处理器执行结果
+             * @param processResult 处理器执行结果
              * @param targetContext 目标上下文
-             * @return 下个节点
+             * @return 下个节点名称
              * @throws Throwable 执行过程中发生任何异常都会往外抛
              */
             public String execute(Object flow, Object processResult, TargetContext targetContext) throws Throwable {

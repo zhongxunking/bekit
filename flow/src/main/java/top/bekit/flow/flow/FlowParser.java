@@ -19,7 +19,7 @@ import top.bekit.flow.annotation.flow.*;
 import top.bekit.flow.annotation.listener.FlowListener;
 import top.bekit.flow.engine.TargetContext;
 import top.bekit.flow.flow.FlowExecutor.NodeExecutor;
-import top.bekit.flow.flow.FlowExecutor.NodeExecutor.NextNodeDecideExecutor;
+import top.bekit.flow.flow.FlowExecutor.NodeExecutor.NodeDeciderExecutor;
 import top.bekit.flow.flow.FlowExecutor.TargetMappingExecutor;
 import top.bekit.flow.processor.ProcessorExecutor;
 import top.bekit.flow.processor.ProcessorHolder;
@@ -96,67 +96,72 @@ public class FlowParser {
         }
         // 新建节点执行器
         NodeExecutor nodeExecutor = new NodeExecutor(nodeName, processorExecutor, nodeAnnotation.autoExecute(), nodeAnnotation.commitTx());
-        // 设置下个节点选择方法执行器
-        nodeExecutor.setNextNodeDecideExecutor(parseNextNodeDecide(method, processorExecutor));
+        // 设置节点决策器执行器
+        nodeExecutor.setNodeDeciderExecutor(parseNodeDecider(method, processorExecutor));
         nodeExecutor.validate();
 
         return nodeExecutor;
     }
 
-    // 解析下个节点选择方法
-    private static NextNodeDecideExecutor parseNextNodeDecide(Method method, ProcessorExecutor processorExecutor) {
-        logger.debug("解析下个节点选择方法：{}", method);
+    // 解析节点决策器
+    private static NodeDeciderExecutor parseNodeDecider(Method method, ProcessorExecutor processorExecutor) {
+        logger.debug("解析节点决策器：{}", method);
         // 校验方法类型
         if (!Modifier.isPublic(method.getModifiers())) {
-            throw new IllegalArgumentException("下个节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
+            throw new IllegalArgumentException("解析节点决策器" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
         }
         // 判断+校验入参类型，可以存在的入参类型：()、(TargetContext)、(T)、(T, TargetContext)————T表示能被处理器返回结果赋值的类型
-        NextNodeDecideExecutor.ParametersType parametersType;
+        NodeDeciderExecutor.ParametersType parametersType;
         Class[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length == 0) {
             // 入参类型：()
-            parametersType = NextNodeDecideExecutor.ParametersType.NONE;
-        } else if (parameterTypes.length == 1) {
-            if (parameterTypes[0] == TargetContext.class) {
-                // 入参类型：(TargetContext)
-                parametersType = NextNodeDecideExecutor.ParametersType.ONLY_TARGET_CONTEXT;
-            } else {
-                // 入参类型：(T)
+            parametersType = NodeDeciderExecutor.ParametersType.NONE;
+        } else {
+            if (method.isAnnotationPresent(EndNode.class)) {
+                throw new IllegalArgumentException("结束节点的决策器" + ClassUtils.getQualifiedMethodName(method) + "不能有入参");
+            }
+            if (parameterTypes.length == 1) {
+                if (parameterTypes[0] == TargetContext.class) {
+                    // 入参类型：(TargetContext)
+                    parametersType = NodeDeciderExecutor.ParametersType.ONLY_TARGET_CONTEXT;
+                } else {
+                    // 入参类型：(T)
+                    if (processorExecutor == null) {
+                        throw new IllegalArgumentException("节点决策器" + ClassUtils.getQualifiedMethodName(method) + "不能有非TargetContext入参，因为这个节点没有处理器");
+                    }
+                    if (!parameterTypes[0].isAssignableFrom(processorExecutor.getReturnType())) {
+                        throw new IllegalArgumentException("节点决策器" + ClassUtils.getQualifiedMethodName(method) + "的非TargetContext入参类型必须能被其处理器返回类型赋值");
+                    }
+                    parametersType = NodeDeciderExecutor.ParametersType.ONLY_PROCESS_RESULT;
+                }
+            } else if (parameterTypes.length == 2) {
+                // 入参类型：(T, TargetContext)
                 if (processorExecutor == null) {
-                    throw new IllegalArgumentException("下个节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "不能有非TargetContext入参，因为这个节点没有处理器");
+                    throw new IllegalArgumentException("节点决策器" + ClassUtils.getQualifiedMethodName(method) + "不能有非TargetContext入参，因为这个节点没有处理器");
                 }
                 if (!parameterTypes[0].isAssignableFrom(processorExecutor.getReturnType())) {
-                    throw new IllegalArgumentException("下个节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "的非TargetContext入参类型必须能被其处理器返回类型赋值");
+                    throw new IllegalArgumentException("节点决策器" + ClassUtils.getQualifiedMethodName(method) + "的非TargetContext入参类型必须能被其处理器返回类型赋值");
                 }
-                parametersType = NextNodeDecideExecutor.ParametersType.ONLY_PROCESS_RESULT;
+                if (parameterTypes[1] != TargetContext.class) {
+                    throw new IllegalArgumentException("节点决策器" + ClassUtils.getQualifiedMethodName(method) + "的第二个参数类型必须是TargetContext");
+                }
+                parametersType = NodeDeciderExecutor.ParametersType.PROCESS_RESULT_AND_TARGET_CONTEXT;
+            } else {
+                throw new IllegalArgumentException("节点决策器" + ClassUtils.getQualifiedMethodName(method) + "的入参个数不能超过2个");
             }
-        } else if (parameterTypes.length == 2) {
-            // 入参类型：(T, TargetContext)
-            if (processorExecutor == null) {
-                throw new IllegalArgumentException("下个节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "不能有非TargetContext入参，因为这个节点没有处理器");
-            }
-            if (!parameterTypes[0].isAssignableFrom(processorExecutor.getReturnType())) {
-                throw new IllegalArgumentException("下个节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "的非TargetContext入参类型必须能被其处理器返回类型赋值");
-            }
-            if (parameterTypes[1] != TargetContext.class) {
-                throw new IllegalArgumentException("下个节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "的第二个参数类型必须是TargetContext");
-            }
-            parametersType = NextNodeDecideExecutor.ParametersType.PROCESS_RESULT_AND_TARGET_CONTEXT;
-        } else {
-            throw new IllegalArgumentException("下个节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "的入参个数不能超过2个");
         }
         // 校验返回类型
         if (method.isAnnotationPresent(EndNode.class)) {
             if (method.getReturnType() != void.class) {
-                throw new IllegalArgumentException("结束节点对应的方法" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是void");
+                throw new IllegalArgumentException("结束节点的节点决策器" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是void");
             }
         } else {
             if (method.getReturnType() != String.class) {
-                throw new IllegalArgumentException("下个节点选择方法" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是String");
+                throw new IllegalArgumentException("节点决策器" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是String");
             }
         }
 
-        return new NextNodeDecideExecutor(method, parametersType);
+        return new NodeDeciderExecutor(method, parametersType);
     }
 
     // 解析目标对象映射方法
