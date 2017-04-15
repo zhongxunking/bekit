@@ -33,7 +33,7 @@ public class DefaultServiceEngine implements ServiceEngine {
     @Override
     public <O, R> R execute(String service, O order, R result) {
         // 构建服务上下文
-        ServiceContext serviceContext = new ServiceContext(order, result);
+        ServiceContext<O, R> serviceContext = new ServiceContext(order, result);
         try {
             // 发布服务申请事件
             eventPublisher.publish(new ServiceApplyEvent(service, serviceContext));
@@ -48,6 +48,6 @@ public class DefaultServiceEngine implements ServiceEngine {
             // 发布服务结束事件
             eventPublisher.publish(new ServiceFinishEvent(service, serviceContext));
         }
-        return (R) serviceContext.getResult();
+        return serviceContext.getResult();
     }
 }
