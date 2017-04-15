@@ -14,7 +14,8 @@ import java.lang.annotation.*;
 
 /**
  * 状态节点
- * （对于开启了流程事务情况，此类型节点处理完成后会提交事务，然后会再次开启新事务并锁住目标对象）
+ * （对于开启了流程事务情况，此类型节点处理完成后会提交事务，然后会再次开启新事务并锁住目标对象；
+ * 对应的节点决策器返回值类型必须为String，入参类型可为：()、(TargetContext)、(T)、(T, TargetContext)————T表示能被对应的处理器返回结果赋值的类型）
  */
 @Documented
 @Target(ElementType.METHOD)

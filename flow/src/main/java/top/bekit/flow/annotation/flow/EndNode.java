@@ -14,8 +14,7 @@ import java.lang.annotation.*;
 
 /**
  * 结束节点
- * 1、流程执行到结束节点自动结束，如果开启了流程事务会自动提交事务
- * 2、对应的流程方法不能有入参，且返回类型必须是void，方法体不会被执行（比如：void end(){}）
+ * （流程执行到结束节点自动结束；对应的节点决策器不能有入参，且返回类型必须是void，决策器的方法体不会被执行）
  */
 @Documented
 @Target(ElementType.METHOD)

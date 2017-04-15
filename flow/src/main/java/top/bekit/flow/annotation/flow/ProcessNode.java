@@ -14,7 +14,8 @@ import java.lang.annotation.*;
 
 /**
  * 处理节点
- * （对于开启了流程事务情况，此类型节点执行完后不会提交事务）
+ * （对于开启了流程事务情况，此类型节点执行完后不会提交事务；
+ * 对应的节点决策器返回值类型必须为String，入参类型可为：()、(TargetContext)、(T)、(T, TargetContext)————T表示能被对应的处理器返回结果赋值的类型）
  */
 @Documented
 @Target(ElementType.METHOD)

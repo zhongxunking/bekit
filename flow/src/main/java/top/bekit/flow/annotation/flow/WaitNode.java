@@ -13,10 +13,9 @@ import org.springframework.core.annotation.AliasFor;
 import java.lang.annotation.*;
 
 /**
- * 等待节点（等待异步通知场景可以使用此节点）
- * <p>
- * 如果流程下一个要执行的节点是等待类型，则会自动停止流程；
- * 如果需要执行等待类型节点，则需要手动触发从等待类型节点开始执行
+ * 等待节点
+ * （当等待节点不是第一个被执行的节点，则当流程跳转到等待节点时会被正常中断（等待节点还未被执行）；当等待节点是第一个被执行的节点，则这个等待节点的执行和状态节点没有任何区别————这个特性非常适合等待异步通知场景。
+ * 对应的节点决策器返回值类型必须为String，入参类型可为：()、(TargetContext)、(T)、(T, TargetContext)————T表示能被对应的处理器返回结果赋值的类型）
  */
 @Documented
 @Target(ElementType.METHOD)
