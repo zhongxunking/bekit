@@ -127,9 +127,7 @@
             <version>1.1.0.RELEASE</version>
         </dependency>
 
-2. 如果是spring-boot项目则只需要在application.properties中加入配置：
-
-        bekit.flow.enable=true
+2. 如果是spring-boot项目则不需要进行任何配置。
         
     如果是非spring-boot项目则需要手动引入流程引擎配置类FlowEngineConfiguration，比如：
     
@@ -368,12 +366,9 @@
             <version>1.1.0.RELEASE</version>
         </dependency>
 
-2. 如果是spring-boot项目则只需要在application.properties中加入配置：
+2. 如果是spring-boot项目则不需要进行任何配置。
 
-
-        bekit.service.enable=true
-
-如果是非spring-boot项目则需要手动引入服务引擎配置类ServiceEngineConfiguration，比如：
+    如果是非spring-boot项目则需要手动引入服务引擎配置类ServiceEngineConfiguration，比如：
     
 
         @Configuration
