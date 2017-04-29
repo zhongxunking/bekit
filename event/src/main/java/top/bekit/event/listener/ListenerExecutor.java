@@ -63,17 +63,6 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
     }
 
     /**
-     * 校验监听器执行器是否有效
-     *
-     * @throws IllegalStateException 如果校验不通过
-     */
-    public void validate() {
-        if (listener == null || type == null) {
-            throw new IllegalStateException("监听器内部要素不全");
-        }
-    }
-
-    /**
      * 获取监听器类型
      */
     public Class getType() {
@@ -106,6 +95,17 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
     @Override
     public int compareTo(ListenerExecutor listenerExecutor) {
         return priority - listenerExecutor.getPriority();
+    }
+
+    /**
+     * 校验监听器执行器是否有效
+     *
+     * @throws IllegalStateException 如果校验不通过
+     */
+    public void validate() {
+        if (listener == null || type == null) {
+            throw new IllegalStateException("监听器内部要素不全");
+        }
     }
 
     /**
