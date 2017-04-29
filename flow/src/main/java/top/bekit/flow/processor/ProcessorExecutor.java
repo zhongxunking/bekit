@@ -126,7 +126,7 @@ public class ProcessorExecutor {
         }
         // 校验处理器内部目标对象类型是否统一
         for (ProcessorMethodExecutor methodExecutor : methodExecutorMap.values()) {
-            if (methodExecutor.getClassOfTarget() != null && methodExecutor.getClassOfTarget() != getClassOfTarget()) {
+            if (methodExecutor.getClassOfTarget() != getClassOfTarget()) {
                 throw new IllegalStateException("处理器" + processorName + "内目标对象类型不统一");
             }
         }
@@ -136,14 +136,11 @@ public class ProcessorExecutor {
      * 处理器方法执行器
      */
     public static class ProcessorMethodExecutor extends MethodExecutor {
-        // 是否有入参
-        private boolean hasParameter;
         // 目标对象类型
         private Class classOfTarget;
 
         public ProcessorMethodExecutor(Method targetMethod, Class classOfTarget) {
             super(targetMethod);
-            this.hasParameter = getParameterTypes().length > 0;
             this.classOfTarget = classOfTarget;
         }
 
@@ -155,11 +152,7 @@ public class ProcessorExecutor {
          * @throws Throwable 执行过程中发生任何异常都会往外抛
          */
         public Object execute(Object processor, TargetContext targetContext) throws Throwable {
-            if (hasParameter) {
-                return execute(processor, new Object[]{targetContext});
-            } else {
-                return execute(processor, new Object[]{});
-            }
+            return execute(processor, new Object[]{targetContext});
         }
 
         /**

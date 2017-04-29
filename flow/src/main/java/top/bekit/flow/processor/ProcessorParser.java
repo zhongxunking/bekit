@@ -66,23 +66,21 @@ public class ProcessorParser {
         if (!Modifier.isPublic(method.getModifiers())) {
             throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
         }
-        // 判断是否有入参+校验入参+获取目标对象类型
+        // 校验入参
         Class[] parameterTypes = method.getParameterTypes();
-        Class classOfTarget = null;
-        if (parameterTypes.length == 1) {
-            if (parameterTypes[0] != TargetContext.class) {
-                throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "要么没入参，要么入参必须是（TargetContext）");
-            }
-            // 获取目标对象类型
-            ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 0);
-            classOfTarget = resolvableType.getGeneric(0).resolve(Object.class);
-        } else if (parameterTypes.length != 0) {
-            throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "要么没入参，要么入参必须是（TargetContext）");
+        if (parameterTypes.length != 1) {
+            throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "入参必须是（TargetContext）");
+        }
+        if (parameterTypes[0] != TargetContext.class) {
+            throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "入参必须是（TargetContext）");
         }
         // 校验返回类型
         if (clazz != Execute.class && method.getReturnType() != void.class) {
             throw new IllegalArgumentException("非@Execute类型的处理器方法" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是void");
         }
+        // 获取目标对象类型
+        ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 0);
+        Class classOfTarget = resolvableType.getGeneric(0).resolve(Object.class);
 
         return new ProcessorMethodExecutor(method, classOfTarget);
     }
