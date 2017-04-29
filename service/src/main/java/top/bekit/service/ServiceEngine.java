@@ -18,9 +18,8 @@ public interface ServiceEngine {
      *
      * @param service 服务名称
      * @param order   入参
-     * @param result  结果
-     * @return 结果（和参数result是同一个对象）
+     * @return 结果
      */
-    <O, R> R execute(String service, O order, R result);
+    <O, R> R execute(String service, O order);
 
 }

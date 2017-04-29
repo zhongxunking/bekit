@@ -8,6 +8,7 @@
  */
 package top.bekit.service.engine;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import top.bekit.event.EventPublisher;
 import top.bekit.service.ServiceEngine;
@@ -31,14 +32,16 @@ public class DefaultServiceEngine implements ServiceEngine {
     }
 
     @Override
-    public <O, R> R execute(String service, O order, R result) {
+    public <O, R> R execute(String service, O order) {
+        // 获取服务执行器
+        ServiceExecutor serviceExecutor = serviceHolder.getRequiredServiceExecutor(service);
+        // 校验order类型
+        checkOrderClass(order, serviceExecutor);
         // 构建服务上下文
-        ServiceContext<O, R> serviceContext = new ServiceContext(order, result);
+        ServiceContext<O, R> serviceContext = new ServiceContext(order, newResult(serviceExecutor));
         try {
             // 发布服务申请事件
             eventPublisher.publish(new ServiceApplyEvent(service, serviceContext));
-            // 获取服务执行器
-            ServiceExecutor serviceExecutor = serviceHolder.getRequiredServiceExecutor(service);
             // 执行服务
             serviceExecutor.execute(serviceContext);
         } catch (Throwable e) {
@@ -49,5 +52,23 @@ public class DefaultServiceEngine implements ServiceEngine {
             eventPublisher.publish(new ServiceFinishEvent(service, serviceContext));
         }
         return serviceContext.getResult();
+    }
+
+    // 校验入参order类型
+    private void checkOrderClass(Object order, ServiceExecutor serviceExecutor) {
+        if (!serviceExecutor.getOrderClass().isAssignableFrom(order.getClass())) {
+            throw new IllegalArgumentException("入参order的类型和服务" + serviceExecutor.getServiceName() + "期望的类型不匹配");
+        }
+    }
+
+    // 创建result
+    private Object newResult(ServiceExecutor serviceExecutor) {
+        Object result = null;
+        try {
+            result = serviceExecutor.getResultClass().newInstance();
+        } catch (Throwable e) {
+            ExceptionUtils.wrapAndThrow(e);
+        }
+        return result;
     }
 }

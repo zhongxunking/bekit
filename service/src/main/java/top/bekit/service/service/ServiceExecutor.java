@@ -97,30 +97,6 @@ public class ServiceExecutor {
     }
 
     /**
-     * 校验服务执行器是否有效
-     *
-     * @throws IllegalStateException 校验不通过
-     */
-    public void validate() {
-        if (serviceName == null || service == null) {
-            throw new IllegalStateException("服务" + serviceName + "内部要素不全");
-        }
-        if (enableTx) {
-            if (txExecutor == null) {
-                throw new IllegalStateException("服务" + serviceName + "的enableTx属性为开启状态，但未设置事务执行器");
-            }
-            txExecutor.validate();
-        } else {
-            if (txExecutor != null) {
-                throw new IllegalStateException("服务" + serviceName + "的enableTx属性为关闭状态，但设置了事务执行器");
-            }
-        }
-        if (!methodExecutorMap.containsKey(ServiceExecute.class)) {
-            throw new IllegalStateException("服务" + serviceName + "缺少@ServiceExecute类型方法");
-        }
-    }
-
-    /**
      * 设置事务管理器
      *
      * @param txManager 事务管理器
@@ -143,12 +119,67 @@ public class ServiceExecutor {
     }
 
     /**
+     * 获取Order的真实类型
+     */
+    public Class getOrderClass() {
+        return methodExecutorMap.get(ServiceExecute.class).getOrderClass();
+    }
+
+    /**
+     * 获取Result的真实类型
+     */
+    public Class getResultClass() {
+        return methodExecutorMap.get(ServiceExecute.class).getResultClass();
+    }
+
+    /**
+     * 校验服务执行器是否有效
+     *
+     * @throws IllegalStateException 校验不通过
+     */
+    public void validate() {
+        if (serviceName == null || service == null) {
+            throw new IllegalStateException("服务" + serviceName + "内部要素不全");
+        }
+        if (enableTx) {
+            if (txExecutor == null) {
+                throw new IllegalStateException("服务" + serviceName + "的enableTx属性为开启状态，但未设置事务执行器");
+            }
+            txExecutor.validate();
+        } else {
+            if (txExecutor != null) {
+                throw new IllegalStateException("服务" + serviceName + "的enableTx属性为关闭状态，但设置了事务执行器");
+            }
+        }
+        if (!methodExecutorMap.containsKey(ServiceExecute.class)) {
+            throw new IllegalStateException("服务" + serviceName + "缺少@ServiceExecute类型方法");
+        }
+        // 校验@ServiceCheck方法和@ServiceExecute方法的ServiceContext泛型类型是否匹配
+        if (methodExecutorMap.containsKey(ServiceCheck.class)) {
+            ServiceMethodExecutor serviceCheckExecutor = methodExecutorMap.get(ServiceCheck.class);
+            ServiceMethodExecutor serviceExecuteExecutor = methodExecutorMap.get(ServiceExecute.class);
+            if (!serviceCheckExecutor.getOrderClass().isAssignableFrom(serviceExecuteExecutor.getOrderClass())) {
+                throw new IllegalStateException("服务" + serviceName + "的@ServiceCheck方法和@ServiceExecute方法的ServiceContext泛型类型不匹配");
+            }
+            if (!serviceCheckExecutor.getResultClass().isAssignableFrom(serviceExecuteExecutor.getResultClass())) {
+                throw new IllegalStateException("服务" + serviceName + "的@ServiceCheck方法和@ServiceExecute方法的ServiceContext泛型类型不匹配");
+            }
+        }
+    }
+
+    /**
      * 服务方法执行器
      */
     public static class ServiceMethodExecutor extends MethodExecutor {
+        // ServiceContext泛型O的真实类型
+        private Class orderClass;
+        // ServiceContext泛型R的真实类型
+        private Class resultClass;
 
-        public ServiceMethodExecutor(Method targetMethod) {
+        public ServiceMethodExecutor(Method targetMethod, Class orderClass, Class resultClass) {
             super(targetMethod);
+            this.orderClass = orderClass;
+            this.resultClass = resultClass;
         }
 
         /**
@@ -160,6 +191,20 @@ public class ServiceExecutor {
          */
         public void execute(Object service, ServiceContext serviceContext) throws Throwable {
             execute(service, new Object[]{serviceContext});
+        }
+
+        /**
+         * 获取ServiceContext泛型O的真实类型
+         */
+        public Class getOrderClass() {
+            return orderClass;
+        }
+
+        /**
+         * 获取ServiceContext泛型R的真实类型
+         */
+        public Class getResultClass() {
+            return resultClass;
         }
     }
 }

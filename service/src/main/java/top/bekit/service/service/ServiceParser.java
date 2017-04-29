@@ -11,9 +11,11 @@ package top.bekit.service.service;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ResolvableType;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
 import top.bekit.service.annotation.service.Service;
+import top.bekit.service.annotation.service.ServiceExecute;
 import top.bekit.service.engine.ServiceContext;
 import top.bekit.service.service.ServiceExecutor.ServiceMethodExecutor;
 
@@ -80,7 +82,17 @@ public class ServiceParser {
         if (method.getReturnType() != void.class) {
             throw new IllegalArgumentException("服务方法" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是void");
         }
+        // 获取ServiceContext中泛型O、R的真实类型
+        ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 0);
+        Class orderClass = resolvableType.getGeneric(0).resolve(Object.class);
+        Class resultClass = resolvableType.getGeneric(1).resolve(Object.class);
+        // 校验result是否有默认构造函数
+        if (method.isAnnotationPresent(ServiceExecute.class)) {
+            if (!ClassUtils.hasConstructor(resultClass, new Class[]{})) {
+                throw new IllegalArgumentException("@ServiceExecute服务方法" + ClassUtils.getQualifiedMethodName(method) + "参数ServiceContext的泛型" + ClassUtils.getShortName(resultClass) + "必须得有默认构造函数");
+            }
+        }
 
-        return new ServiceMethodExecutor(method);
+        return new ServiceMethodExecutor(method, orderClass, resultClass);
     }
 }
