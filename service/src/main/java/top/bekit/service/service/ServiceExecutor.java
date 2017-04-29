@@ -154,15 +154,13 @@ public class ServiceExecutor {
         if (!methodExecutorMap.containsKey(ServiceExecute.class)) {
             throw new IllegalStateException("服务" + serviceName + "缺少@ServiceExecute类型方法");
         }
-        // 校验@ServiceCheck方法和@ServiceExecute方法的ServiceContext泛型类型是否匹配
-        if (methodExecutorMap.containsKey(ServiceCheck.class)) {
-            ServiceMethodExecutor serviceCheckExecutor = methodExecutorMap.get(ServiceCheck.class);
-            ServiceMethodExecutor serviceExecuteExecutor = methodExecutorMap.get(ServiceExecute.class);
-            if (!serviceCheckExecutor.getOrderClass().isAssignableFrom(serviceExecuteExecutor.getOrderClass())) {
-                throw new IllegalStateException("服务" + serviceName + "的@ServiceCheck方法和@ServiceExecute方法的ServiceContext泛型类型不匹配");
+        // 校验服务内的ServiceContext泛型类型是否统一
+        for (ServiceMethodExecutor methodExecutor : methodExecutorMap.values()) {
+            if (methodExecutor.getOrderClass() != getOrderClass()) {
+                throw new IllegalStateException("服务" + serviceName + "内的ServiceContext的泛型类型不统一");
             }
-            if (!serviceCheckExecutor.getResultClass().isAssignableFrom(serviceExecuteExecutor.getResultClass())) {
-                throw new IllegalStateException("服务" + serviceName + "的@ServiceCheck方法和@ServiceExecute方法的ServiceContext泛型类型不匹配");
+            if (methodExecutor.getResultClass() != getResultClass()) {
+                throw new IllegalStateException("服务" + serviceName + "内的ServiceContext的泛型类型不统一");
             }
         }
     }
