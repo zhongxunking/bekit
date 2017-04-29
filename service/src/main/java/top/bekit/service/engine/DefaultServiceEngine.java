@@ -8,8 +8,8 @@
  */
 package top.bekit.service.engine;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.ReflectUtils;
 import top.bekit.event.EventPublisher;
 import top.bekit.service.ServiceEngine;
 import top.bekit.service.event.ServiceApplyEvent;
@@ -63,12 +63,6 @@ public class DefaultServiceEngine implements ServiceEngine {
 
     // 创建result
     private Object newResult(ServiceExecutor serviceExecutor) {
-        Object result = null;
-        try {
-            result = serviceExecutor.getResultClass().newInstance();
-        } catch (Throwable e) {
-            ExceptionUtils.wrapAndThrow(e);
-        }
-        return result;
+        return ReflectUtils.newInstance(serviceExecutor.getResultClass());
     }
 }
