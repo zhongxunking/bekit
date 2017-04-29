@@ -95,7 +95,7 @@ public class TheFlowListenerExecutor {
             throw new IllegalStateException("特定流程监听器" + ClassUtils.getShortName(theFlowListener.getClass()) + "存在多个@" + ClassUtils.getShortName(clazz) + "类型的流程监听方法");
         }
         methodExecutorMap.put(clazz, methodExecutor);
-        // 设值目标对象类型
+        // 设置目标对象类型
         classOfTarget = methodExecutor.getClassOfTarget();
     }
 
@@ -174,7 +174,9 @@ public class TheFlowListenerExecutor {
         }
     }
 
-    // 抽象特定流程监听器方法执行器
+    /**
+     * 抽象特定流程监听器方法执行器
+     */
     public static class AbstractTheFlowListenerMethodExecutor extends MethodExecutor {
         // 目标对象类型
         private Class classOfTarget;
@@ -184,7 +186,9 @@ public class TheFlowListenerExecutor {
             this.classOfTarget = classOfTarget;
         }
 
-        // 获取目标对象类型
+        /**
+         * 获取目标对象类型
+         */
         public Class getClassOfTarget() {
             return classOfTarget;
         }

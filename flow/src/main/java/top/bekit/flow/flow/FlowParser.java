@@ -11,6 +11,7 @@ package top.bekit.flow.flow;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ClassUtils;
 import top.bekit.event.bus.EventBusHolder;
@@ -112,6 +113,7 @@ public class FlowParser {
         }
         // 判断+校验入参类型，可以存在的入参类型：()、(TargetContext)、(T)、(T, TargetContext)————T表示能被处理器返回结果赋值的类型
         NodeDeciderExecutor.ParametersType parametersType;
+        Class classOfTarget = null;
         Class[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length == 0) {
             // 入参类型：()
@@ -124,6 +126,9 @@ public class FlowParser {
                 if (parameterTypes[0] == TargetContext.class) {
                     // 入参类型：(TargetContext)
                     parametersType = NodeDeciderExecutor.ParametersType.ONLY_TARGET_CONTEXT;
+                    // 解析目标对象类型
+                    ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 0);
+                    classOfTarget = resolvableType.getGeneric(0).resolve();
                 } else {
                     // 入参类型：(T)
                     if (processorExecutor == null) {
@@ -146,6 +151,9 @@ public class FlowParser {
                     throw new IllegalArgumentException("节点决策器" + ClassUtils.getQualifiedMethodName(method) + "的第二个参数类型必须是TargetContext");
                 }
                 parametersType = NodeDeciderExecutor.ParametersType.PROCESS_RESULT_AND_TARGET_CONTEXT;
+                // 解析目标对象类型
+                ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 1);
+                classOfTarget = resolvableType.getGeneric(0).resolve();
             } else {
                 throw new IllegalArgumentException("节点决策器" + ClassUtils.getQualifiedMethodName(method) + "的入参个数不能超过2个");
             }
@@ -161,7 +169,7 @@ public class FlowParser {
             }
         }
 
-        return new NodeDeciderExecutor(method, parametersType);
+        return new NodeDeciderExecutor(method, parametersType, classOfTarget);
     }
 
     // 解析目标对象映射方法

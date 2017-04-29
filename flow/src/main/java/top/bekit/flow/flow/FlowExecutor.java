@@ -252,6 +252,10 @@ public class FlowExecutor {
             if (classOfTargetOfProcessor != null && !classOfTargetOfProcessor.isAssignableFrom(getClassOfTarget())) {
                 throw new IllegalStateException("流程" + flowName + "内" + nodeExecutor.getNodeName() + "节点的处理器的目标对象类型和流程的目标对象类型不匹配");
             }
+            Class classOfTargetOfNodeDecider = nodeExecutor.getClassOfTargetOfNodeDecider();
+            if (classOfTargetOfNodeDecider != null && classOfTargetOfNodeDecider != getClassOfTarget()) {
+                throw new IllegalStateException("流程" + flowName + "内目标对象类型不统一");
+            }
         }
         // 校验流程事务的目标对象类型是否匹配
         if (flowTxExecutor != null) {
@@ -342,6 +346,15 @@ public class FlowExecutor {
         }
 
         /**
+         * 获取节点决策器的目标对象类型
+         *
+         * @return null 如果节点决策器没有TargetContext参数
+         */
+        public Class getClassOfTargetOfNodeDecider() {
+            return nodeDeciderExecutor.getClassOfTarget();
+        }
+
+        /**
          * 校验节点执行器是否有效
          *
          * @throws IllegalStateException 如果校验不通过
@@ -358,10 +371,13 @@ public class FlowExecutor {
         public static class NodeDeciderExecutor extends MethodExecutor {
             // 参数类型
             private ParametersType parametersType;
+            // 目标对象类型
+            private Class classOfTarget;
 
-            public NodeDeciderExecutor(Method targetMethod, ParametersType parametersType) {
+            public NodeDeciderExecutor(Method targetMethod, ParametersType parametersType, Class classOfTarget) {
                 super(targetMethod);
                 this.parametersType = parametersType;
+                this.classOfTarget = classOfTarget;
             }
 
             /**
@@ -386,6 +402,15 @@ public class FlowExecutor {
                     default:
                         throw new IllegalStateException("下个节点选择方法执行器内部状态不对");
                 }
+            }
+
+            /**
+             * 获取目标对象类型
+             *
+             * @return null 如果节点决策器没有TargetContext参数
+             */
+            public Class getClassOfTarget() {
+                return classOfTarget;
             }
 
             /**
