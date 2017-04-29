@@ -10,6 +10,7 @@ package top.bekit.flow.transaction;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ResolvableType;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
 import top.bekit.flow.annotation.transaction.FlowTx;
@@ -67,11 +68,14 @@ public class FlowTxParser {
         if (parameterTypes[0] != TargetContext.class) {
             throw new IllegalArgumentException("流程事务方法" + ClassUtils.getQualifiedMethodName(method) + "的入参必须是（TargetContext）");
         }
+        // 获取目标对象类型
+        ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 0);
+        Class classOfTarget = resolvableType.getGeneric(0).resolve(Object.class);
         // 校验返回参数
-        if (method.getReturnType() == void.class) {
-            throw new IllegalArgumentException("流程事务方法" + ClassUtils.getQualifiedMethodName(method) + "的返回类型不能是void，需要返回操作后的目标对象");
+        if (method.getReturnType() != classOfTarget) {
+            throw new IllegalArgumentException("流程事务方法" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是目标对象类型");
         }
 
-        return new FlowTxMethodExecutor(method);
+        return new FlowTxMethodExecutor(method, classOfTarget);
     }
 }

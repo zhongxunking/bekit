@@ -41,7 +41,9 @@ public class TheFlowListenerExecutor {
     // 特定流程监听器
     private Object theFlowListener;
     // 方法执行器Map（key：监听方法注解的CLass）
-    private Map<Class, MethodExecutor> methodExecutorMap = new HashMap<>();
+    private Map<Class, AbstractTheFlowListenerMethodExecutor> methodExecutorMap = new HashMap<>();
+    // 目标对象类型
+    private Class classOfTarget = Object.class;
 
     public TheFlowListenerExecutor(String flow, Object theFlowListener) {
         this.flow = flow;
@@ -82,7 +84,7 @@ public class TheFlowListenerExecutor {
      * @param clazz          类型
      * @param methodExecutor 方法执行器
      */
-    public void setListenMethodExecutor(Class clazz, MethodExecutor methodExecutor) {
+    public void setListenMethodExecutor(Class clazz, AbstractTheFlowListenerMethodExecutor methodExecutor) {
         if (!LISTEN_METHOD_EXECUTOR_MAP.containsKey(clazz)) {
             throw new IllegalArgumentException("流程监听方法类型" + ClassUtils.getShortName(clazz) + "不合法");
         }
@@ -93,6 +95,8 @@ public class TheFlowListenerExecutor {
             throw new IllegalStateException("特定流程监听器" + ClassUtils.getShortName(theFlowListener.getClass()) + "存在多个@" + ClassUtils.getShortName(clazz) + "类型的流程监听方法");
         }
         methodExecutorMap.put(clazz, methodExecutor);
+        // 设值目标对象类型
+        classOfTarget = methodExecutor.getClassOfTarget();
     }
 
     /**
@@ -100,6 +104,13 @@ public class TheFlowListenerExecutor {
      */
     public String getFlow() {
         return flow;
+    }
+
+    /**
+     * 获取目标对象类型
+     */
+    public Class getClassOfTarget() {
+        return classOfTarget;
     }
 
     /**
@@ -111,15 +122,21 @@ public class TheFlowListenerExecutor {
         if (flow == null || theFlowListener == null) {
             throw new IllegalStateException("特定流程监听器内部要素不全");
         }
+        // 校验特定流程监听器内目标对象类型是否统一
+        for (AbstractTheFlowListenerMethodExecutor methodExecutor : methodExecutorMap.values()) {
+            if (methodExecutor.getClassOfTarget() != classOfTarget) {
+                throw new IllegalStateException("特定流程监听器" + ClassUtils.getShortName(theFlowListener.getClass()) + "内目标对象类型不统一");
+            }
+        }
     }
 
     /**
      * 监听节点选择事件方法执行器
      */
-    public static class ListenNodeDecideMethodExecutor extends MethodExecutor {
+    public static class ListenNodeDecideMethodExecutor extends AbstractTheFlowListenerMethodExecutor {
 
-        public ListenNodeDecideMethodExecutor(Method targetMethod) {
-            super(targetMethod);
+        public ListenNodeDecideMethodExecutor(Method targetMethod, Class classOfTarget) {
+            super(targetMethod, classOfTarget);
         }
 
         /**
@@ -138,10 +155,10 @@ public class TheFlowListenerExecutor {
     /**
      * 监听流程异常事件方法执行器
      */
-    public static class ListenFlowExceptionMethodExecutor extends MethodExecutor {
+    public static class ListenFlowExceptionMethodExecutor extends AbstractTheFlowListenerMethodExecutor {
 
-        public ListenFlowExceptionMethodExecutor(Method targetMethod) {
-            super(targetMethod);
+        public ListenFlowExceptionMethodExecutor(Method targetMethod, Class classOfTarget) {
+            super(targetMethod, classOfTarget);
         }
 
         /**
@@ -157,4 +174,19 @@ public class TheFlowListenerExecutor {
         }
     }
 
+    // 抽象特定流程监听器方法执行器
+    public static class AbstractTheFlowListenerMethodExecutor extends MethodExecutor {
+        // 目标对象类型
+        private Class classOfTarget;
+
+        public AbstractTheFlowListenerMethodExecutor(Method targetMethod, Class classOfTarget) {
+            super(targetMethod);
+            this.classOfTarget = classOfTarget;
+        }
+
+        // 获取目标对象类型
+        public Class getClassOfTarget() {
+            return classOfTarget;
+        }
+    }
 }

@@ -10,6 +10,7 @@ package top.bekit.flow.engine;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ClassUtils;
 import top.bekit.flow.FlowEngine;
 import top.bekit.flow.flow.FlowExecutor;
 import top.bekit.flow.flow.FlowHolder;
@@ -62,6 +63,8 @@ public class DefaultFlowEngine implements FlowEngine {
         try {
             // 获取流程执行器
             FlowExecutor flowExecutor = flowHolder.getRequiredFlowExecutor(flow);
+            // 校验目标对象类型
+            checkTargetClass(targetContext.getTarget(), flowExecutor);
             // 执行流程
             flowExecutor.execute(targetContext);
         } catch (Throwable e) {
@@ -70,4 +73,10 @@ public class DefaultFlowEngine implements FlowEngine {
         }
     }
 
+    // 校验目标对象类型
+    private void checkTargetClass(Object target, FlowExecutor flowExecutor) {
+        if (!flowExecutor.getClassOfTarget().isAssignableFrom(target.getClass())) {
+            throw new IllegalArgumentException(String.format("传入的目标对象的类型[%s]和流程%s期望的类型[%s]不匹配", ClassUtils.getShortName(target.getClass()), flowExecutor.getFlowName(), ClassUtils.getShortName(flowExecutor.getClassOfTarget())));
+        }
+    }
 }

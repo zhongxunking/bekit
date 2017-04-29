@@ -8,6 +8,7 @@
  */
 package top.bekit.flow.flow;
 
+import org.springframework.util.ClassUtils;
 import top.bekit.common.method.MethodExecutor;
 import top.bekit.event.EventPublisher;
 import top.bekit.flow.engine.TargetContext;
@@ -205,6 +206,20 @@ public class FlowExecutor {
     }
 
     /**
+     * 获取流程名称
+     */
+    public String getFlowName() {
+        return flowName;
+    }
+
+    /**
+     * 获取目标对象类型
+     */
+    public Class getClassOfTarget() {
+        return mappingExecutor.getClassOfTarget();
+    }
+
+    /**
      * 校验流程执行器是否有效
      *
      * @throws IllegalStateException 如果校验不通过
@@ -231,13 +246,19 @@ public class FlowExecutor {
                 throw new IllegalStateException("流程" + flowName + "的enableFlowTx属性为关闭状态，但设置了流程事务");
             }
         }
-    }
-
-    /**
-     * 获取流程名称
-     */
-    public String getFlowName() {
-        return flowName;
+        // 校验流程节点的处理器的目标对象类型是否匹配
+        for (NodeExecutor nodeExecutor : nodeExecutorMap.values()) {
+            Class classOfTargetOfProcessor = nodeExecutor.getClassOfTargetOfProcessor();
+            if (classOfTargetOfProcessor != null && !classOfTargetOfProcessor.isAssignableFrom(getClassOfTarget())) {
+                throw new IllegalStateException("流程" + flowName + "内" + nodeExecutor.getNodeName() + "节点的处理器的目标对象类型和流程的目标对象类型不匹配");
+            }
+        }
+        // 校验流程事务的目标对象类型是否匹配
+        if (flowTxExecutor != null) {
+            if (!flowTxExecutor.getClassOfTarget().isAssignableFrom(getClassOfTarget())) {
+                throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTxExecutor.getClass()) + "的目标对象类型与流程" + flowName + "的目标对象类型不匹配");
+            }
+        }
     }
 
     /**
@@ -305,6 +326,22 @@ public class FlowExecutor {
         }
 
         /**
+         * 获取节点名称
+         */
+        public String getNodeName() {
+            return nodeName;
+        }
+
+        /**
+         * 获取处理器的目标对象类型
+         *
+         * @return null 如果该节点没有处理器
+         */
+        public Class getClassOfTargetOfProcessor() {
+            return processorExecutor != null ? processorExecutor.getClassOfTarget() : null;
+        }
+
+        /**
          * 校验节点执行器是否有效
          *
          * @throws IllegalStateException 如果校验不通过
@@ -316,14 +353,7 @@ public class FlowExecutor {
         }
 
         /**
-         * 获取节点名称
-         */
-        public String getNodeName() {
-            return nodeName;
-        }
-
-        /**
-         * 节点决策器执行器（选出下个节点）
+         * 节点决策器执行器（选出下一个节点）
          */
         public static class NodeDeciderExecutor extends MethodExecutor {
             // 参数类型
@@ -386,9 +416,12 @@ public class FlowExecutor {
      * 目标对象映射执行器
      */
     public static class TargetMappingExecutor extends MethodExecutor {
+        // 目标对象类型
+        private Class classOfTarget;
 
-        public TargetMappingExecutor(Method targetMethod) {
+        public TargetMappingExecutor(Method targetMethod, Class classOfTarget) {
             super(targetMethod);
+            this.classOfTarget = classOfTarget;
         }
 
         /**
@@ -401,6 +434,13 @@ public class FlowExecutor {
          */
         public String execute(Object flow, TargetContext targetContext) throws Throwable {
             return (String) execute(flow, new Object[]{targetContext.getTarget()});
+        }
+
+        /**
+         * 获取目标对象类型
+         */
+        public Class getClassOfTarget() {
+            return classOfTarget;
         }
     }
 }

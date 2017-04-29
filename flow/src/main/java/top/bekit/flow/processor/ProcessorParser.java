@@ -11,6 +11,7 @@ package top.bekit.flow.processor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ResolvableType;
 import org.springframework.util.ClassUtils;
 import top.bekit.flow.annotation.processor.Execute;
 import top.bekit.flow.annotation.processor.Processor;
@@ -65,12 +66,16 @@ public class ProcessorParser {
         if (!Modifier.isPublic(method.getModifiers())) {
             throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
         }
-        // 判断是否有入参+校验入参
+        // 判断是否有入参+校验入参+获取目标对象类型
         Class[] parameterTypes = method.getParameterTypes();
+        Class classOfTarget = null;
         if (parameterTypes.length == 1) {
             if (parameterTypes[0] != TargetContext.class) {
                 throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "要么没入参，要么入参必须是（TargetContext）");
             }
+            // 获取目标对象类型
+            ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 0);
+            classOfTarget = resolvableType.getGeneric(0).resolve(Object.class);
         } else if (parameterTypes.length != 0) {
             throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "要么没入参，要么入参必须是（TargetContext）");
         }
@@ -79,6 +84,6 @@ public class ProcessorParser {
             throw new IllegalArgumentException("非@Execute类型的处理器方法" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是void");
         }
 
-        return new ProcessorMethodExecutor(method);
+        return new ProcessorMethodExecutor(method, classOfTarget);
     }
 }

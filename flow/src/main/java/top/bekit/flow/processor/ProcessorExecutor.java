@@ -90,6 +90,29 @@ public class ProcessorExecutor {
     }
 
     /**
+     * 获取返回类型
+     *
+     * @throws IllegalStateException 如果不存在@Execute类型的处理器方法
+     */
+    public Class getReturnType() {
+        return methodExecutorMap.get(Execute.class).getReturnType();
+    }
+
+    /**
+     * 获取目标对象类型
+     */
+    public Class getClassOfTarget() {
+        return methodExecutorMap.get(Execute.class).getClassOfTarget();
+    }
+
+    /**
+     * 获取处理器名称
+     */
+    public String getProcessorName() {
+        return processorName;
+    }
+
+    /**
      * 校验处理器执行器是否有效
      *
      * @throws IllegalStateException 校验不通过
@@ -101,26 +124,12 @@ public class ProcessorExecutor {
         if (!methodExecutorMap.containsKey(Execute.class)) {
             throw new IllegalStateException("处理器" + processorName + "不存在@Execute类型的处理器方法");
         }
-    }
-
-    /**
-     * 获取返回类型
-     *
-     * @throws IllegalStateException 如果不存在@Execute类型的处理器方法
-     */
-    public Class getReturnType() {
-        ProcessorMethodExecutor methodExecutor = methodExecutorMap.get(Execute.class);
-        if (methodExecutor == null) {
-            throw new IllegalStateException("处理器" + processorName + "不存在@Execute类型的处理器方法，无法获取返回类型");
+        // 校验处理器内部目标对象类型是否统一
+        for (ProcessorMethodExecutor methodExecutor : methodExecutorMap.values()) {
+            if (methodExecutor.getClassOfTarget() != null && methodExecutor.getClassOfTarget() != getClassOfTarget()) {
+                throw new IllegalStateException("处理器" + processorName + "内目标对象类型不统一");
+            }
         }
-        return methodExecutor.getReturnType();
-    }
-
-    /**
-     * 获取处理器名称
-     */
-    public String getProcessorName() {
-        return processorName;
     }
 
     /**
@@ -129,10 +138,13 @@ public class ProcessorExecutor {
     public static class ProcessorMethodExecutor extends MethodExecutor {
         // 是否有入参
         private boolean hasParameter;
+        // 目标对象类型
+        private Class classOfTarget;
 
-        public ProcessorMethodExecutor(Method targetMethod) {
+        public ProcessorMethodExecutor(Method targetMethod, Class classOfTarget) {
             super(targetMethod);
             this.hasParameter = getParameterTypes().length > 0;
+            this.classOfTarget = classOfTarget;
         }
 
         /**
@@ -148,6 +160,13 @@ public class ProcessorExecutor {
             } else {
                 return execute(processor, new Object[]{});
             }
+        }
+
+        /**
+         * 获取目标对象类型
+         */
+        public Class getClassOfTarget() {
+            return classOfTarget;
         }
     }
 }

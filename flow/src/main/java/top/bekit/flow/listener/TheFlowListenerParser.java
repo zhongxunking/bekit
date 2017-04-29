@@ -10,12 +10,13 @@ package top.bekit.flow.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ResolvableType;
 import org.springframework.util.ClassUtils;
-import top.bekit.common.method.MethodExecutor;
 import top.bekit.flow.annotation.listener.ListenFlowException;
 import top.bekit.flow.annotation.listener.ListenNodeDecide;
 import top.bekit.flow.annotation.listener.TheFlowListener;
 import top.bekit.flow.engine.TargetContext;
+import top.bekit.flow.listener.TheFlowListenerExecutor.AbstractTheFlowListenerMethodExecutor;
 import top.bekit.flow.listener.TheFlowListenerExecutor.ListenFlowExceptionMethodExecutor;
 import top.bekit.flow.listener.TheFlowListenerExecutor.ListenNodeDecideMethodExecutor;
 
@@ -55,7 +56,7 @@ public class TheFlowListenerParser {
     }
 
     // 解析监听方法
-    private static MethodExecutor parseListenMethodExecutor(Class clazz, Method method) {
+    private static AbstractTheFlowListenerMethodExecutor parseListenMethodExecutor(Class clazz, Method method) {
         logger.debug("解析流程监听方法：{}", method);
         // 校验方法类型
         if (!Modifier.isPublic(method.getModifiers())) {
@@ -68,10 +69,14 @@ public class TheFlowListenerParser {
         // 校验入参
         if (clazz == ListenNodeDecide.class) {
             checkListenNodeDecideMethodParameterTypes(method);
-            return new ListenNodeDecideMethodExecutor(method);
+            // 获取目标对象类型
+            ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 1);
+            return new ListenNodeDecideMethodExecutor(method, resolvableType.getGeneric(0).resolve(Object.class));
         } else if (clazz == ListenFlowException.class) {
             checkListenFlowExceptionMethodParameterTypes(method);
-            return new ListenFlowExceptionMethodExecutor(method);
+            // 获取目标对象类型
+            ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 1);
+            return new ListenFlowExceptionMethodExecutor(method, resolvableType.getGeneric(0).resolve(Object.class));
         } else {
             throw new IllegalArgumentException("非法的流程监听方法类型" + ClassUtils.getShortName(clazz));
         }

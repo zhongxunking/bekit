@@ -104,6 +104,20 @@ public class FlowTxExecutor extends TxExecutor {
     }
 
     /**
+     * 获取对应流程名称
+     */
+    public String getFlow() {
+        return flow;
+    }
+
+    /**
+     * 获取目标对象类型
+     */
+    public Class getClassOfTarget() {
+        return flowTxMethodExecutorMap.get(LockTarget.class).getClassOfTarget();
+    }
+
+    /**
      * 校验流程事务执行器有效性
      *
      * @throws IllegalStateException 如果校验不通过
@@ -117,22 +131,24 @@ public class FlowTxExecutor extends TxExecutor {
         if (!flowTxMethodExecutorMap.containsKey(LockTarget.class)) {
             throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTx.getClass()) + "不存在@LockTarget类型方法");
         }
-    }
-
-    /**
-     * 获取对应流程名称
-     */
-    public String getFlow() {
-        return flow;
+        // 校验流程事务内目标对象类型是否统一
+        for (FlowTxMethodExecutor methodExecutor : flowTxMethodExecutorMap.values()) {
+            if (methodExecutor.getClassOfTarget() != getClassOfTarget()) {
+                throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTx.getClass()) + "内目标对象类型不统一");
+            }
+        }
     }
 
     /**
      * 流程事务方法执行器
      */
     public static class FlowTxMethodExecutor extends MethodExecutor {
+        // 目标对象类型
+        private Class classOfTarget;
 
-        public FlowTxMethodExecutor(Method targetMethod) {
+        public FlowTxMethodExecutor(Method targetMethod, Class classOfTarget) {
             super(targetMethod);
+            this.classOfTarget = classOfTarget;
         }
 
         /**
@@ -145,6 +161,13 @@ public class FlowTxExecutor extends TxExecutor {
          */
         public Object execute(Object flowTx, TargetContext targetContext) throws Throwable {
             return execute(flowTx, new Object[]{targetContext});
+        }
+
+        /**
+         * 获取目标对象类型
+         */
+        public Class getClassOfTarget() {
+            return classOfTarget;
         }
     }
 }

@@ -181,6 +181,6 @@ public class FlowParser {
             throw new IllegalArgumentException("目标对象映射方法" + ClassUtils.getQualifiedMethodName(method) + "返回参数必须是String类型");
         }
 
-        return new TargetMappingExecutor(method);
+        return new TargetMappingExecutor(method, parameterTypes[0]);
     }
 }
