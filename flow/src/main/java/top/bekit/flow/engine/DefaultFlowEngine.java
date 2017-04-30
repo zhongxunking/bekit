@@ -34,6 +34,8 @@ public class DefaultFlowEngine implements FlowEngine {
 
     @Override
     public <T> T start(String flow, T target, Map<Object, Object> attachment) {
+        // 校验目标对象类型
+        checkClassOfTarget(target, flow);
         // 构造目标上下文
         TargetContext<T> targetContext = new TargetContext(target, attachment);
         // 执行流程
@@ -44,6 +46,8 @@ public class DefaultFlowEngine implements FlowEngine {
 
     @Override
     public <T> T insertTargetAndStart(String flow, T target, Map<Object, Object> attachment) {
+        // 校验目标对象类型
+        checkClassOfTarget(target, flow);
         // 构造目标上下文
         TargetContext<T> targetContext = new TargetContext(target, attachment);
         try {
@@ -63,8 +67,6 @@ public class DefaultFlowEngine implements FlowEngine {
         try {
             // 获取流程执行器
             FlowExecutor flowExecutor = flowHolder.getRequiredFlowExecutor(flow);
-            // 校验目标对象类型
-            checkClassOfTarget(targetContext.getTarget(), flowExecutor);
             // 执行流程
             flowExecutor.execute(targetContext);
         } catch (Throwable e) {
@@ -74,7 +76,8 @@ public class DefaultFlowEngine implements FlowEngine {
     }
 
     // 校验目标对象类型
-    private void checkClassOfTarget(Object target, FlowExecutor flowExecutor) {
+    private void checkClassOfTarget(Object target, String flow) {
+        FlowExecutor flowExecutor = flowHolder.getRequiredFlowExecutor(flow);
         if (!flowExecutor.getClassOfTarget().isAssignableFrom(target.getClass())) {
             throw new IllegalArgumentException(String.format("传入的目标对象的类型[%s]和流程%s期望的类型[%s]不匹配", ClassUtils.getShortName(target.getClass()), flowExecutor.getFlowName(), ClassUtils.getShortName(flowExecutor.getClassOfTarget())));
         }
