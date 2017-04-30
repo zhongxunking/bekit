@@ -128,7 +128,7 @@ public class FlowParser {
                     parametersType = NodeDeciderExecutor.ParametersType.ONLY_TARGET_CONTEXT;
                     // 解析目标对象类型
                     ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 0);
-                    classOfTarget = resolvableType.getGeneric(0).resolve();
+                    classOfTarget = resolvableType.getGeneric(0).resolve(Object.class);
                 } else {
                     // 入参类型：(T)
                     if (processorExecutor == null) {
@@ -153,7 +153,7 @@ public class FlowParser {
                 parametersType = NodeDeciderExecutor.ParametersType.PROCESS_RESULT_AND_TARGET_CONTEXT;
                 // 解析目标对象类型
                 ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 1);
-                classOfTarget = resolvableType.getGeneric(0).resolve();
+                classOfTarget = resolvableType.getGeneric(0).resolve(Object.class);
             } else {
                 throw new IllegalArgumentException("节点决策器" + ClassUtils.getQualifiedMethodName(method) + "的入参个数不能超过2个");
             }
