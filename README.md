@@ -270,7 +270,7 @@
 
 处理器通过@Processor进行注解，根据可能存在的需求将处理器方法分成了5种类型，只有@Execute类型方法是必须有的，其他都是可选的。
     
-处理器方法可以没有入参，也可以有入参。有入参的话只能有一个入参且类型必须是TargetContext。TargetContext是目标上下文，可以通过它获取你传给流程引擎的目标对象（targetContext.getTarget()）
+处理器方法必须只能有一个入参且类型必须是TargetContext。TargetContext是目标上下文，可以通过它获取你传给流程引擎的目标对象（targetContext.getTarget()）
     
 处理器执行过程中发生任何异常都会往外抛。一个处理器可以同时被多个流程使用。
     
@@ -316,12 +316,12 @@
         public class DemoFlowTx {
         
             @LockTarget     // 锁目标对象，必选
-            public Trade lockTarget(TargetContext<Trade> targetContext) { // 目标上下文
+            public Trade lockTarget(TargetContext<Trade> targetContext) { // 目标上下文中的泛型必须和返回类型一致
                 // 在并发情况下需要用锁来控制并发
                 // 流程引擎知道什么时候应该锁目标对象，但是流程引擎并不知道怎么锁住目标对象（不知道数据库表等信息）
                 // 所以你需要在这里实现具体锁住目标对象的代码
                 
-                // 锁住的目标对象后必须查出目标对象最新内容并返回给流程引擎，流程引擎需要将它更新到目标上下文，
+                // 锁住目标对象后必须查出目标对象最新内容并返回给流程引擎，流程引擎需要将它更新到目标上下文，
                 // 因为在锁住之前目标对象可能被其他线程执行了，并修改了其中的内容
             }
         
@@ -386,8 +386,8 @@
 
 
 
-        // demoService是需要执行的服务名称，XXXOrder是这个服务需要的order，XXXResult是这个服务的result,在执行过程中你肯定会对result设值:）
-        XXXResult result = serviceEngine.execute("demoService", new XXXOrder("001"), new XXXResult());
+        // demoService是需要执行的服务名称，XXXOrder是这个服务需要的order，XXXResult是这个服务的result,result是由服务引擎根据服务创建的
+        XXXResult result = serviceEngine.execute("demoService", new XXXOrder("001"));
         
 ### 2. 一个简单的服务引擎使用样例：
 一个完整的对服务引擎的使用应该包括：定义服务、定义服务监听器、使用服务引擎执行服务。
@@ -445,7 +445,7 @@
 > 注意：服务引擎目前只有这三种类型事件，就目前来看我觉得用这三种事件来完成业务已经足够了。服务监听器是监听的所有服务的事件，而不是针对某个特定服务监听事件。
 
 #### 3. 使用服务引擎执行服务
-        
-        // demoService是需要执行的服务名称，XXXOrder是这个服务需要的order，XXXResult是这个服务的result（在执行过程中你肯定会对result设值）
-        XXXResult result = serviceEngine.execute("demoService", new XXXOrder("001"), new XXXResult());
+
+        // demoService是需要执行的服务名称，XXXOrder是这个服务需要的order，XXXResult是这个服务的result,result是由服务引擎根据服务创建的
+        XXXResult result = serviceEngine.execute("demoService", new XXXOrder("001"));
     
