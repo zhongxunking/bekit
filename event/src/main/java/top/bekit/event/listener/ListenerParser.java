@@ -33,7 +33,7 @@ public class ListenerParser {
      * @return 监听器执行器
      */
     public static ListenerExecutor parseListener(Object listener) {
-        logger.info("解析监听器：{}", listener);
+        logger.info("解析监听器：{}", ClassUtils.getQualifiedName(listener.getClass()));
         // 此处得到的@Listener是已经经过@AliasFor属性别名进行属性同步后的结果
         Listener listenerAnnotation = AnnotatedElementUtils.findMergedAnnotation(listener.getClass(), Listener.class);
         // 创建监听器执行器

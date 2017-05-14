@@ -37,7 +37,7 @@ public class ServiceParser {
      * @return 服务执行器
      */
     public static ServiceExecutor parseService(Object service, PlatformTransactionManager txManager) {
-        logger.info("解析服务：{}", service);
+        logger.info("解析服务：{}", ClassUtils.getQualifiedName(service.getClass()));
         Service serviceAnnotation = service.getClass().getAnnotation(Service.class);
         // 获取服务名称
         String serviceName = serviceAnnotation.name();

@@ -44,7 +44,7 @@ public class FlowParser {
      * @return 流程执行器
      */
     public static FlowExecutor parseFlow(Object flow, ProcessorHolder processorHolder, FlowTxHolder flowTxHolder, EventBusHolder eventBusHolder) {
-        logger.info("解析流程：{}", flow);
+        logger.info("解析流程：{}", ClassUtils.getQualifiedName(flow.getClass()));
         Flow flowAnnotation = flow.getClass().getAnnotation(Flow.class);
         // 获取流程名称
         String flowName = flowAnnotation.name();

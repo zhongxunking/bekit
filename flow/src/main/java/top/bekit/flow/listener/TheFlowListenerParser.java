@@ -37,7 +37,7 @@ public class TheFlowListenerParser {
      * @return 特定流程监听器执行器
      */
     public static TheFlowListenerExecutor parseTheFlowListener(Object theFlowListener) {
-        logger.info("解析特定流程监听器：{}", theFlowListener);
+        logger.info("解析特定流程监听器：{}", ClassUtils.getQualifiedName(theFlowListener.getClass()));
         TheFlowListener theFlowListenerAnnotation = theFlowListener.getClass().getAnnotation(TheFlowListener.class);
         // 创建特定流程监听器执行器
         TheFlowListenerExecutor theFlowListenerExecutor = new TheFlowListenerExecutor(theFlowListenerAnnotation.flow(), theFlowListener);

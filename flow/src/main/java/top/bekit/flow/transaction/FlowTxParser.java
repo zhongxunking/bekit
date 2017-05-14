@@ -35,7 +35,7 @@ public class FlowTxParser {
      * @return 流程事务执行器
      */
     public static FlowTxExecutor parseFlowTx(Object flowTx, PlatformTransactionManager txManager) {
-        logger.info("解析流程事务：{}", flowTx);
+        logger.info("解析流程事务：{}", ClassUtils.getQualifiedName(flowTx.getClass()));
         FlowTx flowTxAnnotation = flowTx.getClass().getAnnotation(FlowTx.class);
         // 创建流程事务执行器
         FlowTxExecutor flowTxExecutor = new FlowTxExecutor(flowTxAnnotation.flow(), flowTx, txManager);

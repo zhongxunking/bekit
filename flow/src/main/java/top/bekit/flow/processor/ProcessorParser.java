@@ -35,7 +35,7 @@ public class ProcessorParser {
      * @return 处理器执行器
      */
     public static ProcessorExecutor parseProcessor(Object processor) {
-        logger.info("解析处理器：{}", processor);
+        logger.info("解析处理器：{}", ClassUtils.getQualifiedName(processor.getClass()));
         // 获取处理器名称
         String processorName = processor.getClass().getAnnotation(Processor.class).name();
         if (StringUtils.isEmpty(processorName)) {
