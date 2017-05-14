@@ -26,7 +26,7 @@ public abstract class MethodExecutor {
      * 执行方法
      *
      * @param obj  被执行的对象
-     * @param args 需传入目标方法的参数（当目标方法无入参时，会忽略args）
+     * @param args 需传入目标方法的参数
      * @return 目标方法返回的结果
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
