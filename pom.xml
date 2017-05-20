@@ -18,8 +18,16 @@
     <url>http://bekit.top</url>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!--设置jdk版本-->
+        <java.version>1.8</java.version>
     </properties>
+
+    <modules>
+        <module>common</module>
+        <module>event</module>
+        <module>flow</module>
+        <module>service</module>
+    </modules>
 
     <dependencyManagement>
         <dependencies>
@@ -30,13 +38,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <modules>
-        <module>common</module>
-        <module>event</module>
-        <module>flow</module>
-        <module>service</module>
-    </modules>
 
     <licenses>
         <license>
@@ -58,24 +59,15 @@
 
     <build>
         <plugins>
-            <!--设置jdk版本-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <!--install时打包源代码-->
+            <!--打包源码-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>attach-sources</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -88,19 +80,6 @@
             <id>release</id>
             <build>
                 <plugins>
-                    <!-- Source -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <!-- Javadoc -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
