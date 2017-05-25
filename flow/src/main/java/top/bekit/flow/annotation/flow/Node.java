@@ -20,7 +20,7 @@ import java.lang.annotation.*;
 public @interface Node {
 
     /**
-     * 节点名称（默认使用被注解的函数名，在一个流程图内节点名称需唯一）
+     * 节点名称（默认使用被注解的函数名，在一个流程内节点名称需唯一）
      */
     String name() default "";
 
