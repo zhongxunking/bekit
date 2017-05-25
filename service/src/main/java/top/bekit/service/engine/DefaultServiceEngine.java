@@ -33,12 +33,34 @@ public class DefaultServiceEngine implements ServiceEngine {
 
     @Override
     public <O, R> R execute(String service, O order) {
+        // 校验order类型
+        checkOrderClass(order, service);
+        // 构建服务上下文
+        ServiceContext<O, R> serviceContext = new ServiceContext(order, newResult(service));
+        // 执行服务
+        executeService(service, serviceContext);
+
+        return serviceContext.getResult();
+    }
+
+    // 校验入参order类型
+    private void checkOrderClass(Object order, String service) {
+        ServiceExecutor serviceExecutor = serviceHolder.getRequiredServiceExecutor(service);
+        if (!serviceExecutor.getOrderClass().isAssignableFrom(order.getClass())) {
+            throw new IllegalArgumentException("入参order的类型和服务" + serviceExecutor.getServiceName() + "期望的类型不匹配");
+        }
+    }
+
+    // 创建result
+    private Object newResult(String service) {
+        ServiceExecutor serviceExecutor = serviceHolder.getRequiredServiceExecutor(service);
+        return ReflectUtils.newInstance(serviceExecutor.getResultClass());
+    }
+
+    // 执行服务
+    private void executeService(String service, ServiceContext serviceContext) {
         // 获取服务执行器
         ServiceExecutor serviceExecutor = serviceHolder.getRequiredServiceExecutor(service);
-        // 校验order类型
-        checkOrderClass(order, serviceExecutor);
-        // 构建服务上下文
-        ServiceContext<O, R> serviceContext = new ServiceContext(order, newResult(serviceExecutor));
         try {
             // 发布服务申请事件
             eventPublisher.publish(new ServiceApplyEvent(service, serviceContext));
@@ -51,18 +73,5 @@ public class DefaultServiceEngine implements ServiceEngine {
             // 发布服务结束事件
             eventPublisher.publish(new ServiceFinishEvent(service, serviceContext));
         }
-        return serviceContext.getResult();
-    }
-
-    // 校验入参order类型
-    private void checkOrderClass(Object order, ServiceExecutor serviceExecutor) {
-        if (!serviceExecutor.getOrderClass().isAssignableFrom(order.getClass())) {
-            throw new IllegalArgumentException("入参order的类型和服务" + serviceExecutor.getServiceName() + "期望的类型不匹配");
-        }
-    }
-
-    // 创建result
-    private Object newResult(ServiceExecutor serviceExecutor) {
-        return ReflectUtils.newInstance(serviceExecutor.getResultClass());
     }
 }
