@@ -46,6 +46,18 @@ public class DefaultFlowEngine implements FlowEngine {
     }
 
     @Override
+    public <T> T insertTarget(String flow, T target, Map<Object, Object> attachment) {
+        // 校验目标对象类型
+        checkClassOfTarget(target, flow);
+        // 构造目标上下文
+        TargetContext<T> targetContext = new TargetContext(target, attachment);
+        // 执行插入目标对象
+        executeInsertTarget(flow, targetContext);
+
+        return targetContext.getTarget();
+    }
+
+    @Override
     public <T> T insertTargetAndStart(String flow, T target, Map<Object, Object> attachment) {
         // 校验目标对象类型
         checkClassOfTarget(target, flow);
