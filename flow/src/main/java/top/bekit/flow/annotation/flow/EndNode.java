@@ -19,7 +19,7 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Node(autoExecute = false, commitTx = true)
+@Node(autoExecute = false, newTx = true)
 public @interface EndNode {
 
     /**

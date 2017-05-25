@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 
 /**
  * 节点
- * （此为节点父注解，StartNode、ProcessNode、StateNode、WaitNode、EndNode都是根据此节点延伸的）
+ * （此为节点父注解，StartNode、ProcessNode、StateNode、WaitNode、EndNode都是根据此注解延伸的）
  */
 @Documented
 @Target(ElementType.ANNOTATION_TYPE)
@@ -35,8 +35,8 @@ public @interface Node {
     boolean autoExecute() default true;
 
     /**
-     * 本节点实行完后是否提交事务（默认不提交）
+     * 本节点执行前是否创建新事务（默认不新建）
      */
-    boolean commitTx() default false;
+    boolean newTx() default false;
 
 }

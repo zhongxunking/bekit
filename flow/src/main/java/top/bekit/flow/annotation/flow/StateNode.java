@@ -20,7 +20,7 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Node(commitTx = true)
+@Node(newTx = true)
 public @interface StateNode {
 
     /**
