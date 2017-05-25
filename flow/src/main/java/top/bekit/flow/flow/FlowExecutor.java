@@ -37,8 +37,6 @@ public class FlowExecutor {
     private String startNode;
     // 结束节点
     private Set<String> endNodes = new HashSet<>();
-    // 等待节点（结束节点也属于等待节点）
-    private Set<String> waitNodes = new HashSet<>();
     // 节点执行器Map（key：节点名称）
     private Map<String, NodeExecutor> nodeExecutorMap = new HashMap<>();
     // 目标对象映射执行器
@@ -70,24 +68,26 @@ public class FlowExecutor {
                 NodeExecutor nodeExecutor = nodeExecutorMap.get(node);
                 do {
                     // 执行节点
-                    String nextNode = nodeExecutor.execute(flow, targetContext);
+                    node = nodeExecutor.execute(flow, targetContext);
                     // 判断是否中断流程
-                    if (nextNode == null) {
+                    if (node == null) {
                         break;
                     }
-                    if (!nodeExecutorMap.containsKey(nextNode)) {
-                        throw new RuntimeException("流程" + flowName + "不存在下一个节点" + nextNode);
+                    // 判断节点是否存在
+                    if (!nodeExecutorMap.containsKey(node)) {
+                        throw new RuntimeException("流程" + flowName + "不存在节点" + node);
                     }
                     // 发送节点选择事件
-                    eventPublisher.publish(new NodeDecideEvent(flowName, nextNode, targetContext));
-                    // 判断是否提交事务
-                    if (enableFlowTx && nodeExecutor.isCommitTx() && !waitNodes.contains(nextNode)) {
-                        afterStep();
-                        // 获取即将执行的节点（防止事务提交后目标对象被其他线程抢占被执行到其他节点，此处就是更新到最新节点）
-                        nextNode = beforeStep(targetContext);
-                    }
+                    eventPublisher.publish(new NodeDecideEvent(flowName, node, targetContext));
                     // 获取下一个节点执行器
-                    nodeExecutor = nodeExecutorMap.get(nextNode);
+                    nodeExecutor = nodeExecutorMap.get(node);
+                    // 判断是否提交事务
+                    if (enableFlowTx && nodeExecutor.isNewTx() && nodeExecutor.isAutoExecute()) {
+                        afterStep();
+                        // 刷新即将执行的节点（防止事务提交后目标对象被其他线程抢占被执行到其他节点，此处就是更新到最新节点）
+                        node = beforeStep(targetContext);
+                        nodeExecutor = nodeExecutorMap.get(node);
+                    }
                 } while (nodeExecutor.isAutoExecute());
             }
             afterStep();
@@ -145,16 +145,13 @@ public class FlowExecutor {
      * 添加节点
      *
      * @param nodeExecutor 节点执行器
-     * @throws IllegalStateException 如果相同名称的节点执行器已存在
+     * @throws IllegalStateException 如果存在同名的节点
      */
     public void addNode(NodeExecutor nodeExecutor) {
         if (nodeExecutorMap.containsKey(nodeExecutor.getNodeName())) {
             throw new IllegalStateException("流程" + flowName + "存在同名的节点" + nodeExecutor.getNodeName());
         }
         nodeExecutorMap.put(nodeExecutor.getNodeName(), nodeExecutor);
-        if (!nodeExecutor.isAutoExecute()) {
-            waitNodes.add(nodeExecutor.getNodeName());
-        }
     }
 
     /**
@@ -275,16 +272,16 @@ public class FlowExecutor {
         private ProcessorExecutor processorExecutor;
         // 是否自动执行本节点
         private boolean autoExecute;
-        // 本节点执行完后是否提交事务
-        private boolean commitTx;
+        // 本节点执行前是否创建新事务
+        private boolean newTx;
         // 节点决策器执行器
         private NodeDeciderExecutor nodeDeciderExecutor;
 
-        public NodeExecutor(String nodeName, ProcessorExecutor processorExecutor, boolean autoExecute, boolean commitTx) {
+        public NodeExecutor(String nodeName, ProcessorExecutor processorExecutor, boolean autoExecute, boolean newTx) {
             this.nodeName = nodeName;
             this.processorExecutor = processorExecutor;
             this.autoExecute = autoExecute;
-            this.commitTx = commitTx;
+            this.newTx = newTx;
         }
 
         /**
@@ -323,10 +320,10 @@ public class FlowExecutor {
         }
 
         /**
-         * 本节点执行完后是否提交事务
+         * 本节点执行前是否创建新事务
          */
-        public boolean isCommitTx() {
-            return commitTx;
+        public boolean isNewTx() {
+            return newTx;
         }
 
         /**

@@ -96,7 +96,7 @@ public class FlowParser {
             processorExecutor = processorHolder.getRequiredProcessorExecutor(nodeAnnotation.processor());
         }
         // 新建节点执行器
-        NodeExecutor nodeExecutor = new NodeExecutor(nodeName, processorExecutor, nodeAnnotation.autoExecute(), nodeAnnotation.commitTx());
+        NodeExecutor nodeExecutor = new NodeExecutor(nodeName, processorExecutor, nodeAnnotation.autoExecute(), nodeAnnotation.newTx());
         // 设置节点决策器执行器
         nodeExecutor.setNodeDeciderExecutor(parseNodeDecider(method, processorExecutor));
         nodeExecutor.validate();
