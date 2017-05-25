@@ -14,6 +14,7 @@ import org.springframework.util.ClassUtils;
 import top.bekit.flow.FlowEngine;
 import top.bekit.flow.flow.FlowExecutor;
 import top.bekit.flow.flow.FlowHolder;
+import top.bekit.flow.transaction.FlowTxExecutor;
 import top.bekit.flow.transaction.FlowTxHolder;
 
 import java.util.Map;
@@ -50,16 +51,33 @@ public class DefaultFlowEngine implements FlowEngine {
         checkClassOfTarget(target, flow);
         // 构造目标上下文
         TargetContext<T> targetContext = new TargetContext(target, attachment);
+        // 执行插入目标对象
+        executeInsertTarget(flow, targetContext);
+        // 执行流程
+        executeFlow(flow, targetContext);
+
+        return targetContext.getTarget();
+    }
+
+    // 校验目标对象类型
+    private void checkClassOfTarget(Object target, String flow) {
+        FlowExecutor flowExecutor = flowHolder.getRequiredFlowExecutor(flow);
+        if (!flowExecutor.getClassOfTarget().isAssignableFrom(target.getClass())) {
+            throw new IllegalArgumentException(String.format("传入的目标对象的类型[%s]和流程%s期望的类型[%s]不匹配", ClassUtils.getShortName(target.getClass()), flowExecutor.getFlowName(), ClassUtils.getShortName(flowExecutor.getClassOfTarget())));
+        }
+    }
+
+    // 执行插入目标对象
+    private void executeInsertTarget(String flow, TargetContext targetContext) {
         try {
-            //以新事务插入目标对象到数据库并提交
-            flowTxHolder.getRequiredFlowTxExecutor(flow).insertTarget(targetContext);
-            // 执行流程
-            executeFlow(flow, targetContext);
+            // 获取流程事务执行器
+            FlowTxExecutor flowTxExecutor = flowTxHolder.getRequiredFlowTxExecutor(flow);
+            // 插入目标对象
+            flowTxExecutor.insertTarget(targetContext);
         } catch (Throwable e) {
             // 非运行时异常包装成UndeclaredThrowableException异常，让外部不用每次调用时都需要catch
             ExceptionUtils.wrapAndThrow(e);
         }
-        return targetContext.getTarget();
     }
 
     // 执行流程
@@ -72,14 +90,6 @@ public class DefaultFlowEngine implements FlowEngine {
         } catch (Throwable e) {
             // 非运行时异常包装成UndeclaredThrowableException异常，让外部不用每次调用时都需要catch
             ExceptionUtils.wrapAndThrow(e);
-        }
-    }
-
-    // 校验目标对象类型
-    private void checkClassOfTarget(Object target, String flow) {
-        FlowExecutor flowExecutor = flowHolder.getRequiredFlowExecutor(flow);
-        if (!flowExecutor.getClassOfTarget().isAssignableFrom(target.getClass())) {
-            throw new IllegalArgumentException(String.format("传入的目标对象的类型[%s]和流程%s期望的类型[%s]不匹配", ClassUtils.getShortName(target.getClass()), flowExecutor.getFlowName(), ClassUtils.getShortName(flowExecutor.getClassOfTarget())));
         }
     }
 }
