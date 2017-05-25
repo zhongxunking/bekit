@@ -43,8 +43,8 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
     public void execute(Object event) throws Throwable {
-        if (listenExecutorMap.containsKey(event.getClass())) {
-            ListenExecutor listenExecutor = listenExecutorMap.get(event.getClass());
+        ListenExecutor listenExecutor = listenExecutorMap.get(event.getClass());
+        if (listenExecutor != null) {
             listenExecutor.execute(listener, event);
         }
     }
