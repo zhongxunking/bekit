@@ -44,14 +44,14 @@ public class ServiceContext<O, R> {
     /**
      * 获取附件属性
      */
-    public <T> T getAttachmentAttribute(Object key) {
-        return (T) attachment.get(key);
+    public <V> V getAttachmentAttr(Object key) {
+        return (V) attachment.get(key);
     }
 
     /**
      * 设值附件属性
      */
-    public void setAttachmentAttribute(Object key, Object value) {
+    public void setAttachmentAttr(Object key, Object value) {
         attachment.put(key, value);
     }
 }

@@ -51,14 +51,14 @@ public class TargetContext<T> {
     /**
      * 获取附件属性
      */
-    public <V> V getAttachmentAttribute(Object key) {
+    public <V> V getAttachmentAttr(Object key) {
         return (V) attachment.get(key);
     }
 
     /**
      * 设置附件属性
      */
-    public void setAttachmentAttribute(Object key, Object value) {
+    public void setAttachmentAttr(Object key, Object value) {
         attachment.put(key, value);
     }
 }
