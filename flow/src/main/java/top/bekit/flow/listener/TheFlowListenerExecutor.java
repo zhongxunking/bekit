@@ -89,7 +89,7 @@ public class TheFlowListenerExecutor {
             throw new IllegalArgumentException("特定流程监听类型" + ClassUtils.getShortName(clazz) + "不合法");
         }
         if (listenExecutor.getClass() != LISTEN_ANNOTATION_EXECUTOR_TYPE_MAP.get(clazz)) {
-            throw new IllegalArgumentException("特定流程监听处理器类型" + ClassUtils.getShortName(listenExecutor.getClass()) + "不合法");
+            throw new IllegalArgumentException("特定流程监听执行器类型" + ClassUtils.getShortName(listenExecutor.getClass()) + "不合法");
         }
         if (listenExecutorMap.containsKey(clazz)) {
             throw new IllegalStateException("特定流程监听器" + ClassUtils.getShortName(theFlowListener.getClass()) + "存在多个监听类型@" + ClassUtils.getShortName(clazz));

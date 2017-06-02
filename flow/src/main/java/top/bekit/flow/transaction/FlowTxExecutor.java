@@ -26,16 +26,16 @@ import java.util.Map;
  */
 public class FlowTxExecutor extends TxExecutor {
     /**
-     * 流程事务方法注解
+     * 流程事务操作注解
      */
-    public static final Class[] FLOW_TX_METHOD_ANNOTATIONS = {LockTarget.class, InsertTarget.class};
+    public static final Class[] FLOW_TX_OPERATE_ANNOTATIONS = {LockTarget.class, InsertTarget.class};
 
     // 对应的流程名称
     private String flow;
     // 流程事务
     private Object flowTx;
-    // 流程事务方法执行器Map（key：流程事务方法注解的Class）
-    private Map<Class, FlowTxMethodExecutor> flowTxMethodExecutorMap = new HashMap<>();
+    // 操作执行器Map（key：流程事务操作注解的Class）
+    private Map<Class, FlowTxOperateExecutor> operateExecutorMap = new HashMap<>();
 
     public FlowTxExecutor(String flow, Object flowTx, PlatformTransactionManager txManager) {
         super(txManager);
@@ -47,35 +47,35 @@ public class FlowTxExecutor extends TxExecutor {
      * 锁住目标对象
      *
      * @param targetContext 目标上下文
-     * @throws IllegalStateException 如果不存在@LockTarget类型方法
+     * @throws IllegalStateException 如果不存在@LockTarget类型操作
      * @throws Throwable             执行过程中发生任何异常都会往外抛
      */
     public void lockTarget(TargetContext targetContext) throws Throwable {
-        // 执行@LockTarget类型方法执行器
-        FlowTxMethodExecutor methodExecutor = flowTxMethodExecutorMap.get(LockTarget.class);
-        if (methodExecutor == null) {
-            throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTx.getClass()) + "不存在@LockTarget类型方法");
+        // 执行@LockTarget类型操作执行器
+        FlowTxOperateExecutor operateExecutor = operateExecutorMap.get(LockTarget.class);
+        if (operateExecutor == null) {
+            throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTx.getClass()) + "不存在@LockTarget类型操作");
         }
-        targetContext.refreshTarget(methodExecutor.execute(flowTx, targetContext));
+        targetContext.refreshTarget(operateExecutor.execute(flowTx, targetContext));
     }
 
     /**
      * 创建新事务插入目标对象并提交事务
      *
      * @param targetContext 目标上下文
-     * @throws IllegalStateException 如果不存在@InsertTarget类型方法
+     * @throws IllegalStateException 如果不存在@InsertTarget类型操作
      * @throws Throwable             执行过程中发生任何异常都会往外抛
      */
     public void insertTarget(TargetContext targetContext) throws Throwable {
         // 创建事务
         createTx();
         try {
-            // 执行@InsertTarget类型方法执行器
-            FlowTxMethodExecutor methodExecutor = flowTxMethodExecutorMap.get(InsertTarget.class);
-            if (methodExecutor == null) {
-                throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTx.getClass()) + "不存在@InsertTarget类型方法");
+            // 执行@InsertTarget类型操作执行器
+            FlowTxOperateExecutor operateExecutor = operateExecutorMap.get(InsertTarget.class);
+            if (operateExecutor == null) {
+                throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTx.getClass()) + "不存在@InsertTarget类型操作");
             }
-            targetContext.refreshTarget(methodExecutor.execute(flowTx, targetContext));
+            targetContext.refreshTarget(operateExecutor.execute(flowTx, targetContext));
             // 提交事务
             commitTx();
         } catch (Throwable e) {
@@ -86,21 +86,21 @@ public class FlowTxExecutor extends TxExecutor {
     }
 
     /**
-     * 设置流程事务方法执行器
+     * 设置流程事务操作执行器
      *
-     * @param clazz          流程事务方法注解的Class
-     * @param methodExecutor 流程事务方法执行器
-     * @throws IllegalArgumentException 如果入参clazz不是流程事务方法注解
-     * @throws IllegalStateException    如果已存在该类型的方法处理器
+     * @param clazz           流程事务操作注解的Class
+     * @param operateExecutor 流程事务操作执行器
+     * @throws IllegalArgumentException 如果入参clazz不是流程事务操作注解
+     * @throws IllegalStateException    如果已存在该类型的操作处理器
      */
-    public void setMethodExecutor(Class clazz, FlowTxMethodExecutor methodExecutor) {
-        if (!Arrays.asList(FLOW_TX_METHOD_ANNOTATIONS).contains(clazz)) {
-            throw new IllegalArgumentException(ClassUtils.getShortName(clazz) + "不是流程事务方法注解");
+    public void setOperateExecutor(Class clazz, FlowTxOperateExecutor operateExecutor) {
+        if (!Arrays.asList(FLOW_TX_OPERATE_ANNOTATIONS).contains(clazz)) {
+            throw new IllegalArgumentException(ClassUtils.getShortName(clazz) + "不是流程事务操作注解");
         }
-        if (flowTxMethodExecutorMap.containsKey(clazz)) {
-            throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTx.getClass()) + "存在多个@" + ClassUtils.getShortName(clazz) + "类型的方法");
+        if (operateExecutorMap.containsKey(clazz)) {
+            throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTx.getClass()) + "存在多个@" + ClassUtils.getShortName(clazz) + "类型的操作");
         }
-        flowTxMethodExecutorMap.put(clazz, methodExecutor);
+        operateExecutorMap.put(clazz, operateExecutor);
     }
 
     /**
@@ -114,7 +114,7 @@ public class FlowTxExecutor extends TxExecutor {
      * 获取目标对象类型
      */
     public Class getClassOfTarget() {
-        return flowTxMethodExecutorMap.get(LockTarget.class).getClassOfTarget();
+        return operateExecutorMap.get(LockTarget.class).getClassOfTarget();
     }
 
     /**
@@ -128,31 +128,31 @@ public class FlowTxExecutor extends TxExecutor {
         if (flow == null || flowTx == null) {
             throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTx.getClass()) + "内部要素不全");
         }
-        if (!flowTxMethodExecutorMap.containsKey(LockTarget.class)) {
-            throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTx.getClass()) + "不存在@LockTarget类型方法");
+        if (!operateExecutorMap.containsKey(LockTarget.class)) {
+            throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTx.getClass()) + "不存在@LockTarget类型操作");
         }
         // 校验流程事务内目标对象类型是否统一
-        for (FlowTxMethodExecutor methodExecutor : flowTxMethodExecutorMap.values()) {
-            if (methodExecutor.getClassOfTarget() != getClassOfTarget()) {
+        for (FlowTxOperateExecutor operateExecutor : operateExecutorMap.values()) {
+            if (operateExecutor.getClassOfTarget() != getClassOfTarget()) {
                 throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTx.getClass()) + "内目标对象类型不统一");
             }
         }
     }
 
     /**
-     * 流程事务方法执行器
+     * 流程事务操作执行器
      */
-    public static class FlowTxMethodExecutor extends MethodExecutor {
+    public static class FlowTxOperateExecutor extends MethodExecutor {
         // 目标对象类型
         private Class classOfTarget;
 
-        public FlowTxMethodExecutor(Method targetMethod, Class classOfTarget) {
+        public FlowTxOperateExecutor(Method targetMethod, Class classOfTarget) {
             super(targetMethod);
             this.classOfTarget = classOfTarget;
         }
 
         /**
-         * 执行流程事务方法
+         * 执行流程事务操作
          *
          * @param flowTx        流程事务
          * @param targetContext 目标上下文

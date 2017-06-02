@@ -15,7 +15,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
 import top.bekit.flow.annotation.transaction.FlowTx;
 import top.bekit.flow.engine.TargetContext;
-import top.bekit.flow.transaction.FlowTxExecutor.FlowTxMethodExecutor;
+import top.bekit.flow.transaction.FlowTxExecutor.FlowTxOperateExecutor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -40,10 +40,10 @@ public class FlowTxParser {
         // 创建流程事务执行器
         FlowTxExecutor flowTxExecutor = new FlowTxExecutor(flowTxAnnotation.flow(), flowTx, txManager);
         for (Method method : flowTx.getClass().getDeclaredMethods()) {
-            for (Class clazz : FlowTxExecutor.FLOW_TX_METHOD_ANNOTATIONS) {
+            for (Class clazz : FlowTxExecutor.FLOW_TX_OPERATE_ANNOTATIONS) {
                 if (method.isAnnotationPresent(clazz)) {
-                    // 设置流程事务方法执行器
-                    flowTxExecutor.setMethodExecutor(clazz, parseFlowTxMethod(method));
+                    // 设置流程事务操作执行器
+                    flowTxExecutor.setOperateExecutor(clazz, parseFlowTxOperate(method));
                     break;
                 }
             }
@@ -53,8 +53,8 @@ public class FlowTxParser {
         return flowTxExecutor;
     }
 
-    // 解析流程事务方法
-    private static FlowTxMethodExecutor parseFlowTxMethod(Method method) {
+    // 解析流程事务操作
+    private static FlowTxOperateExecutor parseFlowTxOperate(Method method) {
         logger.debug("解析流程事务方法：{}", method);
         // 校验方法类型
         if (!Modifier.isPublic(method.getModifiers())) {
@@ -76,6 +76,6 @@ public class FlowTxParser {
             throw new IllegalArgumentException("流程事务方法" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是目标对象类型");
         }
 
-        return new FlowTxMethodExecutor(method, classOfTarget);
+        return new FlowTxOperateExecutor(method, classOfTarget);
     }
 }
