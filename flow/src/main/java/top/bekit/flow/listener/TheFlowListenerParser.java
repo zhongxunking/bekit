@@ -16,9 +16,9 @@ import top.bekit.flow.annotation.listener.ListenFlowException;
 import top.bekit.flow.annotation.listener.ListenNodeDecide;
 import top.bekit.flow.annotation.listener.TheFlowListener;
 import top.bekit.flow.engine.TargetContext;
-import top.bekit.flow.listener.TheFlowListenerExecutor.AbstractTheFlowListenerMethodExecutor;
-import top.bekit.flow.listener.TheFlowListenerExecutor.ListenFlowExceptionMethodExecutor;
-import top.bekit.flow.listener.TheFlowListenerExecutor.ListenNodeDecideMethodExecutor;
+import top.bekit.flow.listener.TheFlowListenerExecutor.AbstractTheFlowListenExecutor;
+import top.bekit.flow.listener.TheFlowListenerExecutor.FlowExceptionListenExecutor;
+import top.bekit.flow.listener.TheFlowListenerExecutor.NodeDecideListenExecutor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -42,10 +42,10 @@ public class TheFlowListenerParser {
         // 创建特定流程监听器执行器
         TheFlowListenerExecutor theFlowListenerExecutor = new TheFlowListenerExecutor(theFlowListenerAnnotation.flow(), theFlowListener);
         for (Method method : theFlowListener.getClass().getDeclaredMethods()) {
-            for (Class clazz : TheFlowListenerExecutor.LISTEN_METHOD_ANNOTATIONS) {
+            for (Class clazz : TheFlowListenerExecutor.THE_FLOW_LISTEN_ANNOTATIONS) {
                 if (method.isAnnotationPresent(clazz)) {
                     // 设置监听方法执行器
-                    theFlowListenerExecutor.setListenMethodExecutor(clazz, parseListenMethodExecutor(clazz, method));
+                    theFlowListenerExecutor.setListenExecutor(clazz, parseListenExecutor(clazz, method));
                     break;
                 }
             }
@@ -56,7 +56,7 @@ public class TheFlowListenerParser {
     }
 
     // 解析监听方法
-    private static AbstractTheFlowListenerMethodExecutor parseListenMethodExecutor(Class clazz, Method method) {
+    private static AbstractTheFlowListenExecutor parseListenExecutor(Class clazz, Method method) {
         logger.debug("解析流程监听方法：{}", method);
         // 校验方法类型
         if (!Modifier.isPublic(method.getModifiers())) {
@@ -71,12 +71,12 @@ public class TheFlowListenerParser {
             checkListenNodeDecideMethodParameterTypes(method);
             // 获取目标对象类型
             ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 1);
-            return new ListenNodeDecideMethodExecutor(method, resolvableType.getGeneric(0).resolve(Object.class));
+            return new NodeDecideListenExecutor(method, resolvableType.getGeneric(0).resolve(Object.class));
         } else if (clazz == ListenFlowException.class) {
             checkListenFlowExceptionMethodParameterTypes(method);
             // 获取目标对象类型
             ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 1);
-            return new ListenFlowExceptionMethodExecutor(method, resolvableType.getGeneric(0).resolve(Object.class));
+            return new FlowExceptionListenExecutor(method, resolvableType.getGeneric(0).resolve(Object.class));
         } else {
             throw new IllegalArgumentException("非法的流程监听方法类型" + ClassUtils.getShortName(clazz));
         }

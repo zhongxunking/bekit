@@ -49,7 +49,7 @@ public class ServiceContext<O, R> {
     }
 
     /**
-     * 设值附件属性
+     * 设置附件属性
      */
     public void setAttachmentAttr(Object key, Object value) {
         attachment.put(key, value);

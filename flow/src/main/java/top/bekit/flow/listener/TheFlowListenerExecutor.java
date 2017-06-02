@@ -23,25 +23,25 @@ import java.util.Map;
  */
 public class TheFlowListenerExecutor {
     /**
-     * 特定流程监听器方法注解
+     * 特定流程监听注解
      */
-    public static final Class[] LISTEN_METHOD_ANNOTATIONS = {ListenNodeDecide.class, ListenFlowException.class};
-    // 监听方法对应的执行器（key：监听方法注解的CLass）
-    private static final Map<Class, Class> LISTEN_METHOD_EXECUTOR_MAP;
+    public static final Class[] THE_FLOW_LISTEN_ANNOTATIONS = {ListenNodeDecide.class, ListenFlowException.class};
+    // 监听注解与对应执行器类型Map（key：监听注解的CLass）
+    private static final Map<Class, Class> LISTEN_ANNOTATION_EXECUTOR_TYPE_MAP;
 
-    // 初始化LISTEN_METHOD_EXECUTOR_MAP
+    // 初始化LISTEN_ANNOTATION_EXECUTOR_TYPE_MAP
     static {
-        LISTEN_METHOD_EXECUTOR_MAP = new HashMap<>();
-        LISTEN_METHOD_EXECUTOR_MAP.put(ListenNodeDecide.class, ListenNodeDecideMethodExecutor.class);
-        LISTEN_METHOD_EXECUTOR_MAP.put(ListenFlowException.class, ListenFlowExceptionMethodExecutor.class);
+        LISTEN_ANNOTATION_EXECUTOR_TYPE_MAP = new HashMap<>();
+        LISTEN_ANNOTATION_EXECUTOR_TYPE_MAP.put(ListenNodeDecide.class, NodeDecideListenExecutor.class);
+        LISTEN_ANNOTATION_EXECUTOR_TYPE_MAP.put(ListenFlowException.class, FlowExceptionListenExecutor.class);
     }
 
     // 被监听的流程名称
     private String flow;
     // 特定流程监听器
     private Object theFlowListener;
-    // 方法执行器Map（key：监听方法注解的CLass）
-    private Map<Class, AbstractTheFlowListenerMethodExecutor> methodExecutorMap = new HashMap<>();
+    // 监听执行器Map（key：监听注解的CLass）
+    private Map<Class, AbstractTheFlowListenExecutor> listenExecutorMap = new HashMap<>();
     // 目标对象类型
     private Class classOfTarget = Object.class;
 
@@ -58,9 +58,9 @@ public class TheFlowListenerExecutor {
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
     public void listenNodeDecide(String node, TargetContext targetContext) throws Throwable {
-        ListenNodeDecideMethodExecutor methodExecutor = (ListenNodeDecideMethodExecutor) methodExecutorMap.get(ListenNodeDecide.class);
-        if (methodExecutor != null) {
-            methodExecutor.execute(theFlowListener, node, targetContext);
+        NodeDecideListenExecutor listenExecutor = (NodeDecideListenExecutor) listenExecutorMap.get(ListenNodeDecide.class);
+        if (listenExecutor != null) {
+            listenExecutor.execute(theFlowListener, node, targetContext);
         }
     }
 
@@ -72,31 +72,31 @@ public class TheFlowListenerExecutor {
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
     public void listenFlowException(Throwable throwable, TargetContext targetContext) throws Throwable {
-        ListenFlowExceptionMethodExecutor methodExecutor = (ListenFlowExceptionMethodExecutor) methodExecutorMap.get(ListenFlowException.class);
-        if (methodExecutor != null) {
-            methodExecutor.execute(theFlowListener, throwable, targetContext);
+        FlowExceptionListenExecutor listenExecutor = (FlowExceptionListenExecutor) listenExecutorMap.get(ListenFlowException.class);
+        if (listenExecutor != null) {
+            listenExecutor.execute(theFlowListener, throwable, targetContext);
         }
     }
 
     /**
-     * 设置监听方法执行器
+     * 设置监听执行器
      *
      * @param clazz          类型
-     * @param methodExecutor 方法执行器
+     * @param listenExecutor 监听执行器
      */
-    public void setListenMethodExecutor(Class clazz, AbstractTheFlowListenerMethodExecutor methodExecutor) {
-        if (!LISTEN_METHOD_EXECUTOR_MAP.containsKey(clazz)) {
-            throw new IllegalArgumentException("流程监听方法类型" + ClassUtils.getShortName(clazz) + "不合法");
+    public void setListenExecutor(Class clazz, AbstractTheFlowListenExecutor listenExecutor) {
+        if (!LISTEN_ANNOTATION_EXECUTOR_TYPE_MAP.containsKey(clazz)) {
+            throw new IllegalArgumentException("特定流程监听类型" + ClassUtils.getShortName(clazz) + "不合法");
         }
-        if (methodExecutor.getClass() != LISTEN_METHOD_EXECUTOR_MAP.get(clazz)) {
-            throw new IllegalArgumentException("流程监听方法处理器" + ClassUtils.getShortName(methodExecutor.getClass()) + "不合法");
+        if (listenExecutor.getClass() != LISTEN_ANNOTATION_EXECUTOR_TYPE_MAP.get(clazz)) {
+            throw new IllegalArgumentException("特定流程监听处理器类型" + ClassUtils.getShortName(listenExecutor.getClass()) + "不合法");
         }
-        if (methodExecutorMap.containsKey(clazz)) {
-            throw new IllegalStateException("特定流程监听器" + ClassUtils.getShortName(theFlowListener.getClass()) + "存在多个@" + ClassUtils.getShortName(clazz) + "类型的流程监听方法");
+        if (listenExecutorMap.containsKey(clazz)) {
+            throw new IllegalStateException("特定流程监听器" + ClassUtils.getShortName(theFlowListener.getClass()) + "存在多个监听类型@" + ClassUtils.getShortName(clazz));
         }
-        methodExecutorMap.put(clazz, methodExecutor);
+        listenExecutorMap.put(clazz, listenExecutor);
         // 设置目标对象类型
-        classOfTarget = methodExecutor.getClassOfTarget();
+        classOfTarget = listenExecutor.getClassOfTarget();
     }
 
     /**
@@ -123,19 +123,19 @@ public class TheFlowListenerExecutor {
             throw new IllegalStateException("特定流程监听器内部要素不全");
         }
         // 校验特定流程监听器内目标对象类型是否统一
-        for (AbstractTheFlowListenerMethodExecutor methodExecutor : methodExecutorMap.values()) {
-            if (methodExecutor.getClassOfTarget() != classOfTarget) {
+        for (AbstractTheFlowListenExecutor listenExecutor : listenExecutorMap.values()) {
+            if (listenExecutor.getClassOfTarget() != classOfTarget) {
                 throw new IllegalStateException("特定流程监听器" + ClassUtils.getShortName(theFlowListener.getClass()) + "内目标对象类型不统一");
             }
         }
     }
 
     /**
-     * 监听节点选择事件方法执行器
+     * 节点选择事件监听执行器
      */
-    public static class ListenNodeDecideMethodExecutor extends AbstractTheFlowListenerMethodExecutor {
+    public static class NodeDecideListenExecutor extends AbstractTheFlowListenExecutor {
 
-        public ListenNodeDecideMethodExecutor(Method targetMethod, Class classOfTarget) {
+        public NodeDecideListenExecutor(Method targetMethod, Class classOfTarget) {
             super(targetMethod, classOfTarget);
         }
 
@@ -153,11 +153,11 @@ public class TheFlowListenerExecutor {
     }
 
     /**
-     * 监听流程异常事件方法执行器
+     * 流程异常事件监听执行器
      */
-    public static class ListenFlowExceptionMethodExecutor extends AbstractTheFlowListenerMethodExecutor {
+    public static class FlowExceptionListenExecutor extends AbstractTheFlowListenExecutor {
 
-        public ListenFlowExceptionMethodExecutor(Method targetMethod, Class classOfTarget) {
+        public FlowExceptionListenExecutor(Method targetMethod, Class classOfTarget) {
             super(targetMethod, classOfTarget);
         }
 
@@ -175,13 +175,13 @@ public class TheFlowListenerExecutor {
     }
 
     /**
-     * 抽象特定流程监听器方法执行器
+     * 抽象特定流程监听执行器
      */
-    public static class AbstractTheFlowListenerMethodExecutor extends MethodExecutor {
+    public static class AbstractTheFlowListenExecutor extends MethodExecutor {
         // 目标对象类型
         private Class classOfTarget;
 
-        public AbstractTheFlowListenerMethodExecutor(Method targetMethod, Class classOfTarget) {
+        public AbstractTheFlowListenExecutor(Method targetMethod, Class classOfTarget) {
             super(targetMethod);
             this.classOfTarget = classOfTarget;
         }
