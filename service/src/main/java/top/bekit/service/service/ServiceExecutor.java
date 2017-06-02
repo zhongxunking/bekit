@@ -26,9 +26,9 @@ import java.util.Map;
  */
 public class ServiceExecutor {
     /**
-     * 服务方法注解
+     * 服务阶段注解
      */
-    public static final Class[] SERVICE_METHOD_ANNOTATIONS = {ServiceCheck.class, ServiceExecute.class};
+    public static final Class[] SERVICE_PHASE_ANNOTATIONS = {ServiceCheck.class, ServiceExecute.class};
 
     // 服务名称
     private String serviceName;
@@ -36,8 +36,8 @@ public class ServiceExecutor {
     private boolean enableTx;
     // 服务
     private Object service;
-    // 服务方法执行器Map（key：服务方法注解的Class）
-    private Map<Class, ServiceMethodExecutor> methodExecutorMap = new HashMap<>();
+    // 服务阶段执行器Map（key：服务阶段注解的Class）
+    private Map<Class, ServicePhaseExecutor> phaseExecutorMap = new HashMap<>();
     // 事务执行器
     private TxExecutor txExecutor;
 
@@ -54,17 +54,17 @@ public class ServiceExecutor {
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
     public void execute(ServiceContext serviceContext) throws Throwable {
-        // 执行服务校验方法（如果存在）
-        if (methodExecutorMap.containsKey(ServiceCheck.class)) {
-            methodExecutorMap.get(ServiceCheck.class).execute(service, serviceContext);
+        // 执行服务校验阶段（如果存在）
+        if (phaseExecutorMap.containsKey(ServiceCheck.class)) {
+            phaseExecutorMap.get(ServiceCheck.class).execute(service, serviceContext);
         }
         if (enableTx) {
             // 开启事务
             txExecutor.createTx();
         }
         try {
-            // 执行服务执行方法
-            methodExecutorMap.get(ServiceExecute.class).execute(service, serviceContext);
+            // 执行服务执行阶段
+            phaseExecutorMap.get(ServiceExecute.class).execute(service, serviceContext);
             if (enableTx) {
                 // 提交事务
                 txExecutor.commitTx();
@@ -79,21 +79,21 @@ public class ServiceExecutor {
     }
 
     /**
-     * 设置服务方法执行器
+     * 设置服务阶段执行器
      *
-     * @param clazz                 服务方法注解的class
-     * @param serviceMethodExecutor 服务方法执行器
-     * @throws IllegalArgumentException 如果入参class不是服务方法注解
-     * @throws IllegalStateException    如果已存在该类型的服务方法处理器
+     * @param clazz         服务阶段注解的class
+     * @param phaseExecutor 服务阶段执行器
+     * @throws IllegalArgumentException 如果入参class不是服务阶段注解
+     * @throws IllegalStateException    如果已存在该类型的服务阶段执行器
      */
-    public void setMethodExecutor(Class clazz, ServiceMethodExecutor serviceMethodExecutor) {
-        if (!Arrays.asList(SERVICE_METHOD_ANNOTATIONS).contains(clazz)) {
-            throw new IllegalArgumentException(ClassUtils.getShortName(clazz) + "不是服务方法注解");
+    public void setPhaseExecutor(Class clazz, ServicePhaseExecutor phaseExecutor) {
+        if (!Arrays.asList(SERVICE_PHASE_ANNOTATIONS).contains(clazz)) {
+            throw new IllegalArgumentException(ClassUtils.getShortName(clazz) + "不是服务阶段注解");
         }
-        if (methodExecutorMap.containsKey(clazz)) {
+        if (phaseExecutorMap.containsKey(clazz)) {
             throw new IllegalStateException("服务" + serviceName + "存在多个@" + ClassUtils.getShortName(clazz) + "类型方法");
         }
-        methodExecutorMap.put(clazz, serviceMethodExecutor);
+        phaseExecutorMap.put(clazz, phaseExecutor);
     }
 
     /**
@@ -122,14 +122,14 @@ public class ServiceExecutor {
      * 获取Order的真实类型
      */
     public Class getOrderClass() {
-        return methodExecutorMap.get(ServiceExecute.class).getOrderClass();
+        return phaseExecutorMap.get(ServiceExecute.class).getOrderClass();
     }
 
     /**
      * 获取Result的真实类型
      */
     public Class getResultClass() {
-        return methodExecutorMap.get(ServiceExecute.class).getResultClass();
+        return phaseExecutorMap.get(ServiceExecute.class).getResultClass();
     }
 
     /**
@@ -151,37 +151,37 @@ public class ServiceExecutor {
                 throw new IllegalStateException("服务" + serviceName + "的enableTx属性为关闭状态，但设置了事务执行器");
             }
         }
-        if (!methodExecutorMap.containsKey(ServiceExecute.class)) {
+        if (!phaseExecutorMap.containsKey(ServiceExecute.class)) {
             throw new IllegalStateException("服务" + serviceName + "缺少@ServiceExecute类型方法");
         }
         // 校验服务内的ServiceContext泛型类型是否统一
-        for (ServiceMethodExecutor methodExecutor : methodExecutorMap.values()) {
-            if (methodExecutor.getOrderClass() != getOrderClass()) {
+        for (ServicePhaseExecutor phaseExecutor : phaseExecutorMap.values()) {
+            if (phaseExecutor.getOrderClass() != getOrderClass()) {
                 throw new IllegalStateException("服务" + serviceName + "内的ServiceContext的泛型类型不统一");
             }
-            if (methodExecutor.getResultClass() != getResultClass()) {
+            if (phaseExecutor.getResultClass() != getResultClass()) {
                 throw new IllegalStateException("服务" + serviceName + "内的ServiceContext的泛型类型不统一");
             }
         }
     }
 
     /**
-     * 服务方法执行器
+     * 服务阶段执行器
      */
-    public static class ServiceMethodExecutor extends MethodExecutor {
+    public static class ServicePhaseExecutor extends MethodExecutor {
         // ServiceContext泛型O的真实类型
         private Class orderClass;
         // ServiceContext泛型R的真实类型
         private Class resultClass;
 
-        public ServiceMethodExecutor(Method targetMethod, Class orderClass, Class resultClass) {
+        public ServicePhaseExecutor(Method targetMethod, Class orderClass, Class resultClass) {
             super(targetMethod);
             this.orderClass = orderClass;
             this.resultClass = resultClass;
         }
 
         /**
-         * 执行服务方法
+         * 执行服务阶段
          *
          * @param service        服务
          * @param serviceContext 服务上下文

@@ -17,7 +17,7 @@ import org.springframework.util.ClassUtils;
 import top.bekit.service.annotation.service.Service;
 import top.bekit.service.annotation.service.ServiceExecute;
 import top.bekit.service.engine.ServiceContext;
-import top.bekit.service.service.ServiceExecutor.ServiceMethodExecutor;
+import top.bekit.service.service.ServiceExecutor.ServicePhaseExecutor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -53,10 +53,10 @@ public class ServiceParser {
             serviceExecutor.setTxManager(txManager);
         }
         for (Method method : service.getClass().getDeclaredMethods()) {
-            for (Class clazz : ServiceExecutor.SERVICE_METHOD_ANNOTATIONS) {
+            for (Class clazz : ServiceExecutor.SERVICE_PHASE_ANNOTATIONS) {
                 if (method.isAnnotationPresent(clazz)) {
-                    // 设置服务方法执行器
-                    serviceExecutor.setMethodExecutor(clazz, parseServiceMethod(method));
+                    // 设置服务阶段执行器
+                    serviceExecutor.setPhaseExecutor(clazz, parseServicePhase(method));
                     break;
                 }
             }
@@ -66,8 +66,8 @@ public class ServiceParser {
         return serviceExecutor;
     }
 
-    // 解析服务方法
-    private static ServiceMethodExecutor parseServiceMethod(Method method) {
+    // 解析服务阶段
+    private static ServicePhaseExecutor parseServicePhase(Method method) {
         logger.debug("解析服务方法：{}", method);
         // 校验方法类型
         if (!Modifier.isPublic(method.getModifiers())) {
@@ -93,6 +93,6 @@ public class ServiceParser {
             }
         }
 
-        return new ServiceMethodExecutor(method, orderClass, resultClass);
+        return new ServicePhaseExecutor(method, orderClass, resultClass);
     }
 }
