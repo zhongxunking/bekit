@@ -35,9 +35,9 @@ public class ListenerHolder {
             List<ListenerExecutor> listenerExecutors = listenerExecutorsMap.get(listenerExecutor.getType());
             if (listenerExecutors == null) {
                 listenerExecutors = new ArrayList<>();
+                listenerExecutorsMap.put(listenerExecutor.getType(), listenerExecutors);
             }
             listenerExecutors.add(listenerExecutor);
-            listenerExecutorsMap.put(listenerExecutor.getType(), listenerExecutors);
         }
     }
 
