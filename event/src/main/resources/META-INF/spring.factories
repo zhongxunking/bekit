@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  top.bekit.event.boot.EventBusAutoConfiguration
+  org.bekit.event.boot.EventBusAutoConfiguration
