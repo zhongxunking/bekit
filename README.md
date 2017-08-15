@@ -10,16 +10,12 @@
 
 
 > 注意：本框架已经上传到maven中央库
-
-3. 注意
-
-> “流程引擎”、“服务引擎”的事务是通过spring的PlatformTransactionManager控制的，暂不支持分布式事务。后续我有计划开发对应用透明的分库框架，到时候会让服务引擎和流程引擎支持分布式事务。
   
-4. 示例
+3. 示例
 
 > 结合示例看文档会更容易上手：https://github.com/zhongxunking/bekit-demo
 
-5. 感谢
+4. 感谢
 
 > 感谢@李根的ADK框架，很多灵感和想法是从ADK上获取到的。
 
@@ -32,9 +28,9 @@
 1. 引入事件总线依赖
 
         <dependency>
-            <groupId>top.bekit</groupId>
+            <groupId>org.bekit</groupId>
             <artifactId>event</artifactId>
-            <version>1.1.0.RELEASE</version>
+            <version>1.2.0.RELEASE</version>
         </dependency>
 
 2. 如果是spring-boot项目则不需要进行任何配置。
@@ -122,9 +118,9 @@
 1. 引入流程引擎依赖
 
         <dependency>
-            <groupId>top.bekit</groupId>
+            <groupId>org.bekit</groupId>
             <artifactId>flow</artifactId>
-            <version>1.1.0.RELEASE</version>
+            <version>1.2.0.RELEASE</version>
         </dependency>
 
 2. 如果是spring-boot项目则不需要进行任何配置。
@@ -365,9 +361,9 @@
 1. 引入服务引擎依赖
 
         <dependency>
-            <groupId>top.bekit</groupId>
+            <groupId>org.bekit</groupId>
             <artifactId>service</artifactId>
-            <version>1.1.0.RELEASE</version>
+            <version>1.2.0.RELEASE</version>
         </dependency>
 
 2. 如果是spring-boot项目则不需要进行任何配置。
