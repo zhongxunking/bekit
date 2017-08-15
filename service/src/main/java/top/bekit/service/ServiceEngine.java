@@ -8,6 +8,8 @@
  */
 package top.bekit.service;
 
+import java.util.Map;
+
 /**
  * 服务引擎
  */
@@ -21,5 +23,15 @@ public interface ServiceEngine {
      * @return 结果
      */
     <O, R> R execute(String service, O order);
+
+    /**
+     * 执行服务
+     *
+     * @param service    服务名称
+     * @param order      入参
+     * @param attachment 附件
+     * @return 结果
+     */
+    <O, R> R execute(String service, O order, Map<Object, Object> attachment);
 
 }
