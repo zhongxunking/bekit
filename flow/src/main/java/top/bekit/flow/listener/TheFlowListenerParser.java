@@ -13,12 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ClassUtils;
 import top.bekit.flow.annotation.listener.ListenFlowException;
-import top.bekit.flow.annotation.listener.ListenNodeDecide;
+import top.bekit.flow.annotation.listener.ListenNodeDecided;
 import top.bekit.flow.annotation.listener.TheFlowListener;
 import top.bekit.flow.engine.TargetContext;
 import top.bekit.flow.listener.TheFlowListenerExecutor.AbstractTheFlowListenExecutor;
 import top.bekit.flow.listener.TheFlowListenerExecutor.FlowExceptionListenExecutor;
-import top.bekit.flow.listener.TheFlowListenerExecutor.NodeDecideListenExecutor;
+import top.bekit.flow.listener.TheFlowListenerExecutor.NodeDecidedListenExecutor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -67,11 +67,11 @@ public class TheFlowListenerParser {
             throw new RuntimeException("流程监听方法" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是void");
         }
         // 校验入参
-        if (clazz == ListenNodeDecide.class) {
+        if (clazz == ListenNodeDecided.class) {
             checkListenNodeDecideMethodParameterTypes(method);
             // 获取目标对象类型
             ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 1);
-            return new NodeDecideListenExecutor(method, resolvableType.getGeneric(0).resolve(Object.class));
+            return new NodeDecidedListenExecutor(method, resolvableType.getGeneric(0).resolve(Object.class));
         } else if (clazz == ListenFlowException.class) {
             checkListenFlowExceptionMethodParameterTypes(method);
             // 获取目标对象类型

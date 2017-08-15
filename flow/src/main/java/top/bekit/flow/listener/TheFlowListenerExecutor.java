@@ -11,7 +11,7 @@ package top.bekit.flow.listener;
 import org.springframework.util.ClassUtils;
 import top.bekit.common.method.MethodExecutor;
 import top.bekit.flow.annotation.listener.ListenFlowException;
-import top.bekit.flow.annotation.listener.ListenNodeDecide;
+import top.bekit.flow.annotation.listener.ListenNodeDecided;
 import top.bekit.flow.engine.TargetContext;
 
 import java.lang.reflect.Method;
@@ -25,14 +25,14 @@ public class TheFlowListenerExecutor {
     /**
      * 特定流程监听注解
      */
-    public static final Class[] THE_FLOW_LISTEN_ANNOTATIONS = {ListenNodeDecide.class, ListenFlowException.class};
+    public static final Class[] THE_FLOW_LISTEN_ANNOTATIONS = {ListenNodeDecided.class, ListenFlowException.class};
     // 监听注解与对应执行器类型Map（key：监听注解的CLass）
     private static final Map<Class, Class> LISTEN_ANNOTATION_EXECUTOR_TYPE_MAP;
 
     // 初始化LISTEN_ANNOTATION_EXECUTOR_TYPE_MAP
     static {
         LISTEN_ANNOTATION_EXECUTOR_TYPE_MAP = new HashMap<>();
-        LISTEN_ANNOTATION_EXECUTOR_TYPE_MAP.put(ListenNodeDecide.class, NodeDecideListenExecutor.class);
+        LISTEN_ANNOTATION_EXECUTOR_TYPE_MAP.put(ListenNodeDecided.class, NodeDecidedListenExecutor.class);
         LISTEN_ANNOTATION_EXECUTOR_TYPE_MAP.put(ListenFlowException.class, FlowExceptionListenExecutor.class);
     }
 
@@ -57,8 +57,8 @@ public class TheFlowListenerExecutor {
      * @param targetContext 目标上下文
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
-    public void listenNodeDecide(String node, TargetContext targetContext) throws Throwable {
-        NodeDecideListenExecutor listenExecutor = (NodeDecideListenExecutor) listenExecutorMap.get(ListenNodeDecide.class);
+    public void listenNodeDecided(String node, TargetContext targetContext) throws Throwable {
+        NodeDecidedListenExecutor listenExecutor = (NodeDecidedListenExecutor) listenExecutorMap.get(ListenNodeDecided.class);
         if (listenExecutor != null) {
             listenExecutor.execute(theFlowListener, node, targetContext);
         }
@@ -133,9 +133,9 @@ public class TheFlowListenerExecutor {
     /**
      * 节点选择事件监听执行器
      */
-    public static class NodeDecideListenExecutor extends AbstractTheFlowListenExecutor {
+    public static class NodeDecidedListenExecutor extends AbstractTheFlowListenExecutor {
 
-        public NodeDecideListenExecutor(Method targetMethod, Class classOfTarget) {
+        public NodeDecidedListenExecutor(Method targetMethod, Class classOfTarget) {
             super(targetMethod, classOfTarget);
         }
 

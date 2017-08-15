@@ -13,7 +13,7 @@ import top.bekit.flow.engine.TargetContext;
 /**
  * 节点选择事件
  */
-public class NodeDecideEvent {
+public class NodeDecidedEvent {
     // 流程名称
     private String flow;
     // 被选择的节点
@@ -21,7 +21,7 @@ public class NodeDecideEvent {
     // 目标上下文
     private TargetContext targetContext;
 
-    public NodeDecideEvent(String flow, String node, TargetContext targetContext) {
+    public NodeDecidedEvent(String flow, String node, TargetContext targetContext) {
         this.flow = flow;
         this.node = node;
         this.targetContext = targetContext;
