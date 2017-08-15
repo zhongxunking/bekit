@@ -10,6 +10,7 @@ package top.bekit.flow.transaction;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
@@ -35,11 +36,13 @@ public class FlowTxParser {
      * @return 流程事务执行器
      */
     public static FlowTxExecutor parseFlowTx(Object flowTx, PlatformTransactionManager txManager) {
-        logger.info("解析流程事务：{}", ClassUtils.getQualifiedName(flowTx.getClass()));
-        FlowTx flowTxAnnotation = flowTx.getClass().getAnnotation(FlowTx.class);
+        // 获取目标class（应对AOP代理情况）
+        Class<?> flowTxClass = AopUtils.getTargetClass(flowTx);
+        logger.info("解析流程事务：{}", ClassUtils.getQualifiedName(flowTxClass));
+        FlowTx flowTxAnnotation = flowTxClass.getAnnotation(FlowTx.class);
         // 创建流程事务执行器
         FlowTxExecutor flowTxExecutor = new FlowTxExecutor(flowTxAnnotation.flow(), flowTx, txManager);
-        for (Method method : flowTx.getClass().getDeclaredMethods()) {
+        for (Method method : flowTxClass.getDeclaredMethods()) {
             for (Class clazz : FlowTxExecutor.FLOW_TX_OPERATE_ANNOTATIONS) {
                 if (method.isAnnotationPresent(clazz)) {
                     // 设置流程事务操作执行器

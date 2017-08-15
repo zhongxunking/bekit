@@ -13,7 +13,7 @@ import top.bekit.common.method.MethodExecutor;
 import top.bekit.event.EventPublisher;
 import top.bekit.flow.engine.TargetContext;
 import top.bekit.flow.event.FlowExceptionEvent;
-import top.bekit.flow.event.NodeDecideEvent;
+import top.bekit.flow.event.NodeDecidedEvent;
 import top.bekit.flow.processor.ProcessorExecutor;
 import top.bekit.flow.transaction.FlowTxExecutor;
 
@@ -78,7 +78,7 @@ public class FlowExecutor {
                         throw new RuntimeException("流程" + flowName + "不存在节点" + node);
                     }
                     // 发送节点选择事件
-                    eventPublisher.publish(new NodeDecideEvent(flowName, node, targetContext));
+                    eventPublisher.publish(new NodeDecidedEvent(flowName, node, targetContext));
                     // 获取下一个节点执行器
                     nodeExecutor = nodeExecutorMap.get(node);
                     // 判断是否提交事务

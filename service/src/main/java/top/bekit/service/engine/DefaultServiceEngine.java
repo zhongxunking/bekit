@@ -18,6 +18,8 @@ import top.bekit.service.event.ServiceFinishEvent;
 import top.bekit.service.service.ServiceExecutor;
 import top.bekit.service.service.ServiceHolder;
 
+import java.util.Map;
+
 /**
  * 服务引擎默认实现类
  */
@@ -33,10 +35,15 @@ public class DefaultServiceEngine implements ServiceEngine {
 
     @Override
     public <O, R> R execute(String service, O order) {
+        return execute(service, order, null);
+    }
+
+    @Override
+    public <O, R> R execute(String service, O order, Map<Object, Object> attachment) {
         // 校验order类型
         checkOrderClass(order, service);
         // 构建服务上下文
-        ServiceContext<O, R> serviceContext = new ServiceContext(order, newResult(service));
+        ServiceContext<O, R> serviceContext = new ServiceContext(order, newResult(service), attachment);
         // 执行服务
         executeService(service, serviceContext);
 

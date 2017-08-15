@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import top.bekit.event.annotation.listener.Listen;
 import top.bekit.flow.annotation.listener.FlowListener;
 import top.bekit.flow.event.FlowExceptionEvent;
-import top.bekit.flow.event.NodeDecideEvent;
+import top.bekit.flow.event.NodeDecidedEvent;
 
 /**
  * 默认的流程事件监听器
@@ -25,16 +25,16 @@ public class DefaultFlowEventListener {
 
     // 监听节点选择事件
     @Listen
-    public void listenNodeDecideEvent(NodeDecideEvent event) throws Throwable {
+    public void listenNodeDecidedEvent(NodeDecidedEvent event) throws Throwable {
         TheFlowListenerExecutor theFlowListenerExecutor = theFlowListenerHolder.getTheFlowListenerExecutor(event.getFlow());
         if (theFlowListenerExecutor != null) {
-            theFlowListenerExecutor.listenNodeDecide(event.getNode(), event.getTargetContext());
+            theFlowListenerExecutor.listenNodeDecided(event.getNode(), event.getTargetContext());
         }
     }
 
     // 监听流程异常事件
     @Listen
-    public void listenFlowException(FlowExceptionEvent event) throws Throwable {
+    public void listenFlowExceptionEvent(FlowExceptionEvent event) throws Throwable {
         TheFlowListenerExecutor theFlowListenerExecutor = theFlowListenerHolder.getTheFlowListenerExecutor(event.getFlow());
         if (theFlowListenerExecutor != null) {
             theFlowListenerExecutor.listenFlowException(event.getThrowable(), event.getTargetContext());

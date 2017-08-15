@@ -10,15 +10,16 @@ package top.bekit.flow.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ClassUtils;
 import top.bekit.flow.annotation.listener.ListenFlowException;
-import top.bekit.flow.annotation.listener.ListenNodeDecide;
+import top.bekit.flow.annotation.listener.ListenNodeDecided;
 import top.bekit.flow.annotation.listener.TheFlowListener;
 import top.bekit.flow.engine.TargetContext;
 import top.bekit.flow.listener.TheFlowListenerExecutor.AbstractTheFlowListenExecutor;
 import top.bekit.flow.listener.TheFlowListenerExecutor.FlowExceptionListenExecutor;
-import top.bekit.flow.listener.TheFlowListenerExecutor.NodeDecideListenExecutor;
+import top.bekit.flow.listener.TheFlowListenerExecutor.NodeDecidedListenExecutor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -37,11 +38,13 @@ public class TheFlowListenerParser {
      * @return 特定流程监听器执行器
      */
     public static TheFlowListenerExecutor parseTheFlowListener(Object theFlowListener) {
-        logger.info("解析特定流程监听器：{}", ClassUtils.getQualifiedName(theFlowListener.getClass()));
-        TheFlowListener theFlowListenerAnnotation = theFlowListener.getClass().getAnnotation(TheFlowListener.class);
+        // 获取目标class（应对AOP代理情况）
+        Class<?> theFlowListenerClass = AopUtils.getTargetClass(theFlowListener);
+        logger.info("解析特定流程监听器：{}", ClassUtils.getQualifiedName(theFlowListenerClass));
+        TheFlowListener theFlowListenerAnnotation = theFlowListenerClass.getAnnotation(TheFlowListener.class);
         // 创建特定流程监听器执行器
         TheFlowListenerExecutor theFlowListenerExecutor = new TheFlowListenerExecutor(theFlowListenerAnnotation.flow(), theFlowListener);
-        for (Method method : theFlowListener.getClass().getDeclaredMethods()) {
+        for (Method method : theFlowListenerClass.getDeclaredMethods()) {
             for (Class clazz : TheFlowListenerExecutor.THE_FLOW_LISTEN_ANNOTATIONS) {
                 if (method.isAnnotationPresent(clazz)) {
                     // 设置监听方法执行器
@@ -67,11 +70,11 @@ public class TheFlowListenerParser {
             throw new RuntimeException("流程监听方法" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是void");
         }
         // 校验入参
-        if (clazz == ListenNodeDecide.class) {
+        if (clazz == ListenNodeDecided.class) {
             checkListenNodeDecideMethodParameterTypes(method);
             // 获取目标对象类型
             ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 1);
-            return new NodeDecideListenExecutor(method, resolvableType.getGeneric(0).resolve(Object.class));
+            return new NodeDecidedListenExecutor(method, resolvableType.getGeneric(0).resolve(Object.class));
         } else if (clazz == ListenFlowException.class) {
             checkListenFlowExceptionMethodParameterTypes(method);
             // 获取目标对象类型

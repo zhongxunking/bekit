@@ -8,7 +8,6 @@
  */
 package top.bekit.service.service;
 
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
 import top.bekit.common.method.MethodExecutor;
 import top.bekit.common.transaction.TxExecutor;
@@ -97,18 +96,18 @@ public class ServiceExecutor {
     }
 
     /**
-     * 设置事务管理器
+     * 设置事务执行器
      *
-     * @param txManager 事务管理器
+     * @param txExecutor 事务执行器
      */
-    public void setTxManager(PlatformTransactionManager txManager) {
+    public void setTxExecutor(TxExecutor txExecutor) {
         if (!enableTx) {
-            throw new IllegalStateException("服务" + serviceName + "的enableTx属性为关闭状态，不能设置事务");
+            throw new IllegalStateException("服务" + serviceName + "的enableTx属性为关闭状态，不能设置事务执行器");
         }
-        if (txExecutor != null) {
-            throw new IllegalStateException("服务" + serviceName + "的事务管理器已经被设置，不能重复设置");
+        if (this.txExecutor != null) {
+            throw new IllegalStateException("服务" + serviceName + "的事务执行器已经被设置，不能重复设置");
         }
-        txExecutor = new TxExecutor(txManager);
+        this.txExecutor = txExecutor;
     }
 
     /**

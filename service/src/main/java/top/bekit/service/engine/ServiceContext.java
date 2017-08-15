@@ -19,12 +19,16 @@ public class ServiceContext<O, R> {
     private O order;
     // 结果
     private R result;
-    // 附件（可往里面设值，可用于@ServiceCheck和@ServiceExecute之间通信）
-    private Map<Object, Object> attachment = new HashMap<>();
+    // 附件（可往里面设值，可传递一些附加信息）
+    private Map<Object, Object> attachment;
 
-    public ServiceContext(O order, R result) {
+    public ServiceContext(O order, R result, Map<Object, Object> attachment) {
         this.order = order;
         this.result = result;
+        this.attachment = attachment;
+        if (this.attachment == null) {
+            this.attachment = new HashMap<>();
+        }
     }
 
     /**

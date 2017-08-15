@@ -58,7 +58,7 @@ public class FlowEngineConfiguration {
         return new DefaultFlowEventListener();
     }
 
-    // 特定流程监听器持有期
+    // 特定流程监听器持有器
     @Bean
     public TheFlowListenerHolder theFlowListenerHolder() {
         return new TheFlowListenerHolder();
