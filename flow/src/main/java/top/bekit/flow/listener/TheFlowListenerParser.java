@@ -10,6 +10,7 @@ package top.bekit.flow.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ClassUtils;
 import top.bekit.flow.annotation.listener.ListenFlowException;
@@ -37,11 +38,13 @@ public class TheFlowListenerParser {
      * @return 特定流程监听器执行器
      */
     public static TheFlowListenerExecutor parseTheFlowListener(Object theFlowListener) {
-        logger.info("解析特定流程监听器：{}", ClassUtils.getQualifiedName(theFlowListener.getClass()));
-        TheFlowListener theFlowListenerAnnotation = theFlowListener.getClass().getAnnotation(TheFlowListener.class);
+        // 获取目标class（应对AOP代理情况）
+        Class<?> theFlowListenerClass = AopUtils.getTargetClass(theFlowListener);
+        logger.info("解析特定流程监听器：{}", ClassUtils.getQualifiedName(theFlowListenerClass));
+        TheFlowListener theFlowListenerAnnotation = theFlowListenerClass.getAnnotation(TheFlowListener.class);
         // 创建特定流程监听器执行器
         TheFlowListenerExecutor theFlowListenerExecutor = new TheFlowListenerExecutor(theFlowListenerAnnotation.flow(), theFlowListener);
-        for (Method method : theFlowListener.getClass().getDeclaredMethods()) {
+        for (Method method : theFlowListenerClass.getDeclaredMethods()) {
             for (Class clazz : TheFlowListenerExecutor.THE_FLOW_LISTEN_ANNOTATIONS) {
                 if (method.isAnnotationPresent(clazz)) {
                     // 设置监听方法执行器

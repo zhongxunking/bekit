@@ -11,6 +11,7 @@ package top.bekit.flow.processor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ClassUtils;
 import top.bekit.flow.annotation.processor.Execute;
@@ -35,15 +36,17 @@ public class ProcessorParser {
      * @return 处理器执行器
      */
     public static ProcessorExecutor parseProcessor(Object processor) {
-        logger.info("解析处理器：{}", ClassUtils.getQualifiedName(processor.getClass()));
+        // 获取目标class（应对AOP代理情况）
+        Class<?> processorClass = AopUtils.getTargetClass(processor);
+        logger.info("解析处理器：{}", ClassUtils.getQualifiedName(processorClass));
         // 获取处理器名称
-        String processorName = processor.getClass().getAnnotation(Processor.class).name();
+        String processorName = processorClass.getAnnotation(Processor.class).name();
         if (StringUtils.isEmpty(processorName)) {
-            processorName = ClassUtils.getShortNameAsProperty(processor.getClass());
+            processorName = ClassUtils.getShortNameAsProperty(processorClass);
         }
         // 创建处理器执行器
         ProcessorExecutor processorExecutor = new ProcessorExecutor(processorName, processor);
-        for (Method method : processor.getClass().getDeclaredMethods()) {
+        for (Method method : processorClass.getDeclaredMethods()) {
             for (Class clazz : ProcessorExecutor.PROCESSOR_METHOD_ANNOTATIONS) {
                 if (method.isAnnotationPresent(clazz)) {
                     // 设置处理器方法执行器

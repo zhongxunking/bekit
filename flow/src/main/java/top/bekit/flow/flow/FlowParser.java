@@ -11,6 +11,7 @@ package top.bekit.flow.flow;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ClassUtils;
@@ -44,19 +45,21 @@ public class FlowParser {
      * @return 流程执行器
      */
     public static FlowExecutor parseFlow(Object flow, ProcessorHolder processorHolder, FlowTxHolder flowTxHolder, EventBusHolder eventBusHolder) {
-        logger.info("解析流程：{}", ClassUtils.getQualifiedName(flow.getClass()));
-        Flow flowAnnotation = flow.getClass().getAnnotation(Flow.class);
+        // 获取目标class（应对AOP代理情况）
+        Class<?> flowClass = AopUtils.getTargetClass(flow);
+        logger.info("解析流程：{}", ClassUtils.getQualifiedName(flowClass));
+        Flow flowAnnotation = flowClass.getAnnotation(Flow.class);
         // 获取流程名称
         String flowName = flowAnnotation.name();
         if (StringUtils.isEmpty(flowName)) {
-            flowName = ClassUtils.getShortNameAsProperty(flow.getClass());
+            flowName = ClassUtils.getShortNameAsProperty(flowClass);
         }
         // 新建流程执行器
         FlowExecutor flowExecutor = new FlowExecutor(flowName, flowAnnotation.enableFlowTx(), flow, new DefaultEventPublisher(eventBusHolder.getEventBus(FlowListener.class)));
         if (flowAnnotation.enableFlowTx()) {
             flowExecutor.setFlowTxExecutor(flowTxHolder.getRequiredFlowTxExecutor(flowName));
         }
-        for (Method method : flow.getClass().getDeclaredMethods()) {
+        for (Method method : flowClass.getDeclaredMethods()) {
             // 此处得到的@Node是已经经过@AliasFor属性别名进行属性同步后的结果
             Node nodeAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, Node.class);
             if (nodeAnnotation != null) {
