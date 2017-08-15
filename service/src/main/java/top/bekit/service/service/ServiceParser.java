@@ -11,6 +11,7 @@ package top.bekit.service.service;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
@@ -37,12 +38,14 @@ public class ServiceParser {
      * @return 服务执行器
      */
     public static ServiceExecutor parseService(Object service, PlatformTransactionManager txManager) {
-        logger.info("解析服务：{}", ClassUtils.getQualifiedName(service.getClass()));
-        Service serviceAnnotation = service.getClass().getAnnotation(Service.class);
+        // 获取目标class（应对AOP代理情况）
+        Class<?> serviceClass = AopUtils.getTargetClass(service);
+        logger.info("解析服务：{}", ClassUtils.getQualifiedName(serviceClass));
+        Service serviceAnnotation = serviceClass.getAnnotation(Service.class);
         // 获取服务名称
         String serviceName = serviceAnnotation.name();
         if (StringUtils.isEmpty(serviceName)) {
-            serviceName = ClassUtils.getShortNameAsProperty(service.getClass());
+            serviceName = ClassUtils.getShortNameAsProperty(serviceClass);
         }
         // 创建服务执行器
         ServiceExecutor serviceExecutor = new ServiceExecutor(serviceName, serviceAnnotation.enableTx(), service);
@@ -52,7 +55,7 @@ public class ServiceParser {
             }
             serviceExecutor.setTxManager(txManager);
         }
-        for (Method method : service.getClass().getDeclaredMethods()) {
+        for (Method method : serviceClass.getDeclaredMethods()) {
             for (Class clazz : ServiceExecutor.SERVICE_PHASE_ANNOTATIONS) {
                 if (method.isAnnotationPresent(clazz)) {
                     // 设置服务阶段执行器
