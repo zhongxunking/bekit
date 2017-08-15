@@ -10,6 +10,7 @@ package top.bekit.event.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ClassUtils;
 import top.bekit.event.annotation.listener.Listen;
@@ -33,12 +34,14 @@ public class ListenerParser {
      * @return 监听器执行器
      */
     public static ListenerExecutor parseListener(Object listener) {
-        logger.info("解析监听器：{}", ClassUtils.getQualifiedName(listener.getClass()));
+        // 获取目标class（应对AOP代理情况）
+        Class<?> listenerClass = AopUtils.getTargetClass(listener);
+        logger.info("解析监听器：{}", ClassUtils.getQualifiedName(listenerClass));
         // 此处得到的@Listener是已经经过@AliasFor属性别名进行属性同步后的结果
-        Listener listenerAnnotation = AnnotatedElementUtils.findMergedAnnotation(listener.getClass(), Listener.class);
+        Listener listenerAnnotation = AnnotatedElementUtils.findMergedAnnotation(listenerClass, Listener.class);
         // 创建监听器执行器
         ListenerExecutor listenerExecutor = new ListenerExecutor(listener, listenerAnnotation.type(), listenerAnnotation.priority());
-        for (Method method : listener.getClass().getDeclaredMethods()) {
+        for (Method method : listenerClass.getDeclaredMethods()) {
             Listen listenAnnotation = method.getAnnotation(Listen.class);
             if (listenAnnotation != null) {
                 ListenExecutor listenExecutor = parseListen(listenAnnotation, method);
