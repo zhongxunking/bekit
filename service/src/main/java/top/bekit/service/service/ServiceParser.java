@@ -15,6 +15,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
+import top.bekit.common.transaction.TxExecutor;
 import top.bekit.service.annotation.service.Service;
 import top.bekit.service.annotation.service.ServiceExecute;
 import top.bekit.service.engine.ServiceContext;
@@ -53,7 +54,7 @@ public class ServiceParser {
             if (txManager == null) {
                 throw new IllegalArgumentException("服务" + serviceAnnotation.name() + "的enableTx属性为开启状态，但不存在事务管理器（PlatformTransactionManager），请检查是否有配置spring事务管理器");
             }
-            serviceExecutor.setTxManager(txManager);
+            serviceExecutor.setTxExecutor(new TxExecutor(txManager));
         }
         for (Method method : serviceClass.getDeclaredMethods()) {
             for (Class clazz : ServiceExecutor.SERVICE_PHASE_ANNOTATIONS) {
