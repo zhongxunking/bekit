@@ -8,18 +8,18 @@
  */
 package org.bekit.flow.listener;
 
+import org.bekit.flow.annotation.listener.ListenFlowException;
 import org.bekit.flow.annotation.listener.ListenNodeDecided;
 import org.bekit.flow.annotation.listener.TheFlowListener;
 import org.bekit.flow.engine.TargetContext;
+import org.bekit.flow.listener.TheFlowListenerExecutor.AbstractTheFlowListenExecutor;
+import org.bekit.flow.listener.TheFlowListenerExecutor.FlowExceptionListenExecutor;
+import org.bekit.flow.listener.TheFlowListenerExecutor.NodeDecidedListenExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ClassUtils;
-import org.bekit.flow.annotation.listener.ListenFlowException;
-import org.bekit.flow.listener.TheFlowListenerExecutor.AbstractTheFlowListenExecutor;
-import org.bekit.flow.listener.TheFlowListenerExecutor.FlowExceptionListenExecutor;
-import org.bekit.flow.listener.TheFlowListenerExecutor.NodeDecidedListenExecutor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -40,7 +40,7 @@ public class TheFlowListenerParser {
     public static TheFlowListenerExecutor parseTheFlowListener(Object theFlowListener) {
         // 获取目标class（应对AOP代理情况）
         Class<?> theFlowListenerClass = AopUtils.getTargetClass(theFlowListener);
-        logger.info("解析特定流程监听器：{}", ClassUtils.getQualifiedName(theFlowListenerClass));
+        logger.debug("解析特定流程监听器：{}", ClassUtils.getQualifiedName(theFlowListenerClass));
         TheFlowListener theFlowListenerAnnotation = theFlowListenerClass.getAnnotation(TheFlowListener.class);
         // 创建特定流程监听器执行器
         TheFlowListenerExecutor theFlowListenerExecutor = new TheFlowListenerExecutor(theFlowListenerAnnotation.flow(), theFlowListener);

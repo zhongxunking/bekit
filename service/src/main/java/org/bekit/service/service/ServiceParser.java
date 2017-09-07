@@ -9,17 +9,17 @@
 package org.bekit.service.service;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bekit.common.transaction.TxExecutor;
+import org.bekit.service.annotation.service.Service;
+import org.bekit.service.annotation.service.ServiceExecute;
+import org.bekit.service.engine.ServiceContext;
+import org.bekit.service.service.ServiceExecutor.ServicePhaseExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
-import org.bekit.common.transaction.TxExecutor;
-import org.bekit.service.annotation.service.Service;
-import org.bekit.service.annotation.service.ServiceExecute;
-import org.bekit.service.engine.ServiceContext;
-import org.bekit.service.service.ServiceExecutor.ServicePhaseExecutor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -41,7 +41,7 @@ public class ServiceParser {
     public static ServiceExecutor parseService(Object service, PlatformTransactionManager txManager) {
         // 获取目标class（应对AOP代理情况）
         Class<?> serviceClass = AopUtils.getTargetClass(service);
-        logger.info("解析服务：{}", ClassUtils.getQualifiedName(serviceClass));
+        logger.debug("解析服务：{}", ClassUtils.getQualifiedName(serviceClass));
         Service serviceAnnotation = serviceClass.getAnnotation(Service.class);
         // 获取服务名称
         String serviceName = serviceAnnotation.name();

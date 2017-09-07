@@ -9,8 +9,12 @@
 package org.bekit.flow.flow;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bekit.event.bus.EventBusHolder;
+import org.bekit.event.publisher.DefaultEventPublisher;
 import org.bekit.flow.annotation.flow.*;
+import org.bekit.flow.annotation.listener.FlowListener;
 import org.bekit.flow.engine.TargetContext;
+import org.bekit.flow.processor.ProcessorExecutor;
 import org.bekit.flow.processor.ProcessorHolder;
 import org.bekit.flow.transaction.FlowTxHolder;
 import org.slf4j.Logger;
@@ -19,10 +23,6 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ClassUtils;
-import org.bekit.event.bus.EventBusHolder;
-import org.bekit.event.publisher.DefaultEventPublisher;
-import org.bekit.flow.annotation.listener.FlowListener;
-import org.bekit.flow.processor.ProcessorExecutor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -44,7 +44,7 @@ public class FlowParser {
     public static FlowExecutor parseFlow(Object flow, ProcessorHolder processorHolder, FlowTxHolder flowTxHolder, EventBusHolder eventBusHolder) {
         // 获取目标class（应对AOP代理情况）
         Class<?> flowClass = AopUtils.getTargetClass(flow);
-        logger.info("解析流程：{}", ClassUtils.getQualifiedName(flowClass));
+        logger.debug("解析流程：{}", ClassUtils.getQualifiedName(flowClass));
         Flow flowAnnotation = flowClass.getAnnotation(Flow.class);
         // 获取流程名称
         String flowName = flowAnnotation.name();

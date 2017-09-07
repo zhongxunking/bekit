@@ -9,15 +9,15 @@
 package org.bekit.flow.processor;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bekit.flow.annotation.processor.Execute;
+import org.bekit.flow.annotation.processor.Processor;
 import org.bekit.flow.engine.TargetContext;
+import org.bekit.flow.processor.ProcessorExecutor.ProcessorMethodExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ClassUtils;
-import org.bekit.flow.annotation.processor.Execute;
-import org.bekit.flow.annotation.processor.Processor;
-import org.bekit.flow.processor.ProcessorExecutor.ProcessorMethodExecutor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -38,7 +38,7 @@ public class ProcessorParser {
     public static ProcessorExecutor parseProcessor(Object processor) {
         // 获取目标class（应对AOP代理情况）
         Class<?> processorClass = AopUtils.getTargetClass(processor);
-        logger.info("解析处理器：{}", ClassUtils.getQualifiedName(processorClass));
+        logger.debug("解析处理器：{}", ClassUtils.getQualifiedName(processorClass));
         // 获取处理器名称
         String processorName = processorClass.getAnnotation(Processor.class).name();
         if (StringUtils.isEmpty(processorName)) {

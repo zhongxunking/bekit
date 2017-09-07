@@ -8,6 +8,7 @@
  */
 package org.bekit.flow.transaction;
 
+import org.bekit.flow.annotation.transaction.FlowTx;
 import org.bekit.flow.engine.TargetContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,6 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ClassUtils;
-import org.bekit.flow.annotation.transaction.FlowTx;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -37,7 +37,7 @@ public class FlowTxParser {
     public static FlowTxExecutor parseFlowTx(Object flowTx, PlatformTransactionManager txManager) {
         // 获取目标class（应对AOP代理情况）
         Class<?> flowTxClass = AopUtils.getTargetClass(flowTx);
-        logger.info("解析流程事务：{}", ClassUtils.getQualifiedName(flowTxClass));
+        logger.debug("解析流程事务：{}", ClassUtils.getQualifiedName(flowTxClass));
         FlowTx flowTxAnnotation = flowTxClass.getAnnotation(FlowTx.class);
         // 创建流程事务执行器
         FlowTxExecutor flowTxExecutor = new FlowTxExecutor(flowTxAnnotation.flow(), flowTx, txManager);
