@@ -8,12 +8,13 @@
  */
 package org.bekit.service.service;
 
-import org.bekit.service.annotation.service.ServiceExecute;
-import org.springframework.util.ClassUtils;
 import org.bekit.common.method.MethodExecutor;
 import org.bekit.common.transaction.TxExecutor;
+import org.bekit.service.annotation.service.ServiceAfter;
 import org.bekit.service.annotation.service.ServiceCheck;
+import org.bekit.service.annotation.service.ServiceExecute;
 import org.bekit.service.engine.ServiceContext;
+import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -27,7 +28,7 @@ public class ServiceExecutor {
     /**
      * 服务阶段注解
      */
-    public static final Class[] SERVICE_PHASE_ANNOTATIONS = {ServiceCheck.class, ServiceExecute.class};
+    public static final Class[] SERVICE_PHASE_ANNOTATIONS = {ServiceCheck.class, ServiceExecute.class, ServiceAfter.class};
 
     // 服务名称
     private String serviceName;
@@ -57,12 +58,21 @@ public class ServiceExecutor {
         if (phaseExecutorMap.containsKey(ServiceCheck.class)) {
             phaseExecutorMap.get(ServiceCheck.class).execute(service, serviceContext);
         }
+        // 执行服务执行阶段
+        executeServiceExecute(serviceContext);
+        // 执行服务后置阶段
+        if (phaseExecutorMap.containsKey(ServiceAfter.class)) {
+            phaseExecutorMap.get(ServiceAfter.class).execute(service, serviceContext);
+        }
+    }
+
+    // 执行服务执行阶段
+    private void executeServiceExecute(ServiceContext serviceContext) throws Throwable {
         if (enableTx) {
             // 开启事务
             txExecutor.createTx();
         }
         try {
-            // 执行服务执行阶段
             phaseExecutorMap.get(ServiceExecute.class).execute(service, serviceContext);
             if (enableTx) {
                 // 提交事务

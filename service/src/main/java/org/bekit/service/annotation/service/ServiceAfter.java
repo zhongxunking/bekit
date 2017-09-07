@@ -4,17 +4,17 @@
 
 /*
  * 修订记录:
- * @author 钟勋 2016-12-16 01:14 创建
+ * @author 钟勋 2017-09-07 14:17 创建
  */
 package org.bekit.service.annotation.service;
 
 import java.lang.annotation.*;
 
 /**
- * 服务校验（执行中不会有事务）
+ * 服务后置处理（执行中不会有事务）
  */
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ServiceCheck {
+public @interface ServiceAfter {
 }
