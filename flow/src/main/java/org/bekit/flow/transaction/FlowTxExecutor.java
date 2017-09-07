@@ -8,13 +8,13 @@
  */
 package org.bekit.flow.transaction;
 
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.util.ClassUtils;
 import org.bekit.common.method.MethodExecutor;
 import org.bekit.common.transaction.TxExecutor;
 import org.bekit.flow.annotation.transaction.InsertTarget;
 import org.bekit.flow.annotation.transaction.LockTarget;
 import org.bekit.flow.engine.TargetContext;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -37,8 +37,8 @@ public class FlowTxExecutor extends TxExecutor {
     // 操作执行器Map（key：流程事务操作注解的Class）
     private Map<Class, FlowTxOperateExecutor> operateExecutorMap = new HashMap<>();
 
-    public FlowTxExecutor(String flow, Object flowTx, PlatformTransactionManager txManager) {
-        super(txManager);
+    public FlowTxExecutor(String flow, Object flowTx, PlatformTransactionManager transactionManager) {
+        super(transactionManager);
         this.flow = flow;
         this.flowTx = flowTx;
     }

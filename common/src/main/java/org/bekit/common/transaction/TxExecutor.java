@@ -21,12 +21,12 @@ public class TxExecutor {
     private static final TransactionDefinition TX_DEFINITION = new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 
     // 事务管理器
-    private PlatformTransactionManager txManager;
+    private PlatformTransactionManager transactionManager;
     // 事务持有器
     private ThreadLocal<TransactionStatus> txStatusHolder = new ThreadLocal<>();
 
-    public TxExecutor(PlatformTransactionManager txManager) {
-        this.txManager = txManager;
+    public TxExecutor(PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
     }
 
     /**
@@ -38,7 +38,7 @@ public class TxExecutor {
         if (txStatusHolder.get() != null) {
             throw new IllegalStateException("本线程事务已存在，不能同时创建多个事务");
         }
-        txStatusHolder.set(txManager.getTransaction(TX_DEFINITION));
+        txStatusHolder.set(transactionManager.getTransaction(TX_DEFINITION));
     }
 
     /**
@@ -50,7 +50,7 @@ public class TxExecutor {
         if (txStatusHolder.get() == null) {
             throw new IllegalStateException("事务不存在，无法提交事务");
         }
-        txManager.commit(txStatusHolder.get());
+        transactionManager.commit(txStatusHolder.get());
         txStatusHolder.remove();
     }
 
@@ -63,7 +63,7 @@ public class TxExecutor {
         if (txStatusHolder.get() == null) {
             throw new IllegalStateException("事务不存在，无法回滚事务");
         }
-        txManager.rollback(txStatusHolder.get());
+        transactionManager.rollback(txStatusHolder.get());
         txStatusHolder.remove();
     }
 
@@ -73,7 +73,7 @@ public class TxExecutor {
      * @throws IllegalStateException 如果校验不通过
      */
     public void validate() {
-        if (txManager == null) {
+        if (transactionManager == null) {
             throw new IllegalStateException("事务执行器内部要素不全");
         }
     }

@@ -8,10 +8,10 @@
  */
 package org.bekit.flow.transaction;
 
+import org.bekit.flow.annotation.transaction.FlowTx;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.bekit.flow.annotation.transaction.FlowTx;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ public class FlowTxHolder {
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired(required = false)
-    private PlatformTransactionManager txManager;
+    private PlatformTransactionManager transactionManager;
     // 流程事务执行器Map（key：流程事务对应的流程名称）
     private Map<String, FlowTxExecutor> flowTxExecutorMap = new HashMap<>();
 
@@ -32,12 +32,12 @@ public class FlowTxHolder {
     @PostConstruct
     public void init() {
         String[] beanNames = applicationContext.getBeanNamesForAnnotation(FlowTx.class);
-        if (beanNames.length > 0 && txManager == null) {
+        if (beanNames.length > 0 && transactionManager == null) {
             throw new RuntimeException("存在流程事务但是不存在事务管理器（PlatformTransactionManager），请检查是否有配置spring事务管理器");
         }
         for (String beanName : beanNames) {
             // 解析流程事务
-            FlowTxExecutor flowTxExecutor = FlowTxParser.parseFlowTx(applicationContext.getBean(beanName), txManager);
+            FlowTxExecutor flowTxExecutor = FlowTxParser.parseFlowTx(applicationContext.getBean(beanName), transactionManager);
             if (flowTxExecutorMap.containsKey(flowTxExecutor.getFlow())) {
                 throw new RuntimeException("流程" + flowTxExecutor.getFlow() + "存在多个流程事务");
             }

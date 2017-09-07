@@ -30,17 +30,17 @@ public class FlowTxParser {
     /**
      * 解析流程事务
      *
-     * @param flowTx    流程事务
-     * @param txManager 事务管理器
+     * @param flowTx             流程事务
+     * @param transactionManager 事务管理器
      * @return 流程事务执行器
      */
-    public static FlowTxExecutor parseFlowTx(Object flowTx, PlatformTransactionManager txManager) {
+    public static FlowTxExecutor parseFlowTx(Object flowTx, PlatformTransactionManager transactionManager) {
         // 获取目标class（应对AOP代理情况）
         Class<?> flowTxClass = AopUtils.getTargetClass(flowTx);
         logger.debug("解析流程事务：{}", ClassUtils.getQualifiedName(flowTxClass));
         FlowTx flowTxAnnotation = flowTxClass.getAnnotation(FlowTx.class);
         // 创建流程事务执行器
-        FlowTxExecutor flowTxExecutor = new FlowTxExecutor(flowTxAnnotation.flow(), flowTx, txManager);
+        FlowTxExecutor flowTxExecutor = new FlowTxExecutor(flowTxAnnotation.flow(), flowTx, transactionManager);
         for (Method method : flowTxClass.getDeclaredMethods()) {
             for (Class clazz : FlowTxExecutor.FLOW_TX_OPERATE_ANNOTATIONS) {
                 if (method.isAnnotationPresent(clazz)) {

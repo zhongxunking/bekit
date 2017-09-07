@@ -34,11 +34,11 @@ public class ServiceParser {
     /**
      * 解析服务
      *
-     * @param service   服务
-     * @param txManager 事务管理器
+     * @param service            服务
+     * @param transactionManager 事务管理器
      * @return 服务执行器
      */
-    public static ServiceExecutor parseService(Object service, PlatformTransactionManager txManager) {
+    public static ServiceExecutor parseService(Object service, PlatformTransactionManager transactionManager) {
         // 获取目标class（应对AOP代理情况）
         Class<?> serviceClass = AopUtils.getTargetClass(service);
         logger.debug("解析服务：{}", ClassUtils.getQualifiedName(serviceClass));
@@ -51,10 +51,10 @@ public class ServiceParser {
         // 创建服务执行器
         ServiceExecutor serviceExecutor = new ServiceExecutor(serviceName, serviceAnnotation.enableTx(), service);
         if (serviceAnnotation.enableTx()) {
-            if (txManager == null) {
+            if (transactionManager == null) {
                 throw new IllegalArgumentException("服务" + serviceAnnotation.name() + "的enableTx属性为开启状态，但不存在事务管理器（PlatformTransactionManager），请检查是否有配置spring事务管理器");
             }
-            serviceExecutor.setTxExecutor(new TxExecutor(txManager));
+            serviceExecutor.setTxExecutor(new TxExecutor(transactionManager));
         }
         for (Method method : serviceClass.getDeclaredMethods()) {
             for (Class clazz : ServiceExecutor.SERVICE_PHASE_ANNOTATIONS) {
