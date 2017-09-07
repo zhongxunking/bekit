@@ -406,6 +406,11 @@
             public void execute(ServiceContext<XXXOrder, XXXResult> serviceContext) {
                 // 真正执行业务
             }
+            
+            @ServiceAfter // 服务后置处理（执行中不会有事务）
+            public void serviceAfter(ServiceContext<TransferOrder, TransferResult> serviceContext) {
+                // 可以进行一些后置处理，一般情况下用的不多
+            }
         }
 
 > 被服务引擎的@Service注解的服务会被自动注册到Spring容器中（因为它继承了spring的@Component），它里面有个name属性用于指定服务名称，默认使用被注解的类名（首字母小写）。如果这个服务需要多次提交事务（比如订单类业务场景），强烈建议结合“流程引擎”一起使用，并且服务引擎不用开启事务，事务由流程引擎来控制，这样会让程序更简单。
