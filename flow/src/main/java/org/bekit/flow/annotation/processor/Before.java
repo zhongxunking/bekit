@@ -14,7 +14,7 @@ import java.lang.annotation.*;
  * 前置处理（可选要素）
  * <p>
  * 一般进行预处理，比如一些预校验。
- * 有入参的话，则必须是TargetContext类型，返回值必须是void（比如：void before(TargetContext targetContext)）
+ * 入参必须是TargetContext类型，返回值必须是void（比如：void before(TargetContext targetContext)）
  */
 @Documented
 @Target(ElementType.METHOD)

@@ -408,7 +408,7 @@
             }
             
             @ServiceAfter // 服务后置处理（执行中不会有事务）
-            public void serviceAfter(ServiceContext<TransferOrder, TransferResult> serviceContext) {
+            public void serviceAfter(ServiceContext<XXXOrder, XXXResult> serviceContext) {
                 // 可以进行一些后置处理，一般情况下用的不多
             }
         }
