@@ -28,8 +28,7 @@ public class DefaultEventPublisher implements EventPublisher {
         try {
             eventBus.dispatch(event);
         } catch (Throwable e) {
-            // 非运行时异常包装成UndeclaredThrowableException异常，让外部不用每次调用时都需要catch
-            ExceptionUtils.wrapAndThrow(e);
+            ExceptionUtils.rethrow(e);
         }
     }
 }

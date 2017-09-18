@@ -9,13 +9,13 @@
 package org.bekit.flow.engine;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ClassUtils;
 import org.bekit.flow.FlowEngine;
 import org.bekit.flow.flow.FlowExecutor;
 import org.bekit.flow.flow.FlowHolder;
 import org.bekit.flow.transaction.FlowTxExecutor;
 import org.bekit.flow.transaction.FlowTxHolder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ClassUtils;
 
 import java.util.Map;
 
@@ -87,8 +87,7 @@ public class DefaultFlowEngine implements FlowEngine {
             // 插入目标对象
             flowTxExecutor.insertTarget(targetContext);
         } catch (Throwable e) {
-            // 非运行时异常包装成UndeclaredThrowableException异常，让外部不用每次调用时都需要catch
-            ExceptionUtils.wrapAndThrow(e);
+            ExceptionUtils.rethrow(e);
         }
     }
 
@@ -100,8 +99,7 @@ public class DefaultFlowEngine implements FlowEngine {
             // 执行流程
             flowExecutor.execute(targetContext);
         } catch (Throwable e) {
-            // 非运行时异常包装成UndeclaredThrowableException异常，让外部不用每次调用时都需要catch
-            ExceptionUtils.wrapAndThrow(e);
+            ExceptionUtils.rethrow(e);
         }
     }
 }
