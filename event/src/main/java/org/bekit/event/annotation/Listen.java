@@ -18,7 +18,7 @@ import java.lang.annotation.*;
 @Documented
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@org.bekit.event.annotation.listener.Listen()
+@org.bekit.event.annotation.listener.Listen
 public @interface Listen {
 
     /**
