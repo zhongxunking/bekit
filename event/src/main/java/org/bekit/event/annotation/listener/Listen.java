@@ -8,15 +8,23 @@
  */
 package org.bekit.event.annotation.listener;
 
+import org.bekit.event.extension.ListenResolver;
+import org.bekit.event.extension.support.DefaultListenResolver;
+
 import java.lang.annotation.*;
 
 /**
  * 监听
  */
 @Documented
-@Target(ElementType.METHOD)
+@Target(ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Listen {
+
+    /**
+     * 监听解决器（默认DefaultListenResolver）
+     */
+    Class<? extends ListenResolver> resolver() default DefaultListenResolver.class;
 
     /**
      * 是否按照优先级升序
@@ -25,5 +33,4 @@ public @interface Listen {
      * 当一个事件发布时，总是先执行完优先级为升序的监听方法，再执行优先级为降序的监听方法
      */
     boolean priorityAsc() default true;
-
 }
