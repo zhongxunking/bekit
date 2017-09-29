@@ -8,6 +8,7 @@
  */
 package org.bekit.event.bus;
 
+import org.bekit.event.extension.EventTypeResolver;
 import org.bekit.event.listener.ListenerExecutor;
 
 import java.util.*;
@@ -18,8 +19,14 @@ import java.util.*;
 public class EventBus {
     // 监听器执行器
     private List<ListenerExecutor> listenerExecutors = new ArrayList<>();
-    // 监听器执行器缓存
-    private Map<Class, List<ListenerExecutor>> listenerExecutorsCache = new HashMap<>();
+    // 监听器执行器缓存（key：事件类型）
+    private Map<Object, List<ListenerExecutor>> listenerExecutorsCache = new HashMap<>();
+    // 事件类型解决器
+    private EventTypeResolver resolver;
+
+    public EventBus(EventTypeResolver resolver) {
+        this.resolver = resolver;
+    }
 
     /**
      * 注册监听器
@@ -41,7 +48,7 @@ public class EventBus {
      */
     public void dispatch(Object event) throws Throwable {
         // 获取该事件类型的监听器缓存
-        List<ListenerExecutor> theListenerExecutors = listenerExecutorsCache.get(event.getClass());
+        List<ListenerExecutor> theListenerExecutors = listenerExecutorsCache.get(resolver.resolve(event));
         if (theListenerExecutors != null) {
             // 执行监听器
             for (ListenerExecutor listenerExecutor : theListenerExecutors) {
@@ -54,13 +61,13 @@ public class EventBus {
     private void refreshListenerCache() {
         listenerExecutorsCache = new HashMap<>();
         // 获取本总线所有的事件类型
-        Set<Class> eventTypes = new HashSet<>();
+        Set<Object> eventTypes = new HashSet<>();
         for (ListenerExecutor listenerExecutor : listenerExecutors) {
             eventTypes.addAll(listenerExecutor.getEventTypes(true));
             eventTypes.addAll(listenerExecutor.getEventTypes(false));
         }
         // 根据事件类型设置缓存
-        for (Class eventType : eventTypes) {
+        for (Object eventType : eventTypes) {
             // 特定事件类型的监听器缓存
             List<ListenerExecutor> theListenerExecutors = new ArrayList<>();
             // 获取指定事件类型的升序监听器
