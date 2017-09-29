@@ -8,11 +8,11 @@
  */
 package org.bekit.flow.listener;
 
+import org.bekit.event.annotation.Listen;
 import org.bekit.flow.annotation.listener.FlowListener;
 import org.bekit.flow.event.FlowExceptionEvent;
 import org.bekit.flow.event.NodeDecidedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.bekit.event.annotation.listener.Listen;
 
 /**
  * 默认的流程事件监听器
