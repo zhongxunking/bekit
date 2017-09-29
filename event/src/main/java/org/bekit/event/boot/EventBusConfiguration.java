@@ -8,13 +8,13 @@
  */
 package org.bekit.event.boot;
 
+import org.bekit.event.EventPublisher;
 import org.bekit.event.bus.EventBusHolder;
+import org.bekit.event.extension.support.BizListenerType;
 import org.bekit.event.listener.ListenerHolder;
 import org.bekit.event.publisher.DefaultEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.bekit.event.EventPublisher;
-import org.bekit.event.annotation.BizListener;
 
 /**
  * 事件总线配置类
@@ -26,7 +26,7 @@ public class EventBusConfiguration {
     // 业务事件发布器
     @Bean
     public EventPublisher eventPublisher(EventBusHolder eventBusHolder) {
-        return new DefaultEventPublisher(eventBusHolder.getEventBus(BizListener.class));
+        return new DefaultEventPublisher(eventBusHolder.getEventBus(BizListenerType.class));
     }
 
     // 事件总线持有器
@@ -40,5 +40,4 @@ public class EventBusConfiguration {
     public ListenerHolder listenerHolder() {
         return new ListenerHolder();
     }
-
 }

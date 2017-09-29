@@ -8,6 +8,7 @@
  */
 package org.bekit.event.bus;
 
+import org.bekit.event.extension.ListenerType;
 import org.bekit.event.listener.ListenerExecutor;
 import org.bekit.event.listener.ListenerHolder;
 import org.bekit.event.listener.ListenerParser;
@@ -46,7 +47,7 @@ public class EventBusHolder {
      *
      * @param type 总线类型
      */
-    public synchronized EventBus getEventBus(Class type) {
+    public synchronized EventBus getEventBus(Class<? extends ListenerType> type) {
         if (!eventBusMap.containsKey(type)) {
             eventBusMap.put(type, new EventBus(ListenerParser.parseEventTypeResolver(type)));
         }
