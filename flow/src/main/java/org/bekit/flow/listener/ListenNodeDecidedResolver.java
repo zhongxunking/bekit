@@ -30,6 +30,7 @@ public class ListenNodeDecidedResolver implements ListenResolver {
         if (theFlowListenerAnnotation == null) {
             throw new IllegalArgumentException("@ListenNodeDecided只能标注在特定流程监听器（@TheFlowListener）的方法上");
         }
+        // 校验入参
         Class[] parameterTypes = listenMethod.getParameterTypes();
         if (parameterTypes.length != 2) {
             throw new RuntimeException("监听节点选择方法" + ClassUtils.getQualifiedMethodName(listenMethod) + "的入参必须是（String, TargetContext）");
