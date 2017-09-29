@@ -31,13 +31,11 @@ public class EventBusHolder {
     @PostConstruct
     public void init() {
         for (Class type : listenerHolder.getTypes()) {
-            // 构造事件总线
-            EventBus eventBus = new EventBus(ListenerParser.parseEventTypeResolver(type));
+            // 初始化事件总线
+            EventBus eventBus = getEventBus(type);
             for (ListenerExecutor listenerExecutor : listenerHolder.getListenerExecutors(type)) {
                 eventBus.register(listenerExecutor);
             }
-            // 将事件总线放入持有器中
-            eventBusMap.put(type, eventBus);
         }
     }
 
