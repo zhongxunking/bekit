@@ -8,8 +8,9 @@
  */
 package org.bekit.service.annotation.listener;
 
-import org.springframework.core.annotation.AliasFor;
 import org.bekit.event.annotation.listener.Listener;
+import org.bekit.service.listener.ServiceListenerType;
+import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
@@ -19,7 +20,7 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Listener(type = ServiceListener.class)
+@Listener(type = ServiceListenerType.class)
 public @interface ServiceListener {
 
     /**
