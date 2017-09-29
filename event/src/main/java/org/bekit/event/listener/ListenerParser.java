@@ -23,8 +23,6 @@ import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 监听器解析器
@@ -32,8 +30,6 @@ import java.util.Map;
 public class ListenerParser {
     // 日志记录器
     private static final Logger logger = LoggerFactory.getLogger(ListenerParser.class);
-    // 事件类型解决器缓存
-    private static final Map<Class, EventTypeResolver> EVENT_TYPE_RESOLVER_CACHE = new HashMap<>();
 
     /**
      * 解析监听器
@@ -48,7 +44,7 @@ public class ListenerParser {
         // 此处得到的@Listener是已经经过@AliasFor属性别名进行属性同步后的结果
         Listener listenerAnnotation = AnnotatedElementUtils.findMergedAnnotation(listenerClass, Listener.class);
         // 创建监听器执行器
-        ListenerExecutor listenerExecutor = new ListenerExecutor(listener, listenerAnnotation.type(), listenerAnnotation.priority(), getEventTypeResolver(listenerAnnotation.type()));
+        ListenerExecutor listenerExecutor = new ListenerExecutor(listener, listenerAnnotation.type(), listenerAnnotation.priority(), parseEventTypeResolver(listenerAnnotation.type()));
         for (Method method : listenerClass.getDeclaredMethods()) {
             Listen listenAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, Listen.class);
             if (listenAnnotation != null) {
@@ -62,18 +58,13 @@ public class ListenerParser {
     }
 
     /**
-     * 获取事件类型解决器
+     * 通过监听器类型解析得到事件类型解决器
      *
      * @param clazz 监听器类型
      */
-    public static EventTypeResolver getEventTypeResolver(Class<? extends ListenerType> clazz) {
-        EventTypeResolver resolver = EVENT_TYPE_RESOLVER_CACHE.get(clazz);
-        if (resolver == null) {
-            ListenerType listenerType = (ListenerType) ReflectUtils.newInstance(clazz);
-            resolver = listenerType.getResolver();
-            EVENT_TYPE_RESOLVER_CACHE.put(clazz, resolver);
-        }
-        return resolver;
+    public static EventTypeResolver parseEventTypeResolver(Class<? extends ListenerType> clazz) {
+        ListenerType listenerType = (ListenerType) ReflectUtils.newInstance(clazz);
+        return listenerType.getResolver();
     }
 
     // 解析监听方法

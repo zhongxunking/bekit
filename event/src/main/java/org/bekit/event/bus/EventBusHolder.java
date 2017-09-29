@@ -8,9 +8,10 @@
  */
 package org.bekit.event.bus;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.bekit.event.listener.ListenerExecutor;
 import org.bekit.event.listener.ListenerHolder;
+import org.bekit.event.listener.ListenerParser;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ public class EventBusHolder {
     public void init() {
         for (Class type : listenerHolder.getTypes()) {
             // 构造事件总线
-            EventBus eventBus = new EventBus();
+            EventBus eventBus = new EventBus(ListenerParser.parseEventTypeResolver(type));
             for (ListenerExecutor listenerExecutor : listenerHolder.getListenerExecutors(type)) {
                 eventBus.register(listenerExecutor);
             }
@@ -47,7 +48,7 @@ public class EventBusHolder {
      */
     public synchronized EventBus getEventBus(Class type) {
         if (!eventBusMap.containsKey(type)) {
-            eventBusMap.put(type, new EventBus());
+            eventBusMap.put(type, new EventBus(ListenerParser.parseEventTypeResolver(type)));
         }
         return eventBusMap.get(type);
     }
