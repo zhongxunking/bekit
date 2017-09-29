@@ -8,8 +8,10 @@
  */
 package org.bekit.event.listener;
 
-import org.springframework.util.ClassUtils;
 import org.bekit.common.method.MethodExecutor;
+import org.bekit.event.extension.EventTypeResolver;
+import org.bekit.event.extension.ListenResolver;
+import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -27,13 +29,16 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
     private Class type;
     // 优先级
     private int priority;
+    // 事件类型解决器
+    private EventTypeResolver resolver;
     // 监听执行器map（key：被监听的事件类型）
-    private Map<Class, ListenExecutor> listenExecutorMap = new HashMap<>();
+    private Map<Object, ListenExecutor> listenExecutorMap = new HashMap<>();
 
-    public ListenerExecutor(Object listener, Class type, int priority) {
+    public ListenerExecutor(Object listener, Class type, int priority, EventTypeResolver resolver) {
         this.listener = listener;
         this.type = type;
         this.priority = priority;
+        this.resolver = resolver;
     }
 
     /**
@@ -43,7 +48,7 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
     public void execute(Object event) throws Throwable {
-        ListenExecutor listenExecutor = listenExecutorMap.get(event.getClass());
+        ListenExecutor listenExecutor = listenExecutorMap.get(resolver.resolve(event));
         if (listenExecutor != null) {
             listenExecutor.execute(listener, event);
         }
@@ -57,7 +62,7 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
      */
     public void addListenExecutor(ListenExecutor listenExecutor) {
         if (listenExecutorMap.containsKey(listenExecutor.getEventType())) {
-            throw new IllegalStateException("监听器" + ClassUtils.getShortName(listener.getClass()) + "存在多个监听" + ClassUtils.getShortName(listenExecutor.getEventType()) + "事件的方法");
+            throw new IllegalStateException("监听器" + ClassUtils.getShortName(listener.getClass()) + "存在多个监听" + listenExecutor.getEventType() + "事件的方法");
         }
         listenExecutorMap.put(listenExecutor.getEventType(), listenExecutor);
     }
@@ -81,9 +86,9 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
      *
      * @param priorityAsc 是否优先级升序（true：升序，false：降序）
      */
-    public Set<Class> getEventTypes(boolean priorityAsc) {
-        Set<Class> eventTypes = new HashSet<>();
-        for (Class eventType : listenExecutorMap.keySet()) {
+    public Set<Object> getEventTypes(boolean priorityAsc) {
+        Set<Object> eventTypes = new HashSet<>();
+        for (Object eventType : listenExecutorMap.keySet()) {
             ListenExecutor listenExecutor = listenExecutorMap.get(eventType);
             if (listenExecutor.isPriorityAsc() == priorityAsc) {
                 eventTypes.add(eventType);
@@ -103,7 +108,7 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
      * @throws IllegalStateException 如果校验不通过
      */
     public void validate() {
-        if (listener == null || type == null) {
+        if (listener == null || type == null || resolver == null) {
             throw new IllegalStateException("监听器内部要素不全");
         }
     }
@@ -112,15 +117,15 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
      * 监听执行器
      */
     public static class ListenExecutor extends MethodExecutor {
+        // 监听解决器
+        private ListenResolver resolver;
         // 是否优先级升序
         private boolean priorityAsc;
-        // 事件类型
-        private Class eventType;
 
-        public ListenExecutor(boolean priorityAsc, Method targetMethod) {
+        public ListenExecutor(ListenResolver resolver, boolean priorityAsc, Method targetMethod) {
             super(targetMethod);
+            this.resolver = resolver;
             this.priorityAsc = priorityAsc;
-            this.eventType = getParameterTypes()[0];
         }
 
         /**
@@ -131,14 +136,14 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
          * @throws Throwable 执行过程中发生任何异常都会往外抛
          */
         public void execute(Object listener, Object event) throws Throwable {
-            execute(listener, new Object[]{event});
+            execute(listener, resolver.resolveArgs(event));
         }
 
         /**
          * 获取事件类型
          */
-        public Class getEventType() {
-            return eventType;
+        public Object getEventType() {
+            return resolver.getEventType();
         }
 
         /**

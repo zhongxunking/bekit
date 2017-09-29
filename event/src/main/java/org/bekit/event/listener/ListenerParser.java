@@ -10,15 +10,21 @@ package org.bekit.event.listener;
 
 import org.bekit.event.annotation.listener.Listen;
 import org.bekit.event.annotation.listener.Listener;
+import org.bekit.event.extension.EventTypeResolver;
+import org.bekit.event.extension.ListenResolver;
+import org.bekit.event.extension.ListenerType;
 import org.bekit.event.listener.ListenerExecutor.ListenExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.cglib.core.ReflectUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 监听器解析器
@@ -26,6 +32,8 @@ import java.lang.reflect.Modifier;
 public class ListenerParser {
     // 日志记录器
     private static final Logger logger = LoggerFactory.getLogger(ListenerParser.class);
+    // 事件类型解决器缓存
+    private static final Map<Class, EventTypeResolver> EVENT_TYPE_RESOLVER_CACHE = new HashMap<>();
 
     /**
      * 解析监听器
@@ -40,9 +48,9 @@ public class ListenerParser {
         // 此处得到的@Listener是已经经过@AliasFor属性别名进行属性同步后的结果
         Listener listenerAnnotation = AnnotatedElementUtils.findMergedAnnotation(listenerClass, Listener.class);
         // 创建监听器执行器
-        ListenerExecutor listenerExecutor = new ListenerExecutor(listener, listenerAnnotation.type(), listenerAnnotation.priority());
+        ListenerExecutor listenerExecutor = new ListenerExecutor(listener, listenerAnnotation.type(), listenerAnnotation.priority(), getEventTypeResolver(listenerAnnotation.type()));
         for (Method method : listenerClass.getDeclaredMethods()) {
-            Listen listenAnnotation = method.getAnnotation(Listen.class);
+            Listen listenAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, Listen.class);
             if (listenAnnotation != null) {
                 ListenExecutor listenExecutor = parseListen(listenAnnotation, method);
                 listenerExecutor.addListenExecutor(listenExecutor);
@@ -53,6 +61,21 @@ public class ListenerParser {
         return listenerExecutor;
     }
 
+    /**
+     * 获取事件类型解决器
+     *
+     * @param clazz 监听器类型
+     */
+    public static EventTypeResolver getEventTypeResolver(Class<? extends ListenerType> clazz) {
+        EventTypeResolver resolver = EVENT_TYPE_RESOLVER_CACHE.get(clazz);
+        if (resolver == null) {
+            ListenerType listenerType = (ListenerType) ReflectUtils.newInstance(clazz);
+            resolver = listenerType.getResolver();
+            EVENT_TYPE_RESOLVER_CACHE.put(clazz, resolver);
+        }
+        return resolver;
+    }
+
     // 解析监听方法
     private static ListenExecutor parseListen(Listen listenAnnotation, Method method) {
         logger.debug("解析监听方法：{}", method);
@@ -60,16 +83,14 @@ public class ListenerParser {
         if (!Modifier.isPublic(method.getModifiers())) {
             throw new IllegalArgumentException("监听方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
         }
-        // 校验入参
-        Class[] parameterTypes = method.getParameterTypes();
-        if (parameterTypes.length != 1) {
-            throw new IllegalArgumentException("监听方法" + ClassUtils.getQualifiedMethodName(method) + "必须只有一个入参");
-        }
         // 校验返回类型
         if (method.getReturnType() != void.class) {
             throw new IllegalArgumentException("监听方法" + ClassUtils.getQualifiedMethodName(method) + "的返回必须是void");
         }
+        // 创建监听解决器
+        ListenResolver resolver = (ListenResolver) ReflectUtils.newInstance(listenAnnotation.resolver());
+        resolver.init(method);
 
-        return new ListenExecutor(listenAnnotation.priorityAsc(), method);
+        return new ListenExecutor(resolver, listenAnnotation.priorityAsc(), method);
     }
 }
