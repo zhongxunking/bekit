@@ -37,7 +37,7 @@ public class ListenNodeDecidedResolver implements ListenResolver {
         if (parameterTypes[0] != String.class || parameterTypes[1] != TargetContext.class) {
             throw new RuntimeException("监听节点选择方法" + ClassUtils.getQualifiedMethodName(listenMethod) + "的入参必须是（String, TargetContext）");
         }
-        eventType = new TheFlowEventType(theFlowListenerAnnotation.flow(), TheFlowEventType.Type.NODE_DECIDED);
+        eventType = new TheFlowEventType(theFlowListenerAnnotation.flow(), NodeDecidedEvent.class);
     }
 
     @Override

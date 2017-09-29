@@ -25,20 +25,18 @@ public class TheFlowListenerType implements ListenerType {
 
     // 特定流程事件类型解决器
     private static class TheFlowEventTypeResolver implements EventTypeResolver {
-        /**
-         * 实例
-         */
-        public static final TheFlowEventTypeResolver INSTANCE = new TheFlowEventTypeResolver();
+        // 实例
+        private static final TheFlowEventTypeResolver INSTANCE = new TheFlowEventTypeResolver();
 
         @Override
         public Object resolve(Object event) {
             if (event instanceof NodeDecidedEvent) {
-                return new TheFlowEventType(((NodeDecidedEvent) event).getFlow(), TheFlowEventType.Type.NODE_DECIDED);
+                return new TheFlowEventType(((NodeDecidedEvent) event).getFlow(), NodeDecidedEvent.class);
             }
             if (event instanceof FlowExceptionEvent) {
-                return new TheFlowEventType(((FlowExceptionEvent) event).getFlow(), TheFlowEventType.Type.FLOW_EXCEPTION);
+                return new TheFlowEventType(((FlowExceptionEvent) event).getFlow(), FlowExceptionEvent.class);
             }
-            throw new IllegalArgumentException("无法识别的流程事件" + event);
+            throw new IllegalArgumentException("无法识别的流程事件：" + event);
         }
     }
 }

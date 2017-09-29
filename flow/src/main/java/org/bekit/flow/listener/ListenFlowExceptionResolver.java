@@ -37,7 +37,7 @@ public class ListenFlowExceptionResolver implements ListenResolver {
         if (parameterTypes[0] != Throwable.class || parameterTypes[1] != TargetContext.class) {
             throw new RuntimeException("监听流程异常方法" + ClassUtils.getQualifiedMethodName(listenMethod) + "的入参必须是（Throwable, TargetContext）");
         }
-        eventType = new TheFlowEventType(theFlowListenerAnnotation.flow(), TheFlowEventType.Type.FLOW_EXCEPTION);
+        eventType = new TheFlowEventType(theFlowListenerAnnotation.flow(), FlowExceptionEvent.class);
     }
 
     @Override

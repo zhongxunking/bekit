@@ -19,16 +19,16 @@ public class TheFlowEventType {
     // 流程
     private String flow;
     // 类型
-    private Type type;
+    private Class eventClass;
 
-    public TheFlowEventType(String flow, Type type) {
+    public TheFlowEventType(String flow, Class eventClass) {
         this.flow = flow;
-        this.type = type;
+        this.eventClass = eventClass;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flow, type);
+        return Objects.hash(flow, eventClass);
     }
 
     @Override
@@ -37,16 +37,6 @@ public class TheFlowEventType {
             return false;
         }
         TheFlowEventType other = (TheFlowEventType) obj;
-        return StringUtils.equals(flow, other.flow) && type == other.type;
-    }
-
-    /**
-     * 类型
-     */
-    public enum Type {
-        // 节点被选择
-        NODE_DECIDED,
-        // 流程异常
-        FLOW_EXCEPTION;
+        return StringUtils.equals(flow, other.flow) && eventClass == other.eventClass;
     }
 }
