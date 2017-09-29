@@ -8,6 +8,10 @@
  */
 package org.bekit.flow.annotation.listener;
 
+import org.bekit.event.annotation.listener.Listen;
+import org.bekit.flow.listener.ListenFlowExceptionResolver;
+import org.springframework.core.annotation.AliasFor;
+
 import java.lang.annotation.*;
 
 /**
@@ -18,5 +22,15 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@Listen(resolver = ListenFlowExceptionResolver.class)
 public @interface ListenFlowException {
+
+    /**
+     * 是否按照优先级升序
+     * <p>
+     * true：表示升序，即监听器中优先级值越小优先级越高；false：表示降序，即监听器中优先级值越大优先级越高。默认为升序。
+     * 当一个事件发布时，总是先执行完优先级为升序的监听方法，再执行优先级为降序的监听方法
+     */
+    @AliasFor(annotation = Listen.class, attribute = "priorityAsc")
+    boolean priorityAsc() default true;
 }
