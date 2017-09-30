@@ -8,14 +8,12 @@
  */
 package org.bekit.flow.flow;
 
-import org.bekit.flow.listener.TheFlowListenerHolder;
+import org.bekit.event.bus.EventBusHolder;
+import org.bekit.flow.annotation.flow.Flow;
 import org.bekit.flow.processor.ProcessorHolder;
 import org.bekit.flow.transaction.FlowTxHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.bekit.event.bus.EventBusHolder;
-import org.bekit.flow.annotation.flow.Flow;
-import org.bekit.flow.listener.TheFlowListenerExecutor;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -33,8 +31,6 @@ public class FlowHolder {
     private FlowTxHolder flowTxHolder;
     @Autowired
     private EventBusHolder eventBusHolder;
-    @Autowired
-    private TheFlowListenerHolder theFlowListenerHolder;
     // 流程执行器Map（key：流程名称）
     private Map<String, FlowExecutor> flowExecutorMap = new HashMap<>();
 
@@ -48,8 +44,6 @@ public class FlowHolder {
             if (flowExecutorMap.containsKey(flowExecutor.getFlowName())) {
                 throw new RuntimeException("存在重名的流程" + flowExecutor.getFlowName());
             }
-            // 校验特定流程监听器的目标对象类型
-            checkTheFlowListenerClassOfTarget(flowExecutor);
             // 将执行器放入持有器中
             flowExecutorMap.put(flowExecutor.getFlowName(), flowExecutor);
         }
@@ -66,15 +60,5 @@ public class FlowHolder {
             throw new RuntimeException("不存在流程" + flow);
         }
         return flowExecutorMap.get(flow);
-    }
-
-    // 校验特定流程监听器的目标对象类型
-    private void checkTheFlowListenerClassOfTarget(FlowExecutor flowExecutor) {
-        TheFlowListenerExecutor theFlowListenerExecutor = theFlowListenerHolder.getTheFlowListenerExecutor(flowExecutor.getFlowName());
-        if (theFlowListenerExecutor != null) {
-            if (!theFlowListenerExecutor.getClassOfTarget().isAssignableFrom(flowExecutor.getClassOfTarget())) {
-                throw new IllegalStateException("流程" + flowExecutor.getFlowName() + "的特定流程监听器的目标对象类型和流程的目标对象类型不匹配");
-            }
-        }
     }
 }

@@ -8,6 +8,10 @@
  */
 package org.bekit.flow.annotation.listener;
 
+import org.bekit.event.annotation.listener.Listen;
+import org.bekit.flow.listener.ListenFlowExceptionResolver;
+import org.springframework.core.annotation.AliasFor;
+
 import java.lang.annotation.*;
 
 /**
@@ -18,5 +22,12 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@Listen(resolver = ListenFlowExceptionResolver.class)
 public @interface ListenFlowException {
+
+    /**
+     * 是否按照优先级升序
+     */
+    @AliasFor(annotation = Listen.class, attribute = "priorityAsc")
+    boolean priorityAsc() default true;
 }

@@ -12,8 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.bekit.event.bus.EventBusHolder;
 import org.bekit.event.publisher.DefaultEventPublisher;
 import org.bekit.flow.annotation.flow.*;
-import org.bekit.flow.annotation.listener.FlowListener;
 import org.bekit.flow.engine.TargetContext;
+import org.bekit.flow.listener.FlowListenerType;
 import org.bekit.flow.processor.ProcessorExecutor;
 import org.bekit.flow.processor.ProcessorHolder;
 import org.bekit.flow.transaction.FlowTxHolder;
@@ -52,7 +52,7 @@ public class FlowParser {
             flowName = ClassUtils.getShortNameAsProperty(flowClass);
         }
         // 新建流程执行器
-        FlowExecutor flowExecutor = new FlowExecutor(flowName, flowAnnotation.enableFlowTx(), flow, new DefaultEventPublisher(eventBusHolder.getEventBus(FlowListener.class)));
+        FlowExecutor flowExecutor = new FlowExecutor(flowName, flowAnnotation.enableFlowTx(), flow, new DefaultEventPublisher(eventBusHolder.getEventBus(FlowListenerType.class)));
         if (flowAnnotation.enableFlowTx()) {
             flowExecutor.setFlowTxExecutor(flowTxHolder.getRequiredFlowTxExecutor(flowName));
         }

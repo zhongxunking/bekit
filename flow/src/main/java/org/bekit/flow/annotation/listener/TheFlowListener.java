@@ -8,18 +8,20 @@
  */
 package org.bekit.flow.annotation.listener;
 
-import org.springframework.stereotype.Component;
+import org.bekit.event.annotation.listener.Listener;
+import org.bekit.flow.listener.TheFlowListenerType;
+import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
 /**
  * 特定流程监听器
- * （监听的是某一个特定流程发生的事件，一个流程最多只能有一个特定流程监听器，配合@ListenNodeDecide、@ListenFlowException一起使用）
+ * （监听的是某一个特定流程发生的事件，配合@ListenNodeDecide、@ListenFlowException一起使用）
  */
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Component
+@Listener(type = TheFlowListenerType.class)
 public @interface TheFlowListener {
 
     /**
@@ -27,4 +29,9 @@ public @interface TheFlowListener {
      */
     String flow();
 
+    /**
+     * 优先级
+     */
+    @AliasFor(annotation = Listener.class, attribute = "priority")
+    int priority() default Integer.MAX_VALUE;
 }

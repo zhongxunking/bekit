@@ -8,17 +8,16 @@
  */
 package org.bekit.flow.boot;
 
+import org.bekit.event.boot.EventBusConfiguration;
 import org.bekit.flow.FlowEngine;
 import org.bekit.flow.engine.DefaultFlowEngine;
+import org.bekit.flow.flow.FlowHolder;
+import org.bekit.flow.listener.DefaultFlowEventListener;
 import org.bekit.flow.processor.ProcessorHolder;
 import org.bekit.flow.transaction.FlowTxHolder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.bekit.event.boot.EventBusConfiguration;
-import org.bekit.flow.flow.FlowHolder;
-import org.bekit.flow.listener.DefaultFlowEventListener;
-import org.bekit.flow.listener.TheFlowListenerHolder;
 
 /**
  * 流程引擎配置类
@@ -57,11 +56,4 @@ public class FlowEngineConfiguration {
     public DefaultFlowEventListener defaultFlowEventListener() {
         return new DefaultFlowEventListener();
     }
-
-    // 特定流程监听器持有器
-    @Bean
-    public TheFlowListenerHolder theFlowListenerHolder() {
-        return new TheFlowListenerHolder();
-    }
-
 }

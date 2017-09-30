@@ -8,16 +8,16 @@
  */
 package org.bekit.service.boot;
 
-import org.bekit.service.annotation.listener.ServiceListener;
-import org.bekit.service.engine.DefaultServiceEngine;
-import org.bekit.service.service.ServiceHolder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.bekit.event.boot.EventBusConfiguration;
 import org.bekit.event.bus.EventBusHolder;
 import org.bekit.event.publisher.DefaultEventPublisher;
 import org.bekit.service.ServiceEngine;
+import org.bekit.service.engine.DefaultServiceEngine;
+import org.bekit.service.listener.ServiceListenerType;
+import org.bekit.service.service.ServiceHolder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * 服务引擎配置类
@@ -30,7 +30,7 @@ public class ServiceEngineConfiguration {
     // 服务引擎
     @Bean
     public ServiceEngine serviceEngine(EventBusHolder eventBusHolder) {
-        return new DefaultServiceEngine(new DefaultEventPublisher(eventBusHolder.getEventBus(ServiceListener.class)));
+        return new DefaultServiceEngine(new DefaultEventPublisher(eventBusHolder.getEventBus(ServiceListenerType.class)));
     }
 
     // 服务持有器

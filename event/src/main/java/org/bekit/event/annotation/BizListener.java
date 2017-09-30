@@ -9,6 +9,7 @@
 package org.bekit.event.annotation;
 
 import org.bekit.event.annotation.listener.Listener;
+import org.bekit.event.extension.support.BizListenerType;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
@@ -19,7 +20,7 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Listener(type = BizListener.class)
+@Listener(type = BizListenerType.class)
 public @interface BizListener {
 
     /**
@@ -28,5 +29,4 @@ public @interface BizListener {
      */
     @AliasFor(annotation = Listener.class, attribute = "priority")
     int priority() default Integer.MAX_VALUE;
-
 }
