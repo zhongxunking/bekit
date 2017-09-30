@@ -33,7 +33,7 @@ public class EventBusHolder {
         for (Class type : listenerHolder.getTypes()) {
             // 初始化事件总线
             EventBus eventBus = getEventBus(type);
-            for (ListenerExecutor listenerExecutor : listenerHolder.getListenerExecutors(type)) {
+            for (ListenerExecutor listenerExecutor : listenerHolder.getRequiredListenerExecutors(type)) {
                 eventBus.register(listenerExecutor);
             }
         }

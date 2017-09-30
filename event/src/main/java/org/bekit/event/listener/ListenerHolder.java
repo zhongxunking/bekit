@@ -11,6 +11,7 @@ package org.bekit.event.listener;
 import org.bekit.event.annotation.listener.Listener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.util.ClassUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -52,11 +53,11 @@ public class ListenerHolder {
      * 获取指定类型的监听器执行器
      *
      * @param type 监听器类型
-     * @return 如果不存在该类型的监听器执行器，则返回空List
+     * @throws IllegalArgumentException 如果不存在该类型的监听器执行器
      */
-    public List<ListenerExecutor> getListenerExecutors(Class type) {
+    public List<ListenerExecutor> getRequiredListenerExecutors(Class type) {
         if (!listenerExecutorsMap.containsKey(type)) {
-            return new ArrayList<>();
+            throw new IllegalArgumentException("不存在" + ClassUtils.getShortName(type) + "类型的监听器");
         }
         return listenerExecutorsMap.get(type);
     }
