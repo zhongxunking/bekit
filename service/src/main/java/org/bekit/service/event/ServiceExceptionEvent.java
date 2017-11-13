@@ -15,27 +15,27 @@ import org.bekit.service.engine.ServiceContext;
  */
 public class ServiceExceptionEvent {
     // 服务名称
-    private String serviceName;
+    private String service;
     // 服务上下文
     private ServiceContext serviceContext;
-    // 目标异常
-    private Throwable targetException;
+    // 发生的异常
+    private Throwable throwable;
 
-    public ServiceExceptionEvent(String serviceName, ServiceContext serviceContext, Throwable targetException) {
-        this.serviceName = serviceName;
+    public ServiceExceptionEvent(String service, ServiceContext serviceContext, Throwable throwable) {
+        this.service = service;
         this.serviceContext = serviceContext;
-        this.targetException = targetException;
+        this.throwable = throwable;
     }
 
-    public String getServiceName() {
-        return serviceName;
+    public String getService() {
+        return service;
     }
 
     public ServiceContext getServiceContext() {
         return serviceContext;
     }
 
-    public Throwable getTargetException() {
-        return targetException;
+    public Throwable getThrowable() {
+        return throwable;
     }
 }

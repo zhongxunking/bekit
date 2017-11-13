@@ -8,8 +8,6 @@
  */
 package org.bekit.service.engine;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.ReflectUtils;
 import org.bekit.event.EventPublisher;
 import org.bekit.service.ServiceEngine;
 import org.bekit.service.event.ServiceApplyEvent;
@@ -17,6 +15,8 @@ import org.bekit.service.event.ServiceExceptionEvent;
 import org.bekit.service.event.ServiceFinishEvent;
 import org.bekit.service.service.ServiceExecutor;
 import org.bekit.service.service.ServiceHolder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.ReflectUtils;
 
 import java.util.Map;
 
@@ -74,7 +74,7 @@ public class DefaultServiceEngine implements ServiceEngine {
             // 执行服务
             serviceExecutor.execute(serviceContext);
         } catch (Throwable e) {
-            // 发布服务执行异常事件
+            // 发布服务异常事件
             eventPublisher.publish(new ServiceExceptionEvent(service, serviceContext, e));
         } finally {
             // 发布服务结束事件

@@ -14,7 +14,7 @@ import org.bekit.service.engine.ServiceContext;
  * 服务申请事件
  */
 public class ServiceApplyEvent {
-    // 被申请的服务名称
+    // 服务名称
     private String service;
     // 服务上下文
     private ServiceContext serviceContext;
