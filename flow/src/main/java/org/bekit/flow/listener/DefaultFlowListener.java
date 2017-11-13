@@ -20,11 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 
 /**
- * 默认的流程事件监听器
+ * 默认的流程监听器
  * （流程引擎初始化时会初始化本监听器，其作用是监听所有流程发生的事件，然后将事件转发给对应流程的特定流程监听器（@TheFlowListener））
  */
 @FlowListener
-public class DefaultFlowEventListener {
+public class DefaultFlowListener {
     @Autowired
     private EventBusHolder eventBusHolder;
     // 特定流程事件发布器

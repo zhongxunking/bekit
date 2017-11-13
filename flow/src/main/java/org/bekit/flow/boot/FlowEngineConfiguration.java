@@ -12,7 +12,7 @@ import org.bekit.event.boot.EventBusConfiguration;
 import org.bekit.flow.FlowEngine;
 import org.bekit.flow.engine.DefaultFlowEngine;
 import org.bekit.flow.flow.FlowHolder;
-import org.bekit.flow.listener.DefaultFlowEventListener;
+import org.bekit.flow.listener.DefaultFlowListener;
 import org.bekit.flow.processor.ProcessorHolder;
 import org.bekit.flow.transaction.FlowTxHolder;
 import org.springframework.context.annotation.Bean;
@@ -51,9 +51,9 @@ public class FlowEngineConfiguration {
         return new FlowTxHolder();
     }
 
-    // 默认的流程事件监听器
+    // 默认的流程监听器
     @Bean
-    public DefaultFlowEventListener defaultFlowEventListener() {
-        return new DefaultFlowEventListener();
+    public DefaultFlowListener defaultFlowListener() {
+        return new DefaultFlowListener();
     }
 }
