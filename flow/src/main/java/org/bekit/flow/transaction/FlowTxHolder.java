@@ -50,11 +50,11 @@ public class FlowTxHolder {
      * 获取流程事务执行器
      *
      * @param flow 流程名称
-     * @throws RuntimeException 如果不存在该流程事务处理器
+     * @throws IllegalArgumentException 如果不存在该流程事务处理器
      */
     public FlowTxExecutor getRequiredFlowTxExecutor(String flow) {
         if (!flowTxExecutorMap.containsKey(flow)) {
-            throw new RuntimeException("不存在流程" + flow + "的流程事务");
+            throw new IllegalArgumentException("不存在流程" + flow + "的流程事务");
         }
         return flowTxExecutorMap.get(flow);
     }

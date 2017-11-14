@@ -8,9 +8,9 @@
  */
 package org.bekit.flow.processor;
 
+import org.bekit.flow.annotation.processor.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.bekit.flow.annotation.processor.Processor;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -44,11 +44,11 @@ public class ProcessorHolder {
      * 获取处理器执行器
      *
      * @param processor 处理器名称
-     * @throws RuntimeException 如果不存在该处理器执行器
+     * @throws IllegalArgumentException 如果不存在该处理器执行器
      */
     public ProcessorExecutor getRequiredProcessorExecutor(String processor) {
         if (!processorExecutorMap.containsKey(processor)) {
-            throw new RuntimeException("不存在处理器：" + processor);
+            throw new IllegalArgumentException("不存在处理器：" + processor);
         }
         return processorExecutorMap.get(processor);
     }

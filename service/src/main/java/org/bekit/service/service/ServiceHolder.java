@@ -47,11 +47,11 @@ public class ServiceHolder {
      * 获取服务执行器
      *
      * @param service 服务名称
-     * @throws RuntimeException 如果不存在该服务
+     * @throws IllegalArgumentException 如果不存在该服务
      */
     public ServiceExecutor getRequiredServiceExecutor(String service) {
         if (!serviceExecutorMap.containsKey(service)) {
-            throw new RuntimeException("不存在服务" + service);
+            throw new IllegalArgumentException("不存在服务" + service);
         }
         return serviceExecutorMap.get(service);
     }
