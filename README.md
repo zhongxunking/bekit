@@ -9,7 +9,7 @@
 > * Spring 4.2及以上
 
 
-> 注意：本框架已经上传到maven中央库
+> 注意：本框架已经上传到[maven中央库](https://search.maven.org/#search%7Cga%7C1%7Corg.bekit)
   
 3. 示例
 
