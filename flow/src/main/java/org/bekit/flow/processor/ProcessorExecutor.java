@@ -90,8 +90,6 @@ public class ProcessorExecutor {
 
     /**
      * 获取返回类型
-     *
-     * @throws IllegalStateException 如果不存在@Execute类型的处理器方法
      */
     public Class getReturnType() {
         return methodExecutorMap.get(ProcessorExecute.class).getReturnType();
