@@ -241,37 +241,37 @@
         @Processor // 处理器注解（处理器名称默认就是类型名称首字母小写，也可以在@Processor注解里面自己指定。本处理器的名称：node1Processor）
         public class Node1Processor {
             
-            @Before  // 业务前置处理，可选    
+            @ProcessorBefore  // 业务前置处理，可选    
             public void before(TargetContext<Trade> targetContext) { // TargetContext叫做目标上下文，可以通过他获取你传给流程引擎的目标对象（targetContext.getTarget()）
                 // 最先执行
                 // 可以做一些检查之类的操作
             }
         
-            @Execute  // 业务处理，必选
+            @ProcessorExecute  // 业务处理，必选
             public String execute(TargetContext<Trade> targetContext) {
-                // 在@before类型方法之后执行
+                // 在@ProcessorBefore类型方法之后执行
                 // 这个是处理器的主体方法，一般就是真正干活的方法，它的返回值会成为整个处理器的返回值，然后传给流程节点中的节点决策器
                 return "success";
             }
         
-            @After  // 业务后置处理，可选
+            @ProcessorAfter  // 业务后置处理，可选
             public void after(TargetContext<Trade> targetContext) {
-                // 在@Execute类型方法之后执行
+                // 在@ProcessorExecute类型方法之后执行
                 // 可以做一些结果校验之类的
             }
         
-            @End    // 业务结束处理，可选
+            @ProcessorEnd    // 业务结束处理，可选
             public void end(TargetContext<Trade> targetContext) {
                 // 最后执行（即使发生异常也会执行）
             }
         
-            @Error   // 异常处理，可选
+            @ProcessorError   // 异常处理，可选
             public void error(TargetContext<Trade> targetContext) {
-                // 当@before、@execute、@after类型方法任何一个发生异常后，会在@End类型方法之前执行
+                // 当@ProcessorBefore、@ProcessorExecute、@ProcessorAfter类型方法任何一个发生异常后，会在@ProcessorEnd类型方法之前执行
             }
         }
 
-处理器通过@Processor进行注解，根据可能存在的需求将处理器方法分成了5种类型，只有@Execute类型方法是必须有的，其他都是可选的。
+处理器通过@Processor进行注解，根据可能存在的需求将处理器方法分成了5种类型，只有@ProcessorExecute类型方法是必须有的，其他都是可选的。
     
 处理器方法必须只能有一个入参且类型必须是TargetContext。TargetContext是目标上下文，可以通过它获取你传给流程引擎的目标对象（targetContext.getTarget()）
     
@@ -427,7 +427,7 @@
             public void listenServiceApplyEvent(ServiceApplyEvent event) {
                 // ServiceApplyEvent是服务申请事件，表示即将要执行某个服务
                 
-                // 如果事务监听这个事件，我会进行一些初始化，比如：打印日志、初始化result、校验order等等
+                // 监听到这个事件后，可以进行一些初始化，比如：打印日志、初始化result、校验order等等
             }
         
             @Listen(priorityAsc = false) // priorityAsc属性表示是否优先级升序（具体使用方式请查看“事件总线”功能模块）
