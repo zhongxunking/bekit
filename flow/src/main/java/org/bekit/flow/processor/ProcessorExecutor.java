@@ -8,11 +8,10 @@
  */
 package org.bekit.flow.processor;
 
+import org.bekit.common.method.MethodExecutor;
 import org.bekit.flow.annotation.processor.*;
 import org.bekit.flow.engine.TargetContext;
 import org.springframework.util.ClassUtils;
-import org.bekit.common.method.MethodExecutor;
-import org.bekit.flow.annotation.processor.Error;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -26,7 +25,7 @@ public class ProcessorExecutor {
     /**
      * 处理器方法注解
      */
-    public static final Class[] PROCESSOR_METHOD_ANNOTATIONS = {Before.class, Execute.class, After.class, End.class, Error.class};
+    public static final Class[] PROCESSOR_METHOD_ANNOTATIONS = {ProcessorBefore.class, ProcessorExecute.class, ProcessorAfter.class, ProcessorEnd.class, ProcessorError.class};
 
     // 处理器名称
     private String processorName;
@@ -42,7 +41,7 @@ public class ProcessorExecutor {
 
     /**
      * 执行处理器
-     * （顺序：@Before、@Execute、@After、@End；如果执行@Before、@Execute、@After发生异常，则会在执行@End之前执行@Error）
+     * （顺序：@ProcessorBefore、@ProcessorExecute、@ProcessorAfter、@ProcessorEnd；如果执行@ProcessorBefore、@ProcessorExecute、@ProcessorAfter发生异常，则会在执行@ProcessorEnd之前执行@ProcessorError）
      *
      * @param targetContext 目标上下文
      * @return Execute类型方法返回的结果
@@ -50,15 +49,15 @@ public class ProcessorExecutor {
      */
     public Object execute(TargetContext targetContext) throws Throwable {
         try {
-            executeMethod(Before.class, targetContext);
-            Object result = executeMethod(Execute.class, targetContext);
-            executeMethod(After.class, targetContext);
+            executeMethod(ProcessorBefore.class, targetContext);
+            Object result = executeMethod(ProcessorExecute.class, targetContext);
+            executeMethod(ProcessorAfter.class, targetContext);
             return result;
         } catch (Throwable e) {
-            executeMethod(Error.class, targetContext);
+            executeMethod(ProcessorError.class, targetContext);
             throw e;
         } finally {
-            executeMethod(End.class, targetContext);
+            executeMethod(ProcessorEnd.class, targetContext);
         }
     }
 
@@ -95,14 +94,14 @@ public class ProcessorExecutor {
      * @throws IllegalStateException 如果不存在@Execute类型的处理器方法
      */
     public Class getReturnType() {
-        return methodExecutorMap.get(Execute.class).getReturnType();
+        return methodExecutorMap.get(ProcessorExecute.class).getReturnType();
     }
 
     /**
      * 获取目标对象类型
      */
     public Class getClassOfTarget() {
-        return methodExecutorMap.get(Execute.class).getClassOfTarget();
+        return methodExecutorMap.get(ProcessorExecute.class).getClassOfTarget();
     }
 
     /**
@@ -121,8 +120,8 @@ public class ProcessorExecutor {
         if (processorName == null || processor == null) {
             throw new IllegalStateException("处理器" + processorName + "内部要素不全");
         }
-        if (!methodExecutorMap.containsKey(Execute.class)) {
-            throw new IllegalStateException("处理器" + processorName + "不存在@Execute类型的处理器方法");
+        if (!methodExecutorMap.containsKey(ProcessorExecute.class)) {
+            throw new IllegalStateException("处理器" + processorName + "不存在@ProcessorExecute类型的处理器方法");
         }
         // 校验处理器内部目标对象类型是否统一
         for (ProcessorMethodExecutor methodExecutor : methodExecutorMap.values()) {

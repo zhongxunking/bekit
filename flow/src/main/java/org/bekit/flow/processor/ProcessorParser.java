@@ -9,8 +9,8 @@
 package org.bekit.flow.processor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bekit.flow.annotation.processor.Execute;
 import org.bekit.flow.annotation.processor.Processor;
+import org.bekit.flow.annotation.processor.ProcessorExecute;
 import org.bekit.flow.engine.TargetContext;
 import org.bekit.flow.processor.ProcessorExecutor.ProcessorMethodExecutor;
 import org.slf4j.Logger;
@@ -78,8 +78,8 @@ public class ProcessorParser {
             throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "入参必须是（TargetContext）");
         }
         // 校验返回类型
-        if (clazz != Execute.class && method.getReturnType() != void.class) {
-            throw new IllegalArgumentException("非@Execute类型的处理器方法" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是void");
+        if (clazz != ProcessorExecute.class && method.getReturnType() != void.class) {
+            throw new IllegalArgumentException("非@ProcessorExecute类型的处理器方法" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是void");
         }
         // 获取目标对象类型
         ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 0);
