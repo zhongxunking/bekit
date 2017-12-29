@@ -77,7 +77,7 @@
     <!--发布到maven中央库配置-->
     <profiles>
         <profile>
-            <id>release</id>
+            <id>release-oss</id>
             <build>
                 <plugins>
                     <!-- Javadoc -->
@@ -97,7 +97,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>1.6</version>
                         <executions>
                             <execution>
                                 <phase>verify</phase>
