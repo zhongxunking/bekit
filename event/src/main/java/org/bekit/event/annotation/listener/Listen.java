@@ -21,7 +21,7 @@ import java.lang.annotation.*;
 public @interface Listen {
 
     /**
-     * 监听解决器（默认DefaultListenResolver）
+     * 监听解决器
      */
     Class<? extends ListenResolver> resolver();
 
