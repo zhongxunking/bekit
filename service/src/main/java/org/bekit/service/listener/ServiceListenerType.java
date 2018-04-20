@@ -10,7 +10,7 @@ package org.bekit.service.listener;
 
 import org.bekit.event.extension.EventTypeResolver;
 import org.bekit.event.extension.ListenerType;
-import org.bekit.event.extension.support.DefaultEventTypeResolver;
+import org.bekit.event.extension.support.ClassEventTypeResolver;
 
 /**
  * 服务监听器类型
@@ -19,6 +19,6 @@ public class ServiceListenerType implements ListenerType {
 
     @Override
     public EventTypeResolver getResolver() {
-        return DefaultEventTypeResolver.INSTANCE;
+        return ClassEventTypeResolver.INSTANCE;
     }
 }

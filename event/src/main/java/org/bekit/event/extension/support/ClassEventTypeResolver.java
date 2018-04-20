@@ -11,13 +11,13 @@ package org.bekit.event.extension.support;
 import org.bekit.event.extension.EventTypeResolver;
 
 /**
- * 默认的事件类型解决器实现（事件类型就是事件对应的Class类）
+ * Class事件类型解决器（事件类型就是事件对应的Class类）
  */
-public class DefaultEventTypeResolver implements EventTypeResolver {
+public class ClassEventTypeResolver implements EventTypeResolver {
     /**
      * 实例
      */
-    public static final DefaultEventTypeResolver INSTANCE = new DefaultEventTypeResolver();
+    public static final ClassEventTypeResolver INSTANCE = new ClassEventTypeResolver();
 
     @Override
     public Object resolve(Object event) {

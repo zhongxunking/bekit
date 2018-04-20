@@ -18,6 +18,6 @@ public class BizListenerType implements ListenerType {
 
     @Override
     public EventTypeResolver getResolver() {
-        return DefaultEventTypeResolver.INSTANCE;
+        return ClassEventTypeResolver.INSTANCE;
     }
 }
