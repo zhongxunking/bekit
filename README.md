@@ -289,8 +289,8 @@
         @TheFlowListener(flow = "demoFlow")  // 特定流程监听器注解，属性flow指定被监听的流程名称
         public class DenoFlowListener {
         
-            @ListenNodeDecide   // 监听节点选择事件
-            public void listenNodeDecide(String node, TargetContext<Transfer> targetContext) { // 入参node表示被选择的节点，targetContext是目标上下文
+            @ListenNodeDecided   // 监听节点选择事件
+            public void listenNodeDecided(String node, TargetContext<Transfer> targetContext) { // 入参node表示被选择的节点，targetContext是目标上下文
                 // 一般监听节点选择事件的目的是用来更新目标对象的状态，因为当节点选择事件发生时，就表明已经执行完一个节点，即将进入到下一个节点，所以目标对象的状态应该修改为下一个状态
             }
         
