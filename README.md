@@ -399,7 +399,7 @@
 
         @Service(enableTx = true) // 服务定义注解（注意：此注解和spring的@Service注解名字一样，但是是两个不一样的注解），enableTx属性表示服务是否开启事务，默认不开启
         public class MyService {
-            @ServiceCheck // 服务校验注解，进行业务校验（注意：此注解对应方法执行时不会开启事务，原因是这里面只是进行业务校验，而不是执行业务，所以没必要开启事务；同时如果开启了事务，但是当校验不通过还需要回滚事务，反而浪费资源）
+            @ServiceBefore // 服务前置处理（执行中不会有事务）
             public void check(ServiceContext<XXXOrder, XXXResult> serviceContext) { 
                 // ServiceContext是服务上下文，可以通过它获取到传给服务引擎的order，也可以获取由服务引擎创建的result。
                 // 进行业务校验（比如校验账户是否合法等等）

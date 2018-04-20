@@ -11,10 +11,10 @@ package org.bekit.service.annotation.service;
 import java.lang.annotation.*;
 
 /**
- * 服务校验（执行中不会有事务）
+ * 服务前置处理（执行中不会有事务）
  */
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ServiceCheck {
+public @interface ServiceBefore {
 }

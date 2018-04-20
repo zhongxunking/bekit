@@ -11,7 +11,7 @@ package org.bekit.service.service;
 import org.bekit.common.method.MethodExecutor;
 import org.bekit.common.transaction.TxExecutor;
 import org.bekit.service.annotation.service.ServiceAfter;
-import org.bekit.service.annotation.service.ServiceCheck;
+import org.bekit.service.annotation.service.ServiceBefore;
 import org.bekit.service.annotation.service.ServiceExecute;
 import org.bekit.service.engine.ServiceContext;
 import org.springframework.util.ClassUtils;
@@ -28,7 +28,7 @@ public class ServiceExecutor {
     /**
      * 服务阶段注解
      */
-    public static final Class[] SERVICE_PHASE_ANNOTATIONS = {ServiceCheck.class, ServiceExecute.class, ServiceAfter.class};
+    public static final Class[] SERVICE_PHASE_ANNOTATIONS = {ServiceBefore.class, ServiceExecute.class, ServiceAfter.class};
 
     // 服务名称
     private String serviceName;
@@ -54,13 +54,13 @@ public class ServiceExecutor {
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
     public void execute(ServiceContext serviceContext) throws Throwable {
-        // 执行服务校验阶段（如果存在）
-        if (phaseExecutorMap.containsKey(ServiceCheck.class)) {
-            phaseExecutorMap.get(ServiceCheck.class).execute(service, serviceContext);
+        // 执行服务前置阶段（如果存在）
+        if (phaseExecutorMap.containsKey(ServiceBefore.class)) {
+            phaseExecutorMap.get(ServiceBefore.class).execute(service, serviceContext);
         }
         // 执行服务执行阶段
         executeServiceExecute(serviceContext);
-        // 执行服务后置阶段
+        // 执行服务后置阶段（如果存在）
         if (phaseExecutorMap.containsKey(ServiceAfter.class)) {
             phaseExecutorMap.get(ServiceAfter.class).execute(service, serviceContext);
         }
