@@ -11,7 +11,7 @@ package org.bekit.flow.engine;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.bekit.flow.FlowEngine;
 import org.bekit.flow.flow.FlowExecutor;
-import org.bekit.flow.flow.FlowHolder;
+import org.bekit.flow.flow.FlowsHolder;
 import org.bekit.flow.transaction.FlowTxExecutor;
 import org.bekit.flow.transaction.FlowTxHolder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public class DefaultFlowEngine implements FlowEngine {
     @Autowired
-    private FlowHolder flowHolder;
+    private FlowsHolder flowsHolder;
     @Autowired
     private FlowTxHolder flowTxHolder;
 
@@ -73,7 +73,7 @@ public class DefaultFlowEngine implements FlowEngine {
 
     // 校验目标对象类型
     private void checkClassOfTarget(Object target, String flow) {
-        FlowExecutor flowExecutor = flowHolder.getRequiredFlowExecutor(flow);
+        FlowExecutor flowExecutor = flowsHolder.getRequiredFlowExecutor(flow);
         if (!flowExecutor.getClassOfTarget().isAssignableFrom(target.getClass())) {
             throw new IllegalArgumentException(String.format("传入的目标对象的类型[%s]和流程%s期望的类型[%s]不匹配", ClassUtils.getShortName(target.getClass()), flowExecutor.getFlowName(), ClassUtils.getShortName(flowExecutor.getClassOfTarget())));
         }
@@ -95,7 +95,7 @@ public class DefaultFlowEngine implements FlowEngine {
     private void executeFlow(String flow, TargetContext targetContext) {
         try {
             // 获取流程执行器
-            FlowExecutor flowExecutor = flowHolder.getRequiredFlowExecutor(flow);
+            FlowExecutor flowExecutor = flowsHolder.getRequiredFlowExecutor(flow);
             // 执行流程
             flowExecutor.execute(targetContext);
         } catch (Throwable e) {

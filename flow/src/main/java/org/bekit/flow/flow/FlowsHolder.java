@@ -23,7 +23,7 @@ import java.util.Set;
 /**
  * 流程持有器（会被注册到spring容器中）
  */
-public class FlowHolder {
+public class FlowsHolder {
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired

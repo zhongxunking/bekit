@@ -11,7 +11,7 @@ package org.bekit.flow.boot;
 import org.bekit.event.boot.EventBusConfiguration;
 import org.bekit.flow.FlowEngine;
 import org.bekit.flow.engine.DefaultFlowEngine;
-import org.bekit.flow.flow.FlowHolder;
+import org.bekit.flow.flow.FlowsHolder;
 import org.bekit.flow.listener.DefaultFlowListener;
 import org.bekit.flow.processor.ProcessorHolder;
 import org.bekit.flow.transaction.FlowTxHolder;
@@ -35,8 +35,8 @@ public class FlowEngineConfiguration {
 
     // 流程持有器
     @Bean
-    public FlowHolder flowHolder() {
-        return new FlowHolder();
+    public FlowsHolder flowsHolder() {
+        return new FlowsHolder();
     }
 
     // 处理器持有器
