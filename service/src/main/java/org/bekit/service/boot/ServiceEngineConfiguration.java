@@ -14,7 +14,7 @@ import org.bekit.event.publisher.DefaultEventPublisher;
 import org.bekit.service.ServiceEngine;
 import org.bekit.service.engine.DefaultServiceEngine;
 import org.bekit.service.listener.ServiceListenerType;
-import org.bekit.service.service.ServiceHolder;
+import org.bekit.service.service.ServicesHolder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -35,7 +35,7 @@ public class ServiceEngineConfiguration {
 
     // 服务持有器
     @Bean
-    public ServiceHolder serviceHolder() {
-        return new ServiceHolder();
+    public ServicesHolder servicesHolder() {
+        return new ServicesHolder();
     }
 }

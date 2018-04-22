@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * 服务持有器（会被注册到spring容器中）
  */
-public class ServiceHolder {
+public class ServicesHolder {
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired(required = false)
