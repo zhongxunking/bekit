@@ -23,21 +23,21 @@ import java.util.Set;
  * 监听器执行器
  */
 public class ListenerExecutor implements Comparable<ListenerExecutor> {
-    // 监听器
-    private Object listener;
     // 监听器类型
     private Class type;
     // 优先级
     private int priority;
+    // 监听器
+    private Object listener;
     // 事件类型解决器
     private EventTypeResolver resolver;
     // 监听执行器map（key：被监听的事件类型）
     private Map<Object, ListenExecutor> listenExecutorMap = new HashMap<>();
 
-    public ListenerExecutor(Object listener, Class type, int priority, EventTypeResolver resolver) {
-        this.listener = listener;
+    public ListenerExecutor(Class type, int priority, Object listener, EventTypeResolver resolver) {
         this.type = type;
         this.priority = priority;
+        this.listener = listener;
         this.resolver = resolver;
     }
 
@@ -68,13 +68,6 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
     }
 
     /**
-     * 获取监听器
-     */
-    public Object getListener() {
-        return listener;
-    }
-
-    /**
      * 获取监听器类型
      */
     public Class getType() {
@@ -86,6 +79,13 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
      */
     public int getPriority() {
         return priority;
+    }
+
+    /**
+     * 获取监听器
+     */
+    public Object getListener() {
+        return listener;
     }
 
     /**
