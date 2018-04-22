@@ -128,6 +128,13 @@ public class ServiceExecutor {
     }
 
     /**
+     * 获取服务
+     */
+    public Object getService() {
+        return service;
+    }
+
+    /**
      * 获取Order的真实类型
      */
     public Class getOrderClass() {
