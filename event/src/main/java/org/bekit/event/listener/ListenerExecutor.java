@@ -75,13 +75,6 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
     }
 
     /**
-     * 获取优先级
-     */
-    public int getPriority() {
-        return priority;
-    }
-
-    /**
      * 获取监听器
      */
     public Object getListener() {
@@ -106,7 +99,7 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
 
     @Override
     public int compareTo(ListenerExecutor listenerExecutor) {
-        return priority - listenerExecutor.getPriority();
+        return priority - listenerExecutor.priority;
     }
 
     /**
