@@ -18,6 +18,7 @@ import org.springframework.context.ApplicationContext;
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 流程持有器（会被注册到spring容器中）
@@ -47,6 +48,13 @@ public class FlowHolder {
             // 将执行器放入持有器中
             flowExecutorMap.put(flowExecutor.getFlowName(), flowExecutor);
         }
+    }
+
+    /**
+     * 获取所有流程名称
+     */
+    public Set<String> getFlowNames() {
+        return flowExecutorMap.keySet();
     }
 
     /**
