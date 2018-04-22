@@ -17,6 +17,7 @@ import org.bekit.flow.processor.ProcessorsHolder;
 import org.bekit.flow.transaction.FlowTxsHolder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -33,6 +34,7 @@ public class FlowEngineConfiguration {
 
     // 流程引擎
     @Bean
+    @DependsOn({"org.bekit.flow.flow.FlowsHolder", "org.bekit.flow.transaction.FlowTxsHolder"})     // 保证出现循环引用时不会出错
     public FlowEngine flowEngine(FlowsHolder flowsHolder, FlowTxsHolder flowTxsHolder) {
         return new DefaultFlowEngine(flowsHolder, flowTxsHolder);
     }

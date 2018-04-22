@@ -15,6 +15,7 @@ import org.bekit.event.listener.ListenersHolder;
 import org.bekit.event.publisher.DefaultEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -27,6 +28,7 @@ public class EventBusConfiguration {
 
     // 业务事件发布器
     @Bean
+    @DependsOn("org.bekit.event.bus.EventBusesHolder")      // 保证出现循环引用时不会出错
     public EventPublisher eventPublisher(EventBusesHolder eventBusesHolder) {
         return new DefaultEventPublisher(eventBusesHolder.getEventBus(BizListenerType.class));
     }
