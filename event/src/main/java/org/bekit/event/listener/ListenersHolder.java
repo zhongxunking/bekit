@@ -19,7 +19,7 @@ import java.util.*;
 /**
  * 监听器持有器（会被注册到spring容器中）
  */
-public class ListenerHolder {
+public class ListenersHolder {
     @Autowired
     private ApplicationContext applicationContext;
     // 监听器执行器Map（key：监听器的类型）

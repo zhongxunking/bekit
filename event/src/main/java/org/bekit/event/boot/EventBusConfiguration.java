@@ -11,7 +11,7 @@ package org.bekit.event.boot;
 import org.bekit.event.EventPublisher;
 import org.bekit.event.bus.EventBusHolder;
 import org.bekit.event.extension.support.BizListenerType;
-import org.bekit.event.listener.ListenerHolder;
+import org.bekit.event.listener.ListenersHolder;
 import org.bekit.event.publisher.DefaultEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +37,7 @@ public class EventBusConfiguration {
 
     // 监听器持有器
     @Bean
-    public ListenerHolder listenerHolder() {
-        return new ListenerHolder();
+    public ListenersHolder listenersHolder() {
+        return new ListenersHolder();
     }
 }
