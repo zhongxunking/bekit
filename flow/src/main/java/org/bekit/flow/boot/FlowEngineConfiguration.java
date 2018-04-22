@@ -13,7 +13,7 @@ import org.bekit.flow.FlowEngine;
 import org.bekit.flow.engine.DefaultFlowEngine;
 import org.bekit.flow.flow.FlowsHolder;
 import org.bekit.flow.listener.DefaultFlowListener;
-import org.bekit.flow.processor.ProcessorHolder;
+import org.bekit.flow.processor.ProcessorsHolder;
 import org.bekit.flow.transaction.FlowTxHolder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,8 +41,8 @@ public class FlowEngineConfiguration {
 
     // 处理器持有器
     @Bean
-    public ProcessorHolder processorHolder() {
-        return new ProcessorHolder();
+    public ProcessorsHolder processorsHolder() {
+        return new ProcessorsHolder();
     }
 
     // 流程事务持有器

@@ -15,7 +15,7 @@ import org.bekit.flow.annotation.flow.*;
 import org.bekit.flow.engine.TargetContext;
 import org.bekit.flow.listener.FlowListenerType;
 import org.bekit.flow.processor.ProcessorExecutor;
-import org.bekit.flow.processor.ProcessorHolder;
+import org.bekit.flow.processor.ProcessorsHolder;
 import org.bekit.flow.transaction.FlowTxHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +36,12 @@ public class FlowParser {
 
     /**
      * @param flow             流程
-     * @param processorHolder  处理器持有器
+     * @param processorsHolder 处理器持有器
      * @param flowTxHolder     流程事务持有器
      * @param eventBusesHolder 事件总线持有器
      * @return 流程执行器
      */
-    public static FlowExecutor parseFlow(Object flow, ProcessorHolder processorHolder, FlowTxHolder flowTxHolder, EventBusesHolder eventBusesHolder) {
+    public static FlowExecutor parseFlow(Object flow, ProcessorsHolder processorsHolder, FlowTxHolder flowTxHolder, EventBusesHolder eventBusesHolder) {
         // 获取目标class（应对AOP代理情况）
         Class<?> flowClass = AopUtils.getTargetClass(flow);
         logger.debug("解析流程：{}", ClassUtils.getQualifiedName(flowClass));
@@ -61,7 +61,7 @@ public class FlowParser {
             Node nodeAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, Node.class);
             if (nodeAnnotation != null) {
                 // 解析节点
-                FlowExecutor.NodeExecutor nodeExecutor = parseNode(nodeAnnotation, method, processorHolder);
+                FlowExecutor.NodeExecutor nodeExecutor = parseNode(nodeAnnotation, method, processorsHolder);
                 // 添加节点
                 flowExecutor.addNode(nodeExecutor);
                 // 校验是否为开始节点
@@ -83,7 +83,7 @@ public class FlowParser {
     }
 
     // 解析节点
-    private static FlowExecutor.NodeExecutor parseNode(Node nodeAnnotation, Method method, ProcessorHolder processorHolder) {
+    private static FlowExecutor.NodeExecutor parseNode(Node nodeAnnotation, Method method, ProcessorsHolder processorsHolder) {
         logger.debug("解析流程节点：node={}，method={}", nodeAnnotation, method);
         // 获取节点名称
         String nodeName = nodeAnnotation.name();
@@ -93,7 +93,7 @@ public class FlowParser {
         // 获取处理器
         ProcessorExecutor processorExecutor = null;
         if (StringUtils.isNotEmpty(nodeAnnotation.processor())) {
-            processorExecutor = processorHolder.getRequiredProcessorExecutor(nodeAnnotation.processor());
+            processorExecutor = processorsHolder.getRequiredProcessorExecutor(nodeAnnotation.processor());
         }
         // 新建节点执行器
         FlowExecutor.NodeExecutor nodeExecutor = new FlowExecutor.NodeExecutor(nodeName, processorExecutor, nodeAnnotation.autoExecute(), nodeAnnotation.newTx());

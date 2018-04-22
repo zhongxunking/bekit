@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * 处理器持有器（会被注册到spring容器中）
  */
-public class ProcessorHolder {
+public class ProcessorsHolder {
     @Autowired
     private ApplicationContext applicationContext;
     // 处理器执行器Map（key：处理器的名称）
