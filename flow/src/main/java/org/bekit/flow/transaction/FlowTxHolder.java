@@ -16,6 +16,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 流程事务持有器（会被注册到spring容器中）
@@ -44,6 +45,13 @@ public class FlowTxHolder {
             // 将执行器放入持有器中
             flowTxExecutorMap.put(flowTxExecutor.getFlow(), flowTxExecutor);
         }
+    }
+
+    /**
+     * 获取所有流程事务对应的流程名称
+     */
+    public Set<String> getFlowNames() {
+        return flowTxExecutorMap.keySet();
     }
 
     /**
