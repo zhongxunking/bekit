@@ -24,18 +24,12 @@ import org.springframework.context.annotation.Import;
  * （非spring-boot项目需手动引入本配置类完成服务引擎配置）
  */
 @Configuration
-@Import(EventBusConfiguration.class)
+@Import({EventBusConfiguration.class, ServicesHolder.class})
 public class ServiceEngineConfiguration {
 
     // 服务引擎
     @Bean
     public ServiceEngine serviceEngine(EventBusesHolder eventBusesHolder) {
         return new DefaultServiceEngine(new DefaultEventPublisher(eventBusesHolder.getEventBus(ServiceListenerType.class)));
-    }
-
-    // 服务持有器
-    @Bean
-    public ServicesHolder servicesHolder() {
-        return new ServicesHolder();
     }
 }
