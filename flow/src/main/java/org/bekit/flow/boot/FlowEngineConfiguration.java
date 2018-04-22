@@ -27,18 +27,13 @@ import org.springframework.context.annotation.Import;
 @Import({EventBusConfiguration.class,
         FlowsHolder.class,
         ProcessorsHolder.class,
-        FlowTxsHolder.class})
+        FlowTxsHolder.class,
+        DefaultFlowListener.class})
 public class FlowEngineConfiguration {
 
     // 流程引擎
     @Bean
-    public FlowEngine flowEngine() {
-        return new DefaultFlowEngine();
-    }
-
-    // 默认的流程监听器
-    @Bean
-    public DefaultFlowListener defaultFlowListener() {
-        return new DefaultFlowListener();
+    public FlowEngine flowEngine(FlowsHolder flowsHolder, FlowTxsHolder flowTxsHolder) {
+        return new DefaultFlowEngine(flowsHolder, flowTxsHolder);
     }
 }

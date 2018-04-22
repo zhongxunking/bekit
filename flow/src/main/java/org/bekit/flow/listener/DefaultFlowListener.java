@@ -15,9 +15,6 @@ import org.bekit.event.publisher.DefaultEventPublisher;
 import org.bekit.flow.annotation.listener.FlowListener;
 import org.bekit.flow.event.FlowExceptionEvent;
 import org.bekit.flow.event.NodeDecidedEvent;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.annotation.PostConstruct;
 
 /**
  * 默认的流程监听器
@@ -25,13 +22,10 @@ import javax.annotation.PostConstruct;
  */
 @FlowListener
 public class DefaultFlowListener {
-    @Autowired
-    private EventBusesHolder eventBusesHolder;
     // 特定流程事件发布器
     private EventPublisher eventPublisher;
 
-    @PostConstruct
-    public void init() {
+    public DefaultFlowListener(EventBusesHolder eventBusesHolder) {
         eventPublisher = new DefaultEventPublisher(eventBusesHolder.getEventBus(TheFlowListenerType.class));
     }
 

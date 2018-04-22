@@ -14,7 +14,6 @@ import org.bekit.flow.flow.FlowExecutor;
 import org.bekit.flow.flow.FlowsHolder;
 import org.bekit.flow.transaction.FlowTxExecutor;
 import org.bekit.flow.transaction.FlowTxsHolder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ClassUtils;
 
 import java.util.Map;
@@ -23,10 +22,15 @@ import java.util.Map;
  * 流程引擎默认实现类
  */
 public class DefaultFlowEngine implements FlowEngine {
-    @Autowired
+    // 流程持有器
     private FlowsHolder flowsHolder;
-    @Autowired
+    // 流程事务持有器
     private FlowTxsHolder flowTxsHolder;
+
+    public DefaultFlowEngine(FlowsHolder flowsHolder, FlowTxsHolder flowTxsHolder) {
+        this.flowsHolder = flowsHolder;
+        this.flowTxsHolder = flowTxsHolder;
+    }
 
     @Override
     public <T> T start(String flow, T target) {
