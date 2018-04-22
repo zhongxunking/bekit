@@ -9,7 +9,7 @@
 package org.bekit.event.boot;
 
 import org.bekit.event.EventPublisher;
-import org.bekit.event.bus.EventBusHolder;
+import org.bekit.event.bus.EventBusesHolder;
 import org.bekit.event.extension.support.BizListenerType;
 import org.bekit.event.listener.ListenersHolder;
 import org.bekit.event.publisher.DefaultEventPublisher;
@@ -25,14 +25,14 @@ public class EventBusConfiguration {
 
     // 业务事件发布器
     @Bean
-    public EventPublisher eventPublisher(EventBusHolder eventBusHolder) {
-        return new DefaultEventPublisher(eventBusHolder.getEventBus(BizListenerType.class));
+    public EventPublisher eventPublisher(EventBusesHolder eventBusesHolder) {
+        return new DefaultEventPublisher(eventBusesHolder.getEventBus(BizListenerType.class));
     }
 
     // 事件总线持有器
     @Bean
-    public EventBusHolder eventBusHolder() {
-        return new EventBusHolder();
+    public EventBusesHolder eventBusesHolder() {
+        return new EventBusesHolder();
     }
 
     // 监听器持有器

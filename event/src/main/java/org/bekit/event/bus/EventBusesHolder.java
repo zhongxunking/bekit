@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * 事件总线持有器（会被注册到spring容器中）
  */
-public class EventBusHolder {
+public class EventBusesHolder {
     @Autowired
     private ListenersHolder listenersHolder;
     // 事件总线Map（key：总线类型）

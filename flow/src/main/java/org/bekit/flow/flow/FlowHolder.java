@@ -8,7 +8,7 @@
  */
 package org.bekit.flow.flow;
 
-import org.bekit.event.bus.EventBusHolder;
+import org.bekit.event.bus.EventBusesHolder;
 import org.bekit.flow.annotation.flow.Flow;
 import org.bekit.flow.processor.ProcessorHolder;
 import org.bekit.flow.transaction.FlowTxHolder;
@@ -31,7 +31,7 @@ public class FlowHolder {
     @Autowired
     private FlowTxHolder flowTxHolder;
     @Autowired
-    private EventBusHolder eventBusHolder;
+    private EventBusesHolder eventBusesHolder;
     // 流程执行器Map（key：流程名称）
     private Map<String, FlowExecutor> flowExecutorMap = new HashMap<>();
 
@@ -41,7 +41,7 @@ public class FlowHolder {
         String[] beanNames = applicationContext.getBeanNamesForAnnotation(Flow.class);
         for (String beanName : beanNames) {
             // 解析流程
-            FlowExecutor flowExecutor = FlowParser.parseFlow(applicationContext.getBean(beanName), processorHolder, flowTxHolder, eventBusHolder);
+            FlowExecutor flowExecutor = FlowParser.parseFlow(applicationContext.getBean(beanName), processorHolder, flowTxHolder, eventBusesHolder);
             if (flowExecutorMap.containsKey(flowExecutor.getFlowName())) {
                 throw new RuntimeException("存在重名的流程" + flowExecutor.getFlowName());
             }

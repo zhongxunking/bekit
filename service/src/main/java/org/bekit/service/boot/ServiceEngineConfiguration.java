@@ -9,7 +9,7 @@
 package org.bekit.service.boot;
 
 import org.bekit.event.boot.EventBusConfiguration;
-import org.bekit.event.bus.EventBusHolder;
+import org.bekit.event.bus.EventBusesHolder;
 import org.bekit.event.publisher.DefaultEventPublisher;
 import org.bekit.service.ServiceEngine;
 import org.bekit.service.engine.DefaultServiceEngine;
@@ -29,8 +29,8 @@ public class ServiceEngineConfiguration {
 
     // 服务引擎
     @Bean
-    public ServiceEngine serviceEngine(EventBusHolder eventBusHolder) {
-        return new DefaultServiceEngine(new DefaultEventPublisher(eventBusHolder.getEventBus(ServiceListenerType.class)));
+    public ServiceEngine serviceEngine(EventBusesHolder eventBusesHolder) {
+        return new DefaultServiceEngine(new DefaultEventPublisher(eventBusesHolder.getEventBus(ServiceListenerType.class)));
     }
 
     // 服务持有器

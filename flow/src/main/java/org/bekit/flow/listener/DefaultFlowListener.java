@@ -10,7 +10,7 @@ package org.bekit.flow.listener;
 
 import org.bekit.event.EventPublisher;
 import org.bekit.event.annotation.Listen;
-import org.bekit.event.bus.EventBusHolder;
+import org.bekit.event.bus.EventBusesHolder;
 import org.bekit.event.publisher.DefaultEventPublisher;
 import org.bekit.flow.annotation.listener.FlowListener;
 import org.bekit.flow.event.FlowExceptionEvent;
@@ -26,13 +26,13 @@ import javax.annotation.PostConstruct;
 @FlowListener
 public class DefaultFlowListener {
     @Autowired
-    private EventBusHolder eventBusHolder;
+    private EventBusesHolder eventBusesHolder;
     // 特定流程事件发布器
     private EventPublisher eventPublisher;
 
     @PostConstruct
     public void init() {
-        eventPublisher = new DefaultEventPublisher(eventBusHolder.getEventBus(TheFlowListenerType.class));
+        eventPublisher = new DefaultEventPublisher(eventBusesHolder.getEventBus(TheFlowListenerType.class));
     }
 
     // 监听节点选择事件

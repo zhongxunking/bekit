@@ -9,7 +9,7 @@
 package org.bekit.flow.flow;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bekit.event.bus.EventBusHolder;
+import org.bekit.event.bus.EventBusesHolder;
 import org.bekit.event.publisher.DefaultEventPublisher;
 import org.bekit.flow.annotation.flow.*;
 import org.bekit.flow.engine.TargetContext;
@@ -35,13 +35,13 @@ public class FlowParser {
     private static final Logger logger = LoggerFactory.getLogger(FlowParser.class);
 
     /**
-     * @param flow            流程
-     * @param processorHolder 处理器持有器
-     * @param flowTxHolder    流程事务持有器
-     * @param eventBusHolder  事件总线持有器
+     * @param flow             流程
+     * @param processorHolder  处理器持有器
+     * @param flowTxHolder     流程事务持有器
+     * @param eventBusesHolder 事件总线持有器
      * @return 流程执行器
      */
-    public static FlowExecutor parseFlow(Object flow, ProcessorHolder processorHolder, FlowTxHolder flowTxHolder, EventBusHolder eventBusHolder) {
+    public static FlowExecutor parseFlow(Object flow, ProcessorHolder processorHolder, FlowTxHolder flowTxHolder, EventBusesHolder eventBusesHolder) {
         // 获取目标class（应对AOP代理情况）
         Class<?> flowClass = AopUtils.getTargetClass(flow);
         logger.debug("解析流程：{}", ClassUtils.getQualifiedName(flowClass));
@@ -52,7 +52,7 @@ public class FlowParser {
             flowName = ClassUtils.getShortNameAsProperty(flowClass);
         }
         // 新建流程执行器
-        FlowExecutor flowExecutor = new FlowExecutor(flowName, flowAnnotation.enableFlowTx(), flow, new DefaultEventPublisher(eventBusHolder.getEventBus(FlowListenerType.class)));
+        FlowExecutor flowExecutor = new FlowExecutor(flowName, flowAnnotation.enableFlowTx(), flow, new DefaultEventPublisher(eventBusesHolder.getEventBus(FlowListenerType.class)));
         if (flowAnnotation.enableFlowTx()) {
             flowExecutor.setFlowTxExecutor(flowTxHolder.getRequiredFlowTxExecutor(flowName));
         }
