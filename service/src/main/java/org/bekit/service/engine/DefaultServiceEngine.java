@@ -15,7 +15,6 @@ import org.bekit.service.event.ServiceExceptionEvent;
 import org.bekit.service.event.ServiceFinishEvent;
 import org.bekit.service.service.ServiceExecutor;
 import org.bekit.service.service.ServicesHolder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.ReflectUtils;
 
 import java.util.Map;
@@ -24,12 +23,13 @@ import java.util.Map;
  * 服务引擎默认实现类
  */
 public class DefaultServiceEngine implements ServiceEngine {
-    @Autowired
+    // 服务持有器
     private ServicesHolder servicesHolder;
     // 服务事件发布器
     private EventPublisher eventPublisher;
 
-    public DefaultServiceEngine(EventPublisher eventPublisher) {
+    public DefaultServiceEngine(ServicesHolder servicesHolder, EventPublisher eventPublisher) {
+        this.servicesHolder = servicesHolder;
         this.eventPublisher = eventPublisher;
     }
 

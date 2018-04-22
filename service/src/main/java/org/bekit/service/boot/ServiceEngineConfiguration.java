@@ -8,6 +8,7 @@
  */
 package org.bekit.service.boot;
 
+import org.bekit.event.EventPublisher;
 import org.bekit.event.boot.EventBusConfiguration;
 import org.bekit.event.bus.EventBusesHolder;
 import org.bekit.event.publisher.DefaultEventPublisher;
@@ -17,6 +18,7 @@ import org.bekit.service.listener.ServiceListenerType;
 import org.bekit.service.service.ServicesHolder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -29,7 +31,9 @@ public class ServiceEngineConfiguration {
 
     // 服务引擎
     @Bean
-    public ServiceEngine serviceEngine(EventBusesHolder eventBusesHolder) {
-        return new DefaultServiceEngine(new DefaultEventPublisher(eventBusesHolder.getEventBus(ServiceListenerType.class)));
+    @DependsOn({"org.bekit.service.service.ServicesHolder", "org.bekit.event.bus.EventBusesHolder"})    // 保证出现循环引用时不会出错
+    public ServiceEngine serviceEngine(ServicesHolder servicesHolder, EventBusesHolder eventBusesHolder) {
+        EventPublisher eventPublisher = new DefaultEventPublisher(eventBusesHolder.getEventBus(ServiceListenerType.class));
+        return new DefaultServiceEngine(servicesHolder, eventPublisher);
     }
 }
