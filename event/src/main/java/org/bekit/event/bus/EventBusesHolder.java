@@ -13,14 +13,16 @@ import org.bekit.event.listener.ListenerExecutor;
 import org.bekit.event.listener.ListenerParser;
 import org.bekit.event.listener.ListenersHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 事件总线持有器（会被注册到spring容器中）
+ * 事件总线持有器
  */
+@Component
 public class EventBusesHolder {
     @Autowired
     private ListenersHolder listenersHolder;

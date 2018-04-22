@@ -15,29 +15,19 @@ import org.bekit.event.listener.ListenersHolder;
 import org.bekit.event.publisher.DefaultEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * 事件总线配置类
  * （非spring-boot项目需手动引入本配置类完成事件总线配置）
  */
 @Configuration
+@Import({EventBusesHolder.class, ListenersHolder.class})
 public class EventBusConfiguration {
 
     // 业务事件发布器
     @Bean
     public EventPublisher eventPublisher(EventBusesHolder eventBusesHolder) {
         return new DefaultEventPublisher(eventBusesHolder.getEventBus(BizListenerType.class));
-    }
-
-    // 事件总线持有器
-    @Bean
-    public EventBusesHolder eventBusesHolder() {
-        return new EventBusesHolder();
-    }
-
-    // 监听器持有器
-    @Bean
-    public ListenersHolder listenersHolder() {
-        return new ListenersHolder();
     }
 }
