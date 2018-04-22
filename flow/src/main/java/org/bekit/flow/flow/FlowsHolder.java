@@ -14,6 +14,7 @@ import org.bekit.flow.processor.ProcessorsHolder;
 import org.bekit.flow.transaction.FlowTxsHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -21,8 +22,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 流程持有器（会被注册到spring容器中）
+ * 流程持有器
  */
+@Component
 public class FlowsHolder {
     @Autowired
     private ApplicationContext applicationContext;

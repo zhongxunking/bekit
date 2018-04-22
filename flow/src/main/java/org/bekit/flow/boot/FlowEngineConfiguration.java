@@ -24,31 +24,16 @@ import org.springframework.context.annotation.Import;
  * （非spring-boot项目需手动引入本配置类完成流程引擎配置）
  */
 @Configuration
-@Import(EventBusConfiguration.class)
+@Import({EventBusConfiguration.class,
+        FlowsHolder.class,
+        ProcessorsHolder.class,
+        FlowTxsHolder.class})
 public class FlowEngineConfiguration {
 
     // 流程引擎
     @Bean
     public FlowEngine flowEngine() {
         return new DefaultFlowEngine();
-    }
-
-    // 流程持有器
-    @Bean
-    public FlowsHolder flowsHolder() {
-        return new FlowsHolder();
-    }
-
-    // 处理器持有器
-    @Bean
-    public ProcessorsHolder processorsHolder() {
-        return new ProcessorsHolder();
-    }
-
-    // 流程事务持有器
-    @Bean
-    public FlowTxsHolder flowTxsHolder() {
-        return new FlowTxsHolder();
     }
 
     // 默认的流程监听器

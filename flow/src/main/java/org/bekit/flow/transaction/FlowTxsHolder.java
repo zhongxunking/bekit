@@ -11,6 +11,7 @@ package org.bekit.flow.transaction;
 import org.bekit.flow.annotation.transaction.FlowTx;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.annotation.PostConstruct;
@@ -19,8 +20,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 流程事务持有器（会被注册到spring容器中）
+ * 流程事务持有器
  */
+@Component
 public class FlowTxsHolder {
     @Autowired
     private ApplicationContext applicationContext;
