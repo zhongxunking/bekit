@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationContext;
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 处理器持有器（会被注册到spring容器中）
@@ -38,6 +39,13 @@ public class ProcessorHolder {
             // 将执行器放入持有器中
             processorExecutorMap.put(processorExecutor.getProcessorName(), processorExecutor);
         }
+    }
+
+    /**
+     * 获取所有处理器名称
+     */
+    public Set<String> getProcessorNames() {
+        return processorExecutorMap.keySet();
     }
 
     /**
