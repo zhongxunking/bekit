@@ -68,6 +68,13 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
     }
 
     /**
+     * 获取监听器
+     */
+    public Object getListener() {
+        return listener;
+    }
+
+    /**
      * 获取监听器类型
      */
     public Class getType() {
