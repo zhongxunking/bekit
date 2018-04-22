@@ -16,7 +16,7 @@ import org.bekit.flow.engine.TargetContext;
 import org.bekit.flow.listener.FlowListenerType;
 import org.bekit.flow.processor.ProcessorExecutor;
 import org.bekit.flow.processor.ProcessorsHolder;
-import org.bekit.flow.transaction.FlowTxHolder;
+import org.bekit.flow.transaction.FlowTxsHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
@@ -37,11 +37,11 @@ public class FlowParser {
     /**
      * @param flow             流程
      * @param processorsHolder 处理器持有器
-     * @param flowTxHolder     流程事务持有器
+     * @param flowTxsHolder    流程事务持有器
      * @param eventBusesHolder 事件总线持有器
      * @return 流程执行器
      */
-    public static FlowExecutor parseFlow(Object flow, ProcessorsHolder processorsHolder, FlowTxHolder flowTxHolder, EventBusesHolder eventBusesHolder) {
+    public static FlowExecutor parseFlow(Object flow, ProcessorsHolder processorsHolder, FlowTxsHolder flowTxsHolder, EventBusesHolder eventBusesHolder) {
         // 获取目标class（应对AOP代理情况）
         Class<?> flowClass = AopUtils.getTargetClass(flow);
         logger.debug("解析流程：{}", ClassUtils.getQualifiedName(flowClass));
@@ -54,7 +54,7 @@ public class FlowParser {
         // 新建流程执行器
         FlowExecutor flowExecutor = new FlowExecutor(flowName, flowAnnotation.enableFlowTx(), flow, new DefaultEventPublisher(eventBusesHolder.getEventBus(FlowListenerType.class)));
         if (flowAnnotation.enableFlowTx()) {
-            flowExecutor.setFlowTxExecutor(flowTxHolder.getRequiredFlowTxExecutor(flowName));
+            flowExecutor.setFlowTxExecutor(flowTxsHolder.getRequiredFlowTxExecutor(flowName));
         }
         for (Method method : flowClass.getDeclaredMethods()) {
             // 此处得到的@Node是已经经过@AliasFor属性别名进行属性同步后的结果

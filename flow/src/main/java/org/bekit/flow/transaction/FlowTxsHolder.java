@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * 流程事务持有器（会被注册到spring容器中）
  */
-public class FlowTxHolder {
+public class FlowTxsHolder {
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired(required = false)

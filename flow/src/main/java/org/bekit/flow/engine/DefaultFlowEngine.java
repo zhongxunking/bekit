@@ -13,7 +13,7 @@ import org.bekit.flow.FlowEngine;
 import org.bekit.flow.flow.FlowExecutor;
 import org.bekit.flow.flow.FlowsHolder;
 import org.bekit.flow.transaction.FlowTxExecutor;
-import org.bekit.flow.transaction.FlowTxHolder;
+import org.bekit.flow.transaction.FlowTxsHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ClassUtils;
 
@@ -26,7 +26,7 @@ public class DefaultFlowEngine implements FlowEngine {
     @Autowired
     private FlowsHolder flowsHolder;
     @Autowired
-    private FlowTxHolder flowTxHolder;
+    private FlowTxsHolder flowTxsHolder;
 
     @Override
     public <T> T start(String flow, T target) {
@@ -83,7 +83,7 @@ public class DefaultFlowEngine implements FlowEngine {
     private void executeInsertTarget(String flow, TargetContext targetContext) {
         try {
             // 获取流程事务执行器
-            FlowTxExecutor flowTxExecutor = flowTxHolder.getRequiredFlowTxExecutor(flow);
+            FlowTxExecutor flowTxExecutor = flowTxsHolder.getRequiredFlowTxExecutor(flow);
             // 插入目标对象
             flowTxExecutor.insertTarget(targetContext);
         } catch (Throwable e) {

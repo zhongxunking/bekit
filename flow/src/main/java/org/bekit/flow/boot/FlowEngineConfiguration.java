@@ -14,7 +14,7 @@ import org.bekit.flow.engine.DefaultFlowEngine;
 import org.bekit.flow.flow.FlowsHolder;
 import org.bekit.flow.listener.DefaultFlowListener;
 import org.bekit.flow.processor.ProcessorsHolder;
-import org.bekit.flow.transaction.FlowTxHolder;
+import org.bekit.flow.transaction.FlowTxsHolder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -47,8 +47,8 @@ public class FlowEngineConfiguration {
 
     // 流程事务持有器
     @Bean
-    public FlowTxHolder flowTxHolder() {
-        return new FlowTxHolder();
+    public FlowTxsHolder flowTxsHolder() {
+        return new FlowTxsHolder();
     }
 
     // 默认的流程监听器
