@@ -9,7 +9,6 @@
 package org.bekit.event.annotation.listener;
 
 import org.bekit.event.extension.ListenResolver;
-import org.bekit.event.extension.support.DefaultListenResolver;
 
 import java.lang.annotation.*;
 
@@ -22,9 +21,9 @@ import java.lang.annotation.*;
 public @interface Listen {
 
     /**
-     * 监听解决器（默认DefaultListenResolver）
+     * 监听解决器
      */
-    Class<? extends ListenResolver> resolver() default DefaultListenResolver.class;
+    Class<? extends ListenResolver> resolver();
 
     /**
      * 是否按照优先级升序

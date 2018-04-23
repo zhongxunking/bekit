@@ -289,8 +289,8 @@
         @TheFlowListener(flow = "demoFlow")  // 特定流程监听器注解，属性flow指定被监听的流程名称
         public class DenoFlowListener {
         
-            @ListenNodeDecide   // 监听节点选择事件
-            public void listenNodeDecide(String node, TargetContext<Transfer> targetContext) { // 入参node表示被选择的节点，targetContext是目标上下文
+            @ListenNodeDecided   // 监听节点选择事件
+            public void listenNodeDecided(String node, TargetContext<Transfer> targetContext) { // 入参node表示被选择的节点，targetContext是目标上下文
                 // 一般监听节点选择事件的目的是用来更新目标对象的状态，因为当节点选择事件发生时，就表明已经执行完一个节点，即将进入到下一个节点，所以目标对象的状态应该修改为下一个状态
             }
         
@@ -399,7 +399,7 @@
 
         @Service(enableTx = true) // 服务定义注解（注意：此注解和spring的@Service注解名字一样，但是是两个不一样的注解），enableTx属性表示服务是否开启事务，默认不开启
         public class MyService {
-            @ServiceCheck // 服务校验注解，进行业务校验（注意：此注解对应方法执行时不会开启事务，原因是这里面只是进行业务校验，而不是执行业务，所以没必要开启事务；同时如果开启了事务，但是当校验不通过还需要回滚事务，反而浪费资源）
+            @ServiceBefore // 服务前置处理（执行中不会有事务）
             public void check(ServiceContext<XXXOrder, XXXResult> serviceContext) { 
                 // ServiceContext是服务上下文，可以通过它获取到传给服务引擎的order，也可以获取由服务引擎创建的result。
                 // 进行业务校验（比如校验账户是否合法等等）

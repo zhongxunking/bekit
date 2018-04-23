@@ -11,15 +11,18 @@ package org.bekit.flow.processor;
 import org.bekit.flow.annotation.processor.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * 处理器持有器（会被注册到spring容器中）
+ * 处理器持有器
  */
-public class ProcessorHolder {
+@Component
+public class ProcessorsHolder {
     @Autowired
     private ApplicationContext applicationContext;
     // 处理器执行器Map（key：处理器的名称）
@@ -38,6 +41,13 @@ public class ProcessorHolder {
             // 将执行器放入持有器中
             processorExecutorMap.put(processorExecutor.getProcessorName(), processorExecutor);
         }
+    }
+
+    /**
+     * 获取所有处理器名称
+     */
+    public Set<String> getProcessorNames() {
+        return processorExecutorMap.keySet();
     }
 
     /**

@@ -8,14 +8,14 @@
  */
 package org.bekit.flow.flow;
 
-import org.bekit.flow.engine.TargetContext;
-import org.bekit.flow.event.NodeDecidedEvent;
-import org.bekit.flow.transaction.FlowTxExecutor;
-import org.springframework.util.ClassUtils;
 import org.bekit.common.method.MethodExecutor;
 import org.bekit.event.EventPublisher;
+import org.bekit.flow.engine.TargetContext;
 import org.bekit.flow.event.FlowExceptionEvent;
+import org.bekit.flow.event.NodeDecidedEvent;
 import org.bekit.flow.processor.ProcessorExecutor;
+import org.bekit.flow.transaction.FlowTxExecutor;
+import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -207,6 +207,13 @@ public class FlowExecutor {
      */
     public String getFlowName() {
         return flowName;
+    }
+
+    /**
+     * 获取流程
+     */
+    public Object getFlow() {
+        return flow;
     }
 
     /**

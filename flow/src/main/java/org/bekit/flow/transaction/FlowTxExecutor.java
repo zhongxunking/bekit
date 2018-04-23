@@ -111,6 +111,13 @@ public class FlowTxExecutor extends TxExecutor {
     }
 
     /**
+     * 获取流程事务
+     */
+    public Object getFlowTx() {
+        return flowTx;
+    }
+
+    /**
      * 获取目标对象类型
      */
     public Class getClassOfTarget() {

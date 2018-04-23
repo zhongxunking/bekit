@@ -110,6 +110,13 @@ public class ProcessorExecutor {
     }
 
     /**
+     * 获取处理器
+     */
+    public Object getProcessor() {
+        return processor;
+    }
+
+    /**
      * 校验处理器执行器是否有效
      *
      * @throws IllegalStateException 校验不通过

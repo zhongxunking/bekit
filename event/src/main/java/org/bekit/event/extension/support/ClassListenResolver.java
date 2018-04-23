@@ -14,9 +14,9 @@ import org.springframework.util.ClassUtils;
 import java.lang.reflect.Method;
 
 /**
- * 默认的监听解决器实现（监听方法只能有一个入参，事件类型就是入参的Class类）
+ * Class监听解决器（监听方法只能有一个入参，事件类型就是入参的Class类）
  */
-public class DefaultListenResolver implements ListenResolver {
+public class ClassListenResolver implements ListenResolver {
     // 监听的事件类型
     private Class eventType;
 

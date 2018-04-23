@@ -10,30 +10,32 @@ package org.bekit.event.bus;
 
 import org.bekit.event.extension.ListenerType;
 import org.bekit.event.listener.ListenerExecutor;
-import org.bekit.event.listener.ListenerHolder;
 import org.bekit.event.listener.ListenerParser;
+import org.bekit.event.listener.ListenersHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 事件总线持有器（会被注册到spring容器中）
+ * 事件总线持有器
  */
-public class EventBusHolder {
+@Component
+public class EventBusesHolder {
     @Autowired
-    private ListenerHolder listenerHolder;
+    private ListenersHolder listenersHolder;
     // 事件总线Map（key：总线类型）
     private Map<Class, EventBus> eventBusMap = new HashMap<>();
 
     // 初始化（根据监听器类型创建相应类型的事件总线，spring自动执行）
     @PostConstruct
     public void init() {
-        for (Class type : listenerHolder.getTypes()) {
+        for (Class type : listenersHolder.getTypes()) {
             // 初始化事件总线
             EventBus eventBus = getEventBus(type);
-            for (ListenerExecutor listenerExecutor : listenerHolder.getRequiredListenerExecutors(type)) {
+            for (ListenerExecutor listenerExecutor : listenersHolder.getRequiredListenerExecutors(type)) {
                 eventBus.register(listenerExecutor);
             }
         }

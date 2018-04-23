@@ -8,6 +8,7 @@
  */
 package org.bekit.event.annotation;
 
+import org.bekit.event.extension.support.ClassListenResolver;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
@@ -18,7 +19,7 @@ import java.lang.annotation.*;
 @Documented
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@org.bekit.event.annotation.listener.Listen
+@org.bekit.event.annotation.listener.Listen(resolver = ClassListenResolver.class)
 public @interface Listen {
 
     /**

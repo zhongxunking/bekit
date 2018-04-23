@@ -11,15 +11,17 @@ package org.bekit.event.listener;
 import org.bekit.event.annotation.listener.Listener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
 
 /**
- * 监听器持有器（会被注册到spring容器中）
+ * 监听器持有器
  */
-public class ListenerHolder {
+@Component
+public class ListenersHolder {
     @Autowired
     private ApplicationContext applicationContext;
     // 监听器执行器Map（key：监听器的类型）

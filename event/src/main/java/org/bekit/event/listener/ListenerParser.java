@@ -44,7 +44,7 @@ public class ListenerParser {
         // 此处得到的@Listener是已经经过@AliasFor属性别名进行属性同步后的结果
         Listener listenerAnnotation = AnnotatedElementUtils.findMergedAnnotation(listenerClass, Listener.class);
         // 创建监听器执行器
-        ListenerExecutor listenerExecutor = new ListenerExecutor(listener, listenerAnnotation.type(), listenerAnnotation.priority(), parseEventTypeResolver(listenerAnnotation.type()));
+        ListenerExecutor listenerExecutor = new ListenerExecutor(listenerAnnotation.type(), listenerAnnotation.priority(), listener, parseEventTypeResolver(listenerAnnotation.type()));
         for (Method method : listenerClass.getDeclaredMethods()) {
             Listen listenAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, Listen.class);
             if (listenAnnotation != null) {

@@ -8,29 +8,32 @@
  */
 package org.bekit.flow.flow;
 
-import org.bekit.event.bus.EventBusHolder;
+import org.bekit.event.bus.EventBusesHolder;
 import org.bekit.flow.annotation.flow.Flow;
-import org.bekit.flow.processor.ProcessorHolder;
-import org.bekit.flow.transaction.FlowTxHolder;
+import org.bekit.flow.processor.ProcessorsHolder;
+import org.bekit.flow.transaction.FlowTxsHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * 流程持有器（会被注册到spring容器中）
+ * 流程持有器
  */
-public class FlowHolder {
+@Component
+public class FlowsHolder {
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
-    private ProcessorHolder processorHolder;
+    private ProcessorsHolder processorsHolder;
     @Autowired
-    private FlowTxHolder flowTxHolder;
+    private FlowTxsHolder flowTxsHolder;
     @Autowired
-    private EventBusHolder eventBusHolder;
+    private EventBusesHolder eventBusesHolder;
     // 流程执行器Map（key：流程名称）
     private Map<String, FlowExecutor> flowExecutorMap = new HashMap<>();
 
@@ -40,13 +43,20 @@ public class FlowHolder {
         String[] beanNames = applicationContext.getBeanNamesForAnnotation(Flow.class);
         for (String beanName : beanNames) {
             // 解析流程
-            FlowExecutor flowExecutor = FlowParser.parseFlow(applicationContext.getBean(beanName), processorHolder, flowTxHolder, eventBusHolder);
+            FlowExecutor flowExecutor = FlowParser.parseFlow(applicationContext.getBean(beanName), processorsHolder, flowTxsHolder, eventBusesHolder);
             if (flowExecutorMap.containsKey(flowExecutor.getFlowName())) {
                 throw new RuntimeException("存在重名的流程" + flowExecutor.getFlowName());
             }
             // 将执行器放入持有器中
             flowExecutorMap.put(flowExecutor.getFlowName(), flowExecutor);
         }
+    }
+
+    /**
+     * 获取所有流程名称
+     */
+    public Set<String> getFlowNames() {
+        return flowExecutorMap.keySet();
     }
 
     /**

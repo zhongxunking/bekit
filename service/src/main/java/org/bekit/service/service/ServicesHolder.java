@@ -11,16 +11,19 @@ package org.bekit.service.service;
 import org.bekit.service.annotation.service.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * 服务持有器（会被注册到spring容器中）
+ * 服务持有器
  */
-public class ServiceHolder {
+@Component
+public class ServicesHolder {
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired(required = false)
@@ -41,6 +44,13 @@ public class ServiceHolder {
             // 将执行器放入持有器中
             serviceExecutorMap.put(serviceExecutor.getServiceName(), serviceExecutor);
         }
+    }
+
+    /**
+     * 获取所有服务名称
+     */
+    public Set<String> getServiceNames() {
+        return serviceExecutorMap.keySet();
     }
 
     /**
