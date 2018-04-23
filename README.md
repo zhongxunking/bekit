@@ -30,7 +30,7 @@
         <dependency>
             <groupId>org.bekit</groupId>
             <artifactId>event</artifactId>
-            <version>1.2.3.RELEASE</version>
+            <version>1.2.4.RELEASE</version>
         </dependency>
 
 2. 如果是spring-boot项目则不需要进行任何配置。
@@ -125,7 +125,7 @@
         <dependency>
             <groupId>org.bekit</groupId>
             <artifactId>flow</artifactId>
-            <version>1.2.3.RELEASE</version>
+            <version>1.2.4.RELEASE</version>
         </dependency>
 
 2. 如果是spring-boot项目则不需要进行任何配置。
@@ -366,7 +366,7 @@
         <dependency>
             <groupId>org.bekit</groupId>
             <artifactId>service</artifactId>
-            <version>1.2.3.RELEASE</version>
+            <version>1.2.4.RELEASE</version>
         </dependency>
 
 2. 如果是spring-boot项目则不需要进行任何配置。

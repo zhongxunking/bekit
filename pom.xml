@@ -10,7 +10,7 @@
 
     <groupId>org.bekit</groupId>
     <artifactId>bekit</artifactId>
-    <version>1.2.3.RELEASE</version>
+    <version>1.2.4.RELEASE</version>
     <packaging>pom</packaging>
 
     <name>bekit</name>
