@@ -26,7 +26,7 @@ public class ProcessorsHolder {
     @Autowired
     private ApplicationContext applicationContext;
     // 处理器执行器Map（key：处理器的名称）
-    private Map<String, ProcessorExecutor> processorExecutorMap = new HashMap<>();
+    private final Map<String, ProcessorExecutor> processorExecutorMap = new HashMap<>();
 
     // 初始化（查询spring容器中所有的@Processor处理器并解析，spring自动执行）
     @PostConstruct

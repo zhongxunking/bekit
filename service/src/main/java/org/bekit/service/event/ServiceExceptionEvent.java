@@ -15,11 +15,11 @@ import org.bekit.service.engine.ServiceContext;
  */
 public class ServiceExceptionEvent {
     // 服务名称
-    private String service;
+    private final String service;
     // 服务上下文
-    private ServiceContext serviceContext;
+    private final ServiceContext serviceContext;
     // 发生的异常
-    private Throwable throwable;
+    private final Throwable throwable;
 
     public ServiceExceptionEvent(String service, ServiceContext serviceContext, Throwable throwable) {
         this.service = service;

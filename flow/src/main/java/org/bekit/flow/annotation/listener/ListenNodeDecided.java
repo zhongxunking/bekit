@@ -24,7 +24,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Listen(resolver = ListenNodeDecidedResolver.class)
 public @interface ListenNodeDecided {
-
     /**
      * 是否按照优先级升序
      */

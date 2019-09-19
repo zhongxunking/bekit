@@ -21,7 +21,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Component
 public @interface Listener {
-
     /**
      * 类型
      */

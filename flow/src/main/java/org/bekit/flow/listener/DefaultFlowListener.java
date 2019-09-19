@@ -25,7 +25,7 @@ import org.springframework.context.annotation.DependsOn;
 @DependsOn("org.bekit.event.bus.EventBusesHolder")      // 保证出现循环引用时不会出错
 public class DefaultFlowListener {
     // 特定流程事件发布器
-    private EventPublisher eventPublisher;
+    private final EventPublisher eventPublisher;
 
     public DefaultFlowListener(EventBusesHolder eventBusesHolder) {
         eventPublisher = new DefaultEventPublisher(eventBusesHolder.getEventBus(TheFlowListenerType.class));

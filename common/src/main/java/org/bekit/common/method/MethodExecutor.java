@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
  */
 public abstract class MethodExecutor {
     // 目标方法
-    private Method targetMethod;
+    private final Method targetMethod;
 
     public MethodExecutor(Method targetMethod) {
         this.targetMethod = targetMethod;

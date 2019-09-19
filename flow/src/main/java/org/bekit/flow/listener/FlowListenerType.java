@@ -16,7 +16,6 @@ import org.bekit.event.extension.support.ClassEventTypeResolver;
  * 流程监听器类型
  */
 public class FlowListenerType implements ListenerType {
-
     @Override
     public EventTypeResolver getResolver() {
         return ClassEventTypeResolver.INSTANCE;

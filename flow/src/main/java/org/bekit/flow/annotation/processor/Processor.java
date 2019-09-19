@@ -28,7 +28,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Component
 public @interface Processor {
-
     /**
      * 处理器名字（默认使用被注解类的名字，首字母小写）
      */

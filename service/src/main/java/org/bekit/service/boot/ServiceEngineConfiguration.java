@@ -28,7 +28,6 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Import({EventBusConfiguration.class, ServicesHolder.class})
 public class ServiceEngineConfiguration {
-
     // 服务引擎
     @Bean
     @DependsOn({"org.bekit.service.service.ServicesHolder", "org.bekit.event.bus.EventBusesHolder"})    // 保证出现循环引用时不会出错

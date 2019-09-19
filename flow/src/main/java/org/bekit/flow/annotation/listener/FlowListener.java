@@ -23,7 +23,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Listener(type = FlowListenerType.class)
 public @interface FlowListener {
-
     /**
      * 优先级
      */

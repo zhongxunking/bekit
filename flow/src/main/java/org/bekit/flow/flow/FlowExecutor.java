@@ -28,17 +28,17 @@ import java.util.Set;
  */
 public class FlowExecutor {
     // 流程名称
-    private String flowName;
+    private final String flowName;
     // 是否开启流程事务
-    private boolean enableFlowTx;
+    private final boolean enableFlowTx;
     // 流程
-    private Object flow;
+    private final Object flow;
     // 开始节点
     private String startNode;
     // 结束节点
-    private Set<String> endNodes = new HashSet<>();
+    private final Set<String> endNodes = new HashSet<>();
     // 节点执行器Map（key：节点名称）
-    private Map<String, NodeExecutor> nodeExecutorMap = new HashMap<>();
+    private final Map<String, NodeExecutor> nodeExecutorMap = new HashMap<>();
     // 目标对象映射执行器
     private TargetMappingExecutor mappingExecutor;
     // 流程事务执行器
@@ -274,13 +274,13 @@ public class FlowExecutor {
      */
     public static class NodeExecutor {
         // 节点名称
-        private String nodeName;
+        private final String nodeName;
         // 处理器执行器
-        private ProcessorExecutor processorExecutor;
+        private final ProcessorExecutor processorExecutor;
         // 是否自动执行本节点
-        private boolean autoExecute;
+        private final boolean autoExecute;
         // 本节点执行前是否创建新事务
-        private boolean newTx;
+        private final boolean newTx;
         // 节点决策器执行器
         private NodeDeciderExecutor nodeDeciderExecutor;
 
@@ -374,9 +374,9 @@ public class FlowExecutor {
          */
         public static class NodeDeciderExecutor extends MethodExecutor {
             // 参数类型
-            private ParametersType parametersType;
+            private final ParametersType parametersType;
             // 目标对象类型
-            private Class classOfTarget;
+            private final Class classOfTarget;
 
             public NodeDeciderExecutor(Method targetMethod, ParametersType parametersType, Class classOfTarget) {
                 super(targetMethod);
@@ -446,7 +446,7 @@ public class FlowExecutor {
      */
     public static class TargetMappingExecutor extends MethodExecutor {
         // 目标对象类型
-        private Class classOfTarget;
+        private final Class classOfTarget;
 
         public TargetMappingExecutor(Method targetMethod, Class classOfTarget) {
             super(targetMethod);

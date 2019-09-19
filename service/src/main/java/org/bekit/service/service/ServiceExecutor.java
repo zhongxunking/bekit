@@ -31,13 +31,13 @@ public class ServiceExecutor {
     public static final Class[] SERVICE_PHASE_ANNOTATIONS = {ServiceBefore.class, ServiceExecute.class, ServiceAfter.class};
 
     // 服务名称
-    private String serviceName;
+    private final String serviceName;
     // 是否开启事务
-    private boolean enableTx;
+    private final boolean enableTx;
     // 服务
-    private Object service;
+    private final Object service;
     // 服务阶段执行器Map（key：服务阶段注解的Class）
-    private Map<Class, ServicePhaseExecutor> phaseExecutorMap = new HashMap<>();
+    private final Map<Class, ServicePhaseExecutor> phaseExecutorMap = new HashMap<>();
     // 事务执行器
     private TxExecutor txExecutor;
 
@@ -186,9 +186,9 @@ public class ServiceExecutor {
      */
     public static class ServicePhaseExecutor extends MethodExecutor {
         // ServiceContext泛型O的真实类型
-        private Class orderClass;
+        private final Class orderClass;
         // ServiceContext泛型R的真实类型
-        private Class resultClass;
+        private final Class resultClass;
 
         public ServicePhaseExecutor(Method targetMethod, Class orderClass, Class resultClass) {
             super(targetMethod);

@@ -12,7 +12,6 @@ package org.bekit.event.extension;
  * 事件类型解决器
  */
 public interface EventTypeResolver {
-
     /**
      * 根据事件得到对应的事件类型
      *

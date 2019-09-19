@@ -17,9 +17,9 @@ import java.util.Objects;
  */
 public class TheFlowEventType {
     // 流程
-    private String flow;
+    private final String flow;
     // 类型
-    private Class eventClass;
+    private final Class eventClass;
 
     public TheFlowEventType(String flow, Class eventClass) {
         this.flow = flow;

@@ -23,9 +23,9 @@ import java.util.Map;
  */
 public class DefaultFlowEngine implements FlowEngine {
     // 流程持有器
-    private FlowsHolder flowsHolder;
+    private final FlowsHolder flowsHolder;
     // 流程事务持有器
-    private FlowTxsHolder flowTxsHolder;
+    private final FlowTxsHolder flowTxsHolder;
 
     public DefaultFlowEngine(FlowsHolder flowsHolder, FlowTxsHolder flowTxsHolder) {
         this.flowsHolder = flowsHolder;

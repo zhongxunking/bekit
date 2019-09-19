@@ -22,11 +22,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Node(autoExecute = false, newTx = true)
 public @interface EndNode {
-
     /**
      * 节点名称（默认使用被注解的函数名，在一个流程内节点名称需唯一）
      */
     @AliasFor(annotation = Node.class, attribute = "name")
     String name() default "";
-
 }

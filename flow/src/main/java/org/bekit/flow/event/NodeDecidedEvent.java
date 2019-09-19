@@ -15,11 +15,11 @@ import org.bekit.flow.engine.TargetContext;
  */
 public class NodeDecidedEvent {
     // 流程名称
-    private String flow;
+    private final String flow;
     // 被选择的节点
-    private String node;
+    private final String node;
     // 目标上下文
-    private TargetContext targetContext;
+    private final TargetContext targetContext;
 
     public NodeDecidedEvent(String flow, String node, TargetContext targetContext) {
         this.flow = flow;

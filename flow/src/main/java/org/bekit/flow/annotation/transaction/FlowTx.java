@@ -21,10 +21,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Component
 public @interface FlowTx {
-
     /**
      * 对应的流程
      */
     String flow();
-
 }

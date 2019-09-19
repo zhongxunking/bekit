@@ -24,15 +24,15 @@ import java.util.Set;
  */
 public class ListenerExecutor implements Comparable<ListenerExecutor> {
     // 监听器类型
-    private Class type;
+    private final Class type;
     // 优先级
-    private int priority;
+    private final int priority;
     // 监听器
-    private Object listener;
+    private final Object listener;
     // 事件类型解决器
-    private EventTypeResolver resolver;
+    private final EventTypeResolver resolver;
     // 监听执行器map（key：被监听的事件类型）
-    private Map<Object, ListenExecutor> listenExecutorMap = new HashMap<>();
+    private final Map<Object, ListenExecutor> listenExecutorMap = new HashMap<>();
 
     public ListenerExecutor(Class type, int priority, Object listener, EventTypeResolver resolver) {
         this.type = type;
@@ -118,9 +118,9 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
      */
     public static class ListenExecutor extends MethodExecutor {
         // 监听解决器
-        private ListenResolver resolver;
+        private final ListenResolver resolver;
         // 是否优先级升序
-        private boolean priorityAsc;
+        private final boolean priorityAsc;
 
         public ListenExecutor(ListenResolver resolver, boolean priorityAsc, Method targetMethod) {
             super(targetMethod);

@@ -16,9 +16,9 @@ import java.util.Map;
  */
 public class ServiceContext<O, R> {
     // 入参
-    private O order;
+    private final O order;
     // 结果
-    private R result;
+    private final R result;
     // 附件（可往里面设值，可传递一些附加信息）
     private Map<Object, Object> attachment;
 

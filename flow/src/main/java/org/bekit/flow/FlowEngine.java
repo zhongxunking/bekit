@@ -14,7 +14,6 @@ import java.util.Map;
  * 流程引擎
  */
 public interface FlowEngine {
-
     /**
      * 执行流程
      *
@@ -53,5 +52,4 @@ public interface FlowEngine {
      * @return 流程执行结束后的目标对象（可能和传入的目标对象不是同一个对象）
      */
     <T> T insertTargetAndStart(String flow, T target, Map<Object, Object> attachment);
-
 }

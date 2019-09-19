@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Import;
         FlowTxsHolder.class,
         DefaultFlowListener.class})
 public class FlowEngineConfiguration {
-
     // 流程引擎
     @Bean
     @DependsOn({"org.bekit.flow.flow.FlowsHolder", "org.bekit.flow.transaction.FlowTxsHolder"})     // 保证出现循环引用时不会出错

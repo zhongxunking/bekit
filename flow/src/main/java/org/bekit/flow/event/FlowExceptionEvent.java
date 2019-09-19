@@ -15,11 +15,11 @@ import org.bekit.flow.engine.TargetContext;
  */
 public class FlowExceptionEvent {
     // 流程名称
-    private String flow;
+    private final String flow;
     // 发生的异常
-    private Throwable throwable;
+    private final Throwable throwable;
     // 目标上下文
-    private TargetContext targetContext;
+    private final TargetContext targetContext;
 
     public FlowExceptionEvent(String flow, Throwable throwable, TargetContext targetContext) {
         this.flow = flow;

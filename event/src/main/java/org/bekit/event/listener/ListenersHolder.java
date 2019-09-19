@@ -25,7 +25,7 @@ public class ListenersHolder {
     @Autowired
     private ApplicationContext applicationContext;
     // 监听器执行器Map（key：监听器的类型）
-    private Map<Class, List<ListenerExecutor>> listenerExecutorsMap = new HashMap<>();
+    private final Map<Class, List<ListenerExecutor>> listenerExecutorsMap = new HashMap<>();
 
     // 初始化（查询spring容器中所有的@Listener监听器并解析，spring自动执行）
     @PostConstruct

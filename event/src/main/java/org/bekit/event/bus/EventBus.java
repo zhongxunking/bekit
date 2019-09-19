@@ -18,11 +18,11 @@ import java.util.*;
  */
 public class EventBus {
     // 监听器执行器
-    private List<ListenerExecutor> listenerExecutors = new ArrayList<>();
+    private final List<ListenerExecutor> listenerExecutors = new ArrayList<>();
     // 监听器执行器缓存（key：事件类型）
     private Map<Object, List<ListenerExecutor>> listenerExecutorsCache = new HashMap<>();
     // 事件类型解决器
-    private EventTypeResolver resolver;
+    private final EventTypeResolver resolver;
 
     public EventBus(EventTypeResolver resolver) {
         this.resolver = resolver;
@@ -59,7 +59,7 @@ public class EventBus {
 
     // 刷新监听器缓存
     private void refreshListenerCache() {
-        listenerExecutorsCache = new HashMap<>();
+        Map<Object, List<ListenerExecutor>> cache = new HashMap<>();
         // 获取本总线所有的事件类型
         Set<Object> eventTypes = new HashSet<>();
         for (ListenerExecutor listenerExecutor : listenerExecutors) {
@@ -84,7 +84,9 @@ public class EventBus {
                 }
             }
             // 设置缓存
-            listenerExecutorsCache.put(eventType, theListenerExecutors);
+            cache.put(eventType, theListenerExecutors);
         }
+        // 刷新缓存
+        listenerExecutorsCache = cache;
     }
 }

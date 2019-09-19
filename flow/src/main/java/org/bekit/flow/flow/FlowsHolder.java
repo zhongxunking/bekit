@@ -35,7 +35,7 @@ public class FlowsHolder {
     @Autowired
     private EventBusesHolder eventBusesHolder;
     // 流程执行器Map（key：流程名称）
-    private Map<String, FlowExecutor> flowExecutorMap = new HashMap<>();
+    private final Map<String, FlowExecutor> flowExecutorMap = new HashMap<>();
 
     // 初始化（查询spring容器中所有的@Flow流程并解析，spring自动执行）
     @PostConstruct

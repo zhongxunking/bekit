@@ -23,7 +23,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Component
 public @interface Service {
-
     /**
      * 服务名称（默认使用被注解的类名，首字母小写）
      */

@@ -31,11 +31,11 @@ public class FlowTxExecutor extends TxExecutor {
     public static final Class[] FLOW_TX_OPERATE_ANNOTATIONS = {LockTarget.class, InsertTarget.class};
 
     // 对应的流程名称
-    private String flow;
+    private final String flow;
     // 流程事务
-    private Object flowTx;
+    private final Object flowTx;
     // 操作执行器Map（key：流程事务操作注解的Class）
-    private Map<Class, FlowTxOperateExecutor> operateExecutorMap = new HashMap<>();
+    private final Map<Class, FlowTxOperateExecutor> operateExecutorMap = new HashMap<>();
 
     public FlowTxExecutor(String flow, Object flowTx, PlatformTransactionManager transactionManager) {
         super(transactionManager, true);
@@ -151,7 +151,7 @@ public class FlowTxExecutor extends TxExecutor {
      */
     public static class FlowTxOperateExecutor extends MethodExecutor {
         // 目标对象类型
-        private Class classOfTarget;
+        private final Class classOfTarget;
 
         public FlowTxOperateExecutor(Method targetMethod, Class classOfTarget) {
             super(targetMethod);

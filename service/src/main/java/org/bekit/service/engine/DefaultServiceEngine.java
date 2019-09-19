@@ -24,9 +24,9 @@ import java.util.Map;
  */
 public class DefaultServiceEngine implements ServiceEngine {
     // 服务持有器
-    private ServicesHolder servicesHolder;
+    private final ServicesHolder servicesHolder;
     // 服务事件发布器
-    private EventPublisher eventPublisher;
+    private final EventPublisher eventPublisher;
 
     public DefaultServiceEngine(ServicesHolder servicesHolder, EventPublisher eventPublisher) {
         this.servicesHolder = servicesHolder;

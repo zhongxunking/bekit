@@ -14,7 +14,6 @@ import java.util.Map;
  * 服务引擎
  */
 public interface ServiceEngine {
-
     /**
      * 执行服务
      *
@@ -33,5 +32,4 @@ public interface ServiceEngine {
      * @return 结果
      */
     <O, R> R execute(String service, O order, Map<Object, Object> attachment);
-
 }

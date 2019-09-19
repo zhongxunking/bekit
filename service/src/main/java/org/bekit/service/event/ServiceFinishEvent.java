@@ -15,9 +15,9 @@ import org.bekit.service.engine.ServiceContext;
  */
 public class ServiceFinishEvent {
     // 服务名称
-    private String service;
+    private final String service;
     // 服务上下文
-    private ServiceContext serviceContext;
+    private final ServiceContext serviceContext;
 
     public ServiceFinishEvent(String service, ServiceContext serviceContext) {
         this.service = service;

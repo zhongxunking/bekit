@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Import({EventBusesHolder.class, ListenersHolder.class})
 public class EventBusConfiguration {
-
     // 业务事件发布器
     @Bean
     @DependsOn("org.bekit.event.bus.EventBusesHolder")      // 保证出现循环引用时不会出错

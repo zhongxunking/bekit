@@ -17,7 +17,6 @@ import org.bekit.flow.event.NodeDecidedEvent;
  * 特定流程监听器类型
  */
 public class TheFlowListenerType implements ListenerType {
-
     @Override
     public EventTypeResolver getResolver() {
         return TheFlowEventTypeResolver.INSTANCE;

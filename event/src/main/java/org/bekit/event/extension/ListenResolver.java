@@ -14,7 +14,6 @@ import java.lang.reflect.Method;
  * 监听解决器
  */
 public interface ListenResolver {
-
     /**
      * 初始化（每个实例仅调用一次）
      *

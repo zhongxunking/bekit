@@ -28,11 +28,11 @@ public class ProcessorExecutor {
     public static final Class[] PROCESSOR_METHOD_ANNOTATIONS = {ProcessorBefore.class, ProcessorExecute.class, ProcessorAfter.class, ProcessorEnd.class, ProcessorError.class};
 
     // 处理器名称
-    private String processorName;
+    private final String processorName;
     // 处理器
-    private Object processor;
+    private final Object processor;
     // 处理器方法执行器Map（key：处理器方法注解的Class）
-    private Map<Class, ProcessorMethodExecutor> methodExecutorMap = new HashMap<>();
+    private final Map<Class, ProcessorMethodExecutor> methodExecutorMap = new HashMap<>();
 
     public ProcessorExecutor(String processorName, Object processor) {
         this.processorName = processorName;
@@ -141,7 +141,7 @@ public class ProcessorExecutor {
      */
     public static class ProcessorMethodExecutor extends MethodExecutor {
         // 目标对象类型
-        private Class classOfTarget;
+        private final Class classOfTarget;
 
         public ProcessorMethodExecutor(Method targetMethod, Class classOfTarget) {
             super(targetMethod);

@@ -21,7 +21,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @org.bekit.event.annotation.listener.Listen(resolver = ClassListenResolver.class)
 public @interface Listen {
-
     /**
      * 是否按照优先级升序
      * <p>

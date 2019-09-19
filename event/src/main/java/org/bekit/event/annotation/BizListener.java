@@ -22,7 +22,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Listener(type = BizListenerType.class)
 public @interface BizListener {
-
     /**
      * 优先级
      * （具体执行顺序需要结合@Listen注解的priorityAsc属性共同决定）

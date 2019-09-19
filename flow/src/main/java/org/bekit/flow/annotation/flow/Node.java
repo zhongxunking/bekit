@@ -18,7 +18,6 @@ import java.lang.annotation.*;
 @Target(ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Node {
-
     /**
      * 节点名称（默认使用被注解的函数名，在一个流程内节点名称需唯一）
      */
@@ -38,5 +37,4 @@ public @interface Node {
      * 本节点执行前是否创建新事务（默认不新建）
      */
     boolean newTx() default false;
-
 }

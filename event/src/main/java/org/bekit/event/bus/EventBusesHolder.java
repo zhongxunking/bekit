@@ -27,7 +27,7 @@ public class EventBusesHolder {
     @Autowired
     private ListenersHolder listenersHolder;
     // 事件总线Map（key：总线类型）
-    private Map<Class, EventBus> eventBusMap = new HashMap<>();
+    private final Map<Class, EventBus> eventBusMap = new HashMap<>();
 
     // 初始化（根据监听器类型创建相应类型的事件总线，spring自动执行）
     @PostConstruct

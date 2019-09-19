@@ -17,7 +17,7 @@ import org.bekit.event.bus.EventBus;
  */
 public class DefaultEventPublisher implements EventPublisher {
     // 事件总线
-    private EventBus eventBus;
+    private final EventBus eventBus;
 
     public DefaultEventPublisher(EventBus eventBus) {
         this.eventBus = eventBus;

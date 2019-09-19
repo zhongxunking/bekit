@@ -22,12 +22,10 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Listener(type = ServiceListenerType.class)
 public @interface ServiceListener {
-
     /**
      * 优先级
      * （具体执行顺序需要结合@Listen注解的priorityAsc属性共同决定）
      */
     @AliasFor(annotation = Listener.class, attribute = "priority")
     int priority() default Integer.MAX_VALUE;
-
 }

@@ -15,7 +15,6 @@ import org.bekit.event.extension.ListenerType;
  * biz监听器类型
  */
 public class BizListenerType implements ListenerType {
-
     @Override
     public EventTypeResolver getResolver() {
         return ClassEventTypeResolver.INSTANCE;

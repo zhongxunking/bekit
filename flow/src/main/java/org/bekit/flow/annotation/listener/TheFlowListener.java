@@ -23,7 +23,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Listener(type = TheFlowListenerType.class)
 public @interface TheFlowListener {
-
     /**
      * 被监听的流程
      */

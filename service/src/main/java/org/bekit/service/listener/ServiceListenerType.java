@@ -16,7 +16,6 @@ import org.bekit.event.extension.support.ClassEventTypeResolver;
  * 服务监听器类型
  */
 public class ServiceListenerType implements ListenerType {
-
     @Override
     public EventTypeResolver getResolver() {
         return ClassEventTypeResolver.INSTANCE;

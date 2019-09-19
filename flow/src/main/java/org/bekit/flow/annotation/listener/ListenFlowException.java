@@ -24,7 +24,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Listen(resolver = ListenFlowExceptionResolver.class)
 public @interface ListenFlowException {
-
     /**
      * 是否按照优先级升序
      */

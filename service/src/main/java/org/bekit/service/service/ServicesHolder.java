@@ -29,7 +29,7 @@ public class ServicesHolder {
     @Autowired(required = false)
     private PlatformTransactionManager transactionManager;
     // 服务执行器Map（key：服务名称）
-    private Map<String, ServiceExecutor> serviceExecutorMap = new HashMap<>();
+    private final Map<String, ServiceExecutor> serviceExecutorMap = new HashMap<>();
 
     // 初始化（查询spring容器中所有的@Service服务并解析，spring自动执行）
     @PostConstruct
