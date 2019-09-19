@@ -54,7 +54,7 @@ public class ServiceParser {
             if (transactionManager == null) {
                 throw new IllegalArgumentException("服务" + serviceAnnotation.name() + "的enableTx属性为开启状态，但不存在事务管理器（PlatformTransactionManager），请检查是否有配置spring事务管理器");
             }
-            serviceExecutor.setTxExecutor(new TxExecutor(transactionManager));
+            serviceExecutor.setTxExecutor(new TxExecutor(transactionManager, false));
         }
         for (Method method : serviceClass.getDeclaredMethods()) {
             for (Class clazz : ServiceExecutor.SERVICE_PHASE_ANNOTATIONS) {

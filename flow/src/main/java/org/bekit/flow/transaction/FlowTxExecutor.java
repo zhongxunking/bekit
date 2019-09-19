@@ -38,7 +38,7 @@ public class FlowTxExecutor extends TxExecutor {
     private Map<Class, FlowTxOperateExecutor> operateExecutorMap = new HashMap<>();
 
     public FlowTxExecutor(String flow, Object flowTx, PlatformTransactionManager transactionManager) {
-        super(transactionManager);
+        super(transactionManager, true);
         this.flow = flow;
         this.flowTx = flowTx;
     }
