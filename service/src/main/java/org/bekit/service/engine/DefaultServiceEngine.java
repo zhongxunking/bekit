@@ -17,6 +17,7 @@ import org.bekit.service.service.ServiceExecutor;
 import org.bekit.service.service.ServicesHolder;
 import org.springframework.cglib.core.ReflectUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -43,7 +44,7 @@ public class DefaultServiceEngine implements ServiceEngine {
         // 校验order类型
         checkOrderClass(order, service);
         // 构建服务上下文
-        ServiceContext<O, R> serviceContext = new ServiceContext(order, newResult(service), attachment);
+        ServiceContext<O, R> serviceContext = new ServiceContext(order, newResult(service), reviseAttachment(attachment));
         // 执行服务
         executeService(service, serviceContext);
 
@@ -62,6 +63,11 @@ public class DefaultServiceEngine implements ServiceEngine {
     private Object newResult(String service) {
         ServiceExecutor serviceExecutor = servicesHolder.getRequiredServiceExecutor(service);
         return ReflectUtils.newInstance(serviceExecutor.getResultClass());
+    }
+
+    // 修正附件
+    private Map<Object, Object> reviseAttachment(Map<Object, Object> attachment) {
+        return attachment != null ? attachment : new HashMap<>();
     }
 
     // 执行服务

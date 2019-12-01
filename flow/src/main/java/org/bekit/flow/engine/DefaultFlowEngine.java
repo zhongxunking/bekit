@@ -16,6 +16,7 @@ import org.bekit.flow.transaction.FlowTxExecutor;
 import org.bekit.flow.transaction.FlowTxsHolder;
 import org.springframework.util.ClassUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -42,7 +43,7 @@ public class DefaultFlowEngine implements FlowEngine {
         // 校验目标对象类型
         checkClassOfTarget(target, flow);
         // 构造目标上下文
-        TargetContext<T> targetContext = new TargetContext(target, attachment);
+        TargetContext<T> targetContext = new TargetContext(target, reviseAttachment(attachment));
         // 执行流程
         executeFlow(flow, targetContext);
 
@@ -54,7 +55,7 @@ public class DefaultFlowEngine implements FlowEngine {
         // 校验目标对象类型
         checkClassOfTarget(target, flow);
         // 构造目标上下文
-        TargetContext<T> targetContext = new TargetContext(target, attachment);
+        TargetContext<T> targetContext = new TargetContext(target, reviseAttachment(attachment));
         // 执行插入目标对象
         executeInsertTarget(flow, targetContext);
 
@@ -66,7 +67,7 @@ public class DefaultFlowEngine implements FlowEngine {
         // 校验目标对象类型
         checkClassOfTarget(target, flow);
         // 构造目标上下文
-        TargetContext<T> targetContext = new TargetContext(target, attachment);
+        TargetContext<T> targetContext = new TargetContext(target, reviseAttachment(attachment));
         // 执行插入目标对象
         executeInsertTarget(flow, targetContext);
         // 执行流程
@@ -81,6 +82,11 @@ public class DefaultFlowEngine implements FlowEngine {
         if (!flowExecutor.getClassOfTarget().isAssignableFrom(target.getClass())) {
             throw new IllegalArgumentException(String.format("传入的目标对象的类型[%s]和流程%s期望的类型[%s]不匹配", ClassUtils.getShortName(target.getClass()), flowExecutor.getFlowName(), ClassUtils.getShortName(flowExecutor.getClassOfTarget())));
         }
+    }
+
+    // 修正附件
+    private Map<Object, Object> reviseAttachment(Map<Object, Object> attachment) {
+        return attachment != null ? attachment : new HashMap<>();
     }
 
     // 执行插入目标对象
