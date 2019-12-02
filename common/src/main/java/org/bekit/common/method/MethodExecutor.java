@@ -8,19 +8,20 @@
  */
 package org.bekit.common.method;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
  * 方法执行器
  */
+@AllArgsConstructor
+@Getter
 public abstract class MethodExecutor {
     // 目标方法
     private final Method targetMethod;
-
-    public MethodExecutor(Method targetMethod) {
-        this.targetMethod = targetMethod;
-    }
 
     /**
      * 执行方法
