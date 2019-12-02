@@ -14,9 +14,9 @@ import lombok.AllArgsConstructor;
  * 事务执行器
  */
 @AllArgsConstructor
-public class TransactionExecutor {
+public class TxExecutor {
     // 事务持有器
-    private final ThreadLocal<Object> transactionStatusHolder = new ThreadLocal<>();
+    private final ThreadLocal<Object> txStatusHolder = new ThreadLocal<>();
     // 事务管理器
     private final TransactionManager transactionManager;
     // 事务定义
@@ -27,13 +27,13 @@ public class TransactionExecutor {
      *
      * @throws IllegalStateException 如果已存在事务
      */
-    public void createTransaction() {
-        Object transactionStatus = transactionStatusHolder.get();
-        if (transactionStatus != null) {
+    public void createTx() {
+        Object txStatus = txStatusHolder.get();
+        if (txStatus != null) {
             throw new IllegalStateException("事务已存在，不能同时创建多个事务");
         }
-        transactionStatus = transactionManager.getTransaction(transactionType);
-        transactionStatusHolder.set(transactionStatus);
+        txStatus = transactionManager.getTransaction(transactionType);
+        txStatusHolder.set(txStatus);
     }
 
     /**
@@ -41,13 +41,13 @@ public class TransactionExecutor {
      *
      * @throws IllegalStateException 如果不存在事务
      */
-    public void commitTransaction() {
-        Object transactionStatus = transactionStatusHolder.get();
-        if (transactionStatus == null) {
+    public void commitTx() {
+        Object txStatus = txStatusHolder.get();
+        if (txStatus == null) {
             throw new IllegalStateException("事务不存在，无法提交事务");
         }
-        transactionStatusHolder.remove();
-        transactionManager.commit(transactionStatus);
+        txStatusHolder.remove();
+        transactionManager.commit(txStatus);
     }
 
     /**
@@ -55,12 +55,12 @@ public class TransactionExecutor {
      *
      * @throws IllegalStateException 如果不存在事务
      */
-    public void rollbackTransaction() {
-        Object transactionStatus = transactionStatusHolder.get();
-        if (transactionStatus == null) {
+    public void rollbackTx() {
+        Object txStatus = txStatusHolder.get();
+        if (txStatus == null) {
             throw new IllegalStateException("事务不存在，无法回滚事务");
         }
-        transactionStatusHolder.remove();
-        transactionManager.rollback(transactionStatus);
+        txStatusHolder.remove();
+        transactionManager.rollback(txStatus);
     }
 }
