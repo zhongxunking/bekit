@@ -27,7 +27,7 @@ public class TransactionExecutor {
      *
      * @throws IllegalStateException 如果已存在事务
      */
-    public void createTx() {
+    public void createTransaction() {
         Object transactionStatus = transactionStatusHolder.get();
         if (transactionStatus != null) {
             throw new IllegalStateException("事务已存在，不能同时创建多个事务");
@@ -41,7 +41,7 @@ public class TransactionExecutor {
      *
      * @throws IllegalStateException 如果不存在事务
      */
-    public void commitTx() {
+    public void commitTransaction() {
         Object transactionStatus = transactionStatusHolder.get();
         if (transactionStatus == null) {
             throw new IllegalStateException("事务不存在，无法提交事务");
@@ -55,7 +55,7 @@ public class TransactionExecutor {
      *
      * @throws IllegalStateException 如果不存在事务
      */
-    public void rollbackTx() {
+    public void rollbackTransaction() {
         Object transactionStatus = transactionStatusHolder.get();
         if (transactionStatus == null) {
             throw new IllegalStateException("事务不存在，无法回滚事务");
