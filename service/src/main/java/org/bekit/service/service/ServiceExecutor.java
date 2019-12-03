@@ -32,7 +32,7 @@ public class ServiceExecutor {
     @Getter
     private final Object service;
     // 服务阶段执行器Map（key：服务阶段注解的Class）
-    private final Map<Class, ServicePhaseExecutor> phaseExecutorMap;
+    private final Map<Class<?>, ServicePhaseExecutor> phaseExecutorMap;
     // 事务执行器
     private final TxExecutor txExecutor;
 
@@ -79,14 +79,14 @@ public class ServiceExecutor {
     /**
      * 获取Order的真实类型
      */
-    public Class getOrderClass() {
+    public Class<?> getOrderClass() {
         return phaseExecutorMap.get(ServiceExecute.class).getOrderClass();
     }
 
     /**
      * 获取Result的真实类型
      */
-    public Class getResultClass() {
+    public Class<?> getResultClass() {
         return phaseExecutorMap.get(ServiceExecute.class).getResultClass();
     }
 
@@ -96,11 +96,11 @@ public class ServiceExecutor {
     @Getter
     public static class ServicePhaseExecutor extends MethodExecutor {
         // ServiceContext泛型O的真实类型
-        private final Class orderClass;
+        private final Class<?> orderClass;
         // ServiceContext泛型R的真实类型
-        private final Class resultClass;
+        private final Class<?> resultClass;
 
-        public ServicePhaseExecutor(Method targetMethod, Class orderClass, Class resultClass) {
+        public ServicePhaseExecutor(Method targetMethod, Class<?> orderClass, Class<?> resultClass) {
             super(targetMethod);
             this.orderClass = orderClass;
             this.resultClass = resultClass;

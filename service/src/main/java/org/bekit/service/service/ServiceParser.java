@@ -37,7 +37,7 @@ import java.util.Map;
 @Slf4j
 public final class ServiceParser {
     // 服务阶段注解
-    private static final Class[] SERVICE_PHASE_ANNOTATIONS = {ServiceBefore.class, ServiceExecute.class, ServiceAfter.class};
+    private static final Class<? extends Annotation>[] SERVICE_PHASE_ANNOTATIONS = new Class[]{ServiceBefore.class, ServiceExecute.class, ServiceAfter.class};
 
     /**
      * 解析服务
@@ -62,17 +62,17 @@ public final class ServiceParser {
             txExecutor = new TxExecutor(transactionManager, TransactionManager.TransactionType.REQUIRED);
         }
         // 解析所有服务阶段
-        Map<Class, ServicePhaseExecutor> phaseExecutorMap = parsePhaseExecutorMap(serviceClass);
+        Map<Class<?>, ServicePhaseExecutor> phaseExecutorMap = parsePhaseExecutorMap(serviceClass);
 
         return new ServiceExecutor(serviceName, service, phaseExecutorMap, txExecutor);
     }
 
     // 解析所有服务阶段
-    private static Map<Class, ServicePhaseExecutor> parsePhaseExecutorMap(Class serviceClass) {
-        Map<Class, ServicePhaseExecutor> map = new HashMap<>();
+    private static Map<Class<?>, ServicePhaseExecutor> parsePhaseExecutorMap(Class serviceClass) {
+        Map<Class<?>, ServicePhaseExecutor> map = new HashMap<>();
         // 解析
         ReflectionUtils.doWithLocalMethods(serviceClass, method -> {
-            for (Class annotationClass : SERVICE_PHASE_ANNOTATIONS) {
+            for (Class<? extends Annotation> annotationClass : SERVICE_PHASE_ANNOTATIONS) {
                 Annotation annotation = AnnotatedElementUtils.findMergedAnnotation(method, annotationClass);
                 if (annotation != null) {
                     map.put(annotationClass, parseServicePhase(method));
@@ -81,8 +81,8 @@ public final class ServiceParser {
         });
         // 校验
         Assert.isTrue(map.containsKey(ServiceExecute.class), String.format("服务[%s]缺少@ServiceExecute类型方法", serviceClass));
-        Class orderClass = map.get(ServiceExecute.class).getOrderClass();
-        Class resultClass = map.get(ServiceExecute.class).getResultClass();
+        Class<?> orderClass = map.get(ServiceExecute.class).getOrderClass();
+        Class<?> resultClass = map.get(ServiceExecute.class).getResultClass();
         Assert.isTrue(ClassUtils.hasConstructor(resultClass), String.format("@ServiceExecute服务方法[%s]的参数ServiceContext的泛型[%s]必须得有默认构造函数", map.get(ServiceExecute.class).getTargetMethod(), resultClass));
         map.forEach((annotationClass, phaseExecutor) -> {
             Assert.isAssignable(phaseExecutor.getOrderClass(), orderClass, String.format("服务[%s]内的ServiceContext的泛型类型不统一", serviceClass));
@@ -98,7 +98,7 @@ public final class ServiceParser {
         // 校验方法类型
         Assert.isTrue(Modifier.isPublic(method.getModifiers()), String.format("服务方法[%s]必须是public类型", method));
         // 校验入参
-        Class[] parameterTypes = method.getParameterTypes();
+        Class<?>[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length != 1 || parameterTypes[0] != ServiceContext.class) {
             throw new IllegalArgumentException(String.format("服务方法[%s]的入参必须是(ServiceContext<O,R> context)", method));
         }
@@ -106,8 +106,8 @@ public final class ServiceParser {
         Assert.isTrue(method.getReturnType() == void.class, String.format("服务方法[%s]的返回类型必须是void", method));
         // 获取ServiceContext中泛型O、R的真实类型
         ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 0);
-        Class orderClass = resolvableType.getGeneric(0).resolve(Object.class);
-        Class resultClass = resolvableType.getGeneric(1).resolve(Object.class);
+        Class<?> orderClass = resolvableType.getGeneric(0).resolve(Object.class);
+        Class<?> resultClass = resolvableType.getGeneric(1).resolve(Object.class);
 
         return new ServicePhaseExecutor(method, orderClass, resultClass);
     }
