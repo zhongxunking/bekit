@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * BekitCommon配置
+ * bekit公共配置
  */
 @Configuration
 public class BekitCommonConfiguration {

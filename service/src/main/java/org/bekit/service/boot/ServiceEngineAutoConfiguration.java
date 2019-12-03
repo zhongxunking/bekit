@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
- * 服务引擎自动配置类
+ * 服务引擎自动配置
  */
 @Configuration
 @AutoConfigureAfter(EventBusAutoConfiguration.class)

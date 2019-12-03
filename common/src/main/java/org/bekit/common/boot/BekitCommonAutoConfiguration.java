@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
- * BekitCommon自动配置
+ * bekit公共自动配置
  */
 @Configuration
 @Import(BekitCommonConfiguration.class)

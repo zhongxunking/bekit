@@ -22,8 +22,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 
 /**
- * 服务引擎配置类
- * （非spring-boot项目需手动引入本配置类完成服务引擎配置）
+ * 服务引擎配置
  */
 @Configuration
 @Import({EventBusConfiguration.class, ServicesHolder.class})
