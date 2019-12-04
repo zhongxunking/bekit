@@ -8,29 +8,29 @@
  */
 package org.bekit.event.listener;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bekit.event.annotation.listener.Listen;
 import org.bekit.event.annotation.listener.Listener;
 import org.bekit.event.extension.EventTypeResolver;
 import org.bekit.event.extension.ListenResolver;
 import org.bekit.event.extension.ListenerType;
 import org.bekit.event.listener.ListenerExecutor.ListenExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.cglib.core.ReflectUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.util.ClassUtils;
+import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 监听器解析器
  */
-public class ListenerParser {
-    // 日志记录器
-    private static final Logger logger = LoggerFactory.getLogger(ListenerParser.class);
-
+@Slf4j
+public final class ListenerParser {
     /**
      * 解析监听器
      *
@@ -40,46 +40,49 @@ public class ListenerParser {
     public static ListenerExecutor parseListener(Object listener) {
         // 获取目标class（应对AOP代理情况）
         Class<?> listenerClass = AopUtils.getTargetClass(listener);
-        logger.debug("解析监听器：{}", ClassUtils.getQualifiedName(listenerClass));
-        // 此处得到的@Listener是已经经过@AliasFor属性别名进行属性同步后的结果
+        log.debug("解析监听器：{}", listenerClass);
         Listener listenerAnnotation = AnnotatedElementUtils.findMergedAnnotation(listenerClass, Listener.class);
-        // 创建监听器执行器
-        ListenerExecutor listenerExecutor = new ListenerExecutor(listenerAnnotation.type(), listenerAnnotation.priority(), listener, parseEventTypeResolver(listenerAnnotation.type()));
-        for (Method method : listenerClass.getDeclaredMethods()) {
-            Listen listenAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, Listen.class);
-            if (listenAnnotation != null) {
-                ListenExecutor listenExecutor = parseListen(listenAnnotation, method);
-                listenerExecutor.addListenExecutor(listenExecutor);
-            }
-        }
-        listenerExecutor.validate();
+        // 解析
+        EventTypeResolver resolver = parseEventTypeResolver(listenerAnnotation.type());
+        Map<Object, ListenExecutor> listenExecutorMap = parseListenExecutors(listenerClass);
 
-        return listenerExecutor;
+        return new ListenerExecutor(listenerAnnotation.type(), listenerAnnotation.priority(), listener, resolver, listenExecutorMap);
     }
 
     /**
      * 通过监听器类型解析得到事件类型解决器
      *
-     * @param clazz 监听器类型
+     * @param type 监听器类型
      */
-    public static EventTypeResolver parseEventTypeResolver(Class<? extends ListenerType> clazz) {
-        ListenerType listenerType = (ListenerType) ReflectUtils.newInstance(clazz);
+    public static EventTypeResolver parseEventTypeResolver(Class<? extends ListenerType> type) {
+        ListenerType listenerType = BeanUtils.instantiate(type);
         return listenerType.getResolver();
+    }
+
+    // 解析所有监听方法
+    private static Map<Object, ListenExecutor> parseListenExecutors(Class<?> listenerClass) {
+        Map<Object, ListenExecutor> map = new HashMap<>();
+        // 解析
+        ReflectionUtils.doWithLocalMethods(listenerClass, method -> {
+            Listen listenAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, Listen.class);
+            if (listenAnnotation != null) {
+                ListenExecutor listenExecutor = parseListen(listenAnnotation, method);
+                Assert.isTrue(!map.containsKey(listenExecutor.getEventType()), String.format("监听器[%s]存在监听同一个事件类型[%s]的多个方法", listenerClass, listenExecutor.getEventType()));
+                map.put(listenExecutor.getEventType(), listenExecutor);
+            }
+        });
+
+        return map;
     }
 
     // 解析监听方法
     private static ListenExecutor parseListen(Listen listenAnnotation, Method method) {
-        logger.debug("解析监听方法：{}", method);
-        // 校验方法类型
-        if (!Modifier.isPublic(method.getModifiers())) {
-            throw new IllegalArgumentException("监听方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
-        }
-        // 校验返回类型
-        if (method.getReturnType() != void.class) {
-            throw new IllegalArgumentException("监听方法" + ClassUtils.getQualifiedMethodName(method) + "的返回必须是void");
-        }
+        log.debug("解析监听方法：{}", method);
+        // 校验方法类型、返回类型
+        Assert.isTrue(Modifier.isPublic(method.getModifiers()), String.format("监听方法[%s]必须是public类型", method));
+        Assert.isTrue(method.getReturnType() == void.class, String.format("监听方法[%s]的返回必须是void", method));
         // 创建监听解决器
-        ListenResolver resolver = (ListenResolver) ReflectUtils.newInstance(listenAnnotation.resolver());
+        ListenResolver resolver = BeanUtils.instantiate(listenAnnotation.resolver());
         resolver.init(method);
 
         return new ListenExecutor(resolver, listenAnnotation.priorityAsc(), method);

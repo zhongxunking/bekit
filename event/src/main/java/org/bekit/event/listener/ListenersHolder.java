@@ -9,10 +9,10 @@
 package org.bekit.event.listener;
 
 import org.bekit.event.annotation.listener.Listener;
+import org.bekit.event.extension.ListenerType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ClassUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -25,9 +25,9 @@ public class ListenersHolder {
     @Autowired
     private ApplicationContext applicationContext;
     // 监听器执行器Map（key：监听器的类型）
-    private final Map<Class, List<ListenerExecutor>> listenerExecutorsMap = new HashMap<>();
+    private final Map<Class<? extends ListenerType>, Set<ListenerExecutor>> listenerExecutorsMap = new HashMap<>();
 
-    // 初始化（查询spring容器中所有的@Listener监听器并解析，spring自动执行）
+    // 初始化
     @PostConstruct
     public void init() {
         String[] beanNames = applicationContext.getBeanNamesForAnnotation(Listener.class);
@@ -35,11 +35,7 @@ public class ListenersHolder {
             // 解析监听器
             ListenerExecutor listenerExecutor = ListenerParser.parseListener(applicationContext.getBean(beanName));
             // 将执行器放入持有器中
-            List<ListenerExecutor> listenerExecutors = listenerExecutorsMap.get(listenerExecutor.getType());
-            if (listenerExecutors == null) {
-                listenerExecutors = new ArrayList<>();
-                listenerExecutorsMap.put(listenerExecutor.getType(), listenerExecutors);
-            }
+            Set<ListenerExecutor> listenerExecutors = listenerExecutorsMap.computeIfAbsent(listenerExecutor.getType(), type -> new HashSet<>());
             listenerExecutors.add(listenerExecutor);
         }
     }
@@ -47,20 +43,20 @@ public class ListenersHolder {
     /**
      * 获取所有的监听器类型
      */
-    public Set<Class> getTypes() {
-        return listenerExecutorsMap.keySet();
+    public Set<Class<? extends ListenerType>> getListenerTypes() {
+        return Collections.unmodifiableSet(listenerExecutorsMap.keySet());
     }
 
     /**
      * 获取指定类型的监听器执行器
      *
-     * @param type 监听器类型
-     * @throws IllegalArgumentException 如果不存在该类型的监听器执行器
+     * @param listenerType 监听器类型
      */
-    public List<ListenerExecutor> getRequiredListenerExecutors(Class type) {
-        if (!listenerExecutorsMap.containsKey(type)) {
-            throw new IllegalArgumentException("不存在" + ClassUtils.getShortName(type) + "类型的监听器");
+    public Set<ListenerExecutor> getListenerExecutors(Class<? extends ListenerType> listenerType) {
+        Set<ListenerExecutor> listenerExecutors = listenerExecutorsMap.get(listenerType);
+        if (listenerExecutors == null) {
+            listenerExecutors = new HashSet<>();
         }
-        return listenerExecutorsMap.get(type);
+        return listenerExecutors;
     }
 }
