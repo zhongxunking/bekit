@@ -9,12 +9,11 @@
 package org.bekit.event.extension.support;
 
 import org.bekit.event.extension.EventTypeResolver;
-import org.bekit.event.extension.ListenerType;
 
 /**
- * biz监听器类型
+ * 监听器类型
  */
-public class BizListenerType implements ListenerType {
+public class ListenerType implements org.bekit.event.extension.ListenerType {
     @Override
     public EventTypeResolver getResolver() {
         return ClassEventTypeResolver.INSTANCE;

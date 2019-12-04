@@ -8,24 +8,22 @@
  */
 package org.bekit.event.annotation;
 
-import org.bekit.event.annotation.listener.Listener;
-import org.bekit.event.extension.support.BizListenerType;
+import org.bekit.event.extension.support.ListenerType;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
 /**
- * 业务监听器
+ * 监听器
  */
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Listener(type = BizListenerType.class)
-public @interface BizListener {
+@org.bekit.event.annotation.listener.Listener(type = ListenerType.class, priority = Integer.MAX_VALUE)
+public @interface Listener {
     /**
      * 优先级
-     * （具体执行顺序需要结合@Listen注解的priorityAsc属性共同决定）
      */
-    @AliasFor(annotation = Listener.class, attribute = "priority")
+    @AliasFor(annotation = org.bekit.event.annotation.listener.Listener.class, attribute = "priority")
     int priority() default Integer.MAX_VALUE;
 }

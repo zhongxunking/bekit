@@ -55,12 +55,12 @@ public class ListenerExecutor {
     /**
      * 获取指定优先级顺序的监听事件类型
      *
-     * @param priorityAsc 是否优先级升序（true：升序，false：降序）
+     * @param priorityType 优先级类型
      */
-    public Set<Object> getEventTypes(boolean priorityAsc) {
+    public Set<Object> getEventTypes(PriorityType priorityType) {
         Set<Object> eventTypes = new HashSet<>();
         listenExecutorMap.forEach((eventType, listenExecutor) -> {
-            if (listenExecutor.isPriorityAsc() == priorityAsc) {
+            if (listenExecutor.getPriorityType() == priorityType) {
                 eventTypes.add(eventType);
             }
         });
@@ -75,12 +75,12 @@ public class ListenerExecutor {
         private final ListenResolver resolver;
         // 是否优先级升序
         @Getter
-        private final boolean priorityAsc;
+        private final PriorityType priorityType;
 
-        public ListenExecutor(ListenResolver resolver, boolean priorityAsc, Method targetMethod) {
+        public ListenExecutor(ListenResolver resolver, PriorityType priorityType, Method targetMethod) {
             super(targetMethod);
             this.resolver = resolver;
-            this.priorityAsc = priorityAsc;
+            this.priorityType = priorityType;
         }
 
         /**

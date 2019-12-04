@@ -85,6 +85,6 @@ public final class ListenerParser {
         ListenResolver resolver = BeanUtils.instantiate(listenAnnotation.resolver());
         resolver.init(method);
 
-        return new ListenExecutor(resolver, listenAnnotation.priorityAsc(), method);
+        return new ListenExecutor(resolver, listenAnnotation.priorityType(), method);
     }
 }

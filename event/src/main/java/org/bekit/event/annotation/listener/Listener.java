@@ -28,7 +28,6 @@ public @interface Listener {
 
     /**
      * 优先级
-     * （具体执行顺序需要结合@Listen注解的priorityAsc属性共同决定）
      */
-    int priority() default Integer.MAX_VALUE;
+    int priority();
 }
