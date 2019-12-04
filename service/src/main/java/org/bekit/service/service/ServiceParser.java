@@ -95,15 +95,14 @@ public final class ServiceParser {
     // 解析服务阶段
     private static ServicePhaseExecutor parseServicePhase(Method method) {
         log.debug("解析服务方法：{}", method);
-        // 校验方法类型
+        // 校验方法类型、返回类型
         Assert.isTrue(Modifier.isPublic(method.getModifiers()), String.format("服务方法[%s]必须是public类型", method));
+        Assert.isTrue(method.getReturnType() == void.class, String.format("服务方法[%s]的返回类型必须是void", method));
         // 校验入参
         Class<?>[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length != 1 || parameterTypes[0] != ServiceContext.class) {
             throw new IllegalArgumentException(String.format("服务方法[%s]的入参必须是(ServiceContext<O,R> context)", method));
         }
-        // 校验返回类型
-        Assert.isTrue(method.getReturnType() == void.class, String.format("服务方法[%s]的返回类型必须是void", method));
         // 获取ServiceContext中泛型O、R的真实类型
         ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 0);
         Class<?> orderClass = resolvableType.getGeneric(0).resolve(Object.class);
