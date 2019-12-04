@@ -50,7 +50,7 @@ public final class ServiceParser {
         // 获取目标class（应对AOP代理情况）
         Class<?> serviceClass = AopUtils.getTargetClass(service);
         log.debug("解析服务：{}", serviceClass);
-        Service serviceAnnotation = serviceClass.getAnnotation(Service.class);
+        Service serviceAnnotation = AnnotatedElementUtils.findMergedAnnotation(serviceClass, Service.class);
         // 获取服务名称
         String serviceName = serviceAnnotation.name();
         if (StringUtils.isEmpty(serviceName)) {

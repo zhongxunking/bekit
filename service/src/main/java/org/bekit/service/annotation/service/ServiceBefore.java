@@ -14,7 +14,7 @@ import java.lang.annotation.*;
  * 服务前置处理（执行中不会有事务）
  */
 @Documented
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ServiceBefore {
 }
