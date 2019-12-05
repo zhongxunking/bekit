@@ -32,11 +32,11 @@ public class EventBusesHolder {
     // 初始化（根据监听器类型创建相应类型的事件总线，spring自动执行）
     @PostConstruct
     public void init() {
-        for (Class type : listenersHolder.getTypes()) {
+        for (Class<? extends ListenerType> listenerType : listenersHolder.getListenerTypes()) {
             // 初始化事件总线
-            EventBus eventBus = getEventBus(type);
-            for (ListenerExecutor listenerExecutor : listenersHolder.getRequiredListenerExecutors(type)) {
-                eventBus.register(listenerExecutor);
+            EventBus eventBus = getEventBus(listenerType);
+            for (ListenerExecutor listenerExecutor : listenersHolder.getListenerExecutors(listenerType)) {
+                eventBus.addListenerExecutor(listenerExecutor);
             }
         }
     }

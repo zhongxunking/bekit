@@ -8,85 +8,134 @@
  */
 package org.bekit.event.bus;
 
+import lombok.RequiredArgsConstructor;
 import org.bekit.event.extension.EventTypeResolver;
 import org.bekit.event.listener.ListenerExecutor;
+import org.bekit.event.listener.PriorityType;
 
 import java.util.*;
 
 /**
  * 事件总线
  */
+@RequiredArgsConstructor
 public class EventBus {
-    // 监听器执行器
-    private final List<ListenerExecutor> listenerExecutors = new ArrayList<>();
-    // 监听器执行器缓存（key：事件类型）
-    private Map<Object, List<ListenerExecutor>> listenerExecutorsCache = new HashMap<>();
     // 事件类型解决器
-    private final EventTypeResolver resolver;
-
-    public EventBus(EventTypeResolver resolver) {
-        this.resolver = resolver;
-    }
-
-    /**
-     * 注册监听器
-     *
-     * @param listenerExecutor 监听器执行器
-     */
-    public void register(ListenerExecutor listenerExecutor) {
-        listenerExecutors.add(listenerExecutor);
-        Collections.sort(listenerExecutors);
-        refreshListenerCache();
-    }
+    private final EventTypeResolver eventTypeResolver;
+    // 所有监听器执行器
+    private final Set<ListenerExecutor> listenerExecutors = new HashSet<>();
+    // 分发器
+    private Dispatcher dispatcher = new Dispatcher();
 
     /**
-     * 分派事件
-     * （先执行优先级升序，再执行优先级降序）
+     * 分发事件
      *
      * @param event 事件
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
     public void dispatch(Object event) throws Throwable {
-        // 获取该事件类型的监听器缓存
-        List<ListenerExecutor> theListenerExecutors = listenerExecutorsCache.get(resolver.resolve(event));
-        if (theListenerExecutors != null) {
-            // 执行监听器
-            for (ListenerExecutor listenerExecutor : theListenerExecutors) {
-                listenerExecutor.execute(event);
-            }
+        dispatcher.dispatch(event);
+    }
+
+    /**
+     * 添加监听器执行器
+     *
+     * @param listenerExecutor 监听器执行器
+     */
+    public synchronized void addListenerExecutor(ListenerExecutor listenerExecutor) {
+        if (!listenerExecutors.contains(listenerExecutor)) {
+            listenerExecutors.add(listenerExecutor);
+            dispatcher = dispatcher.addExecutor(listenerExecutor);
         }
     }
 
-    // 刷新监听器缓存
-    private void refreshListenerCache() {
-        Map<Object, List<ListenerExecutor>> cache = new HashMap<>();
-        // 获取本总线所有的事件类型
-        Set<Object> eventTypes = new HashSet<>();
-        for (ListenerExecutor listenerExecutor : listenerExecutors) {
-            eventTypes.addAll(listenerExecutor.getEventTypes(true));
-            eventTypes.addAll(listenerExecutor.getEventTypes(false));
+    /**
+     * 移除监听器执行器
+     *
+     * @param listenerExecutor 监听器
+     */
+    public synchronized void removeListenerExecutor(ListenerExecutor listenerExecutor) {
+        if (listenerExecutors.contains(listenerExecutor)) {
+            listenerExecutors.remove(listenerExecutor);
+            dispatcher = dispatcher.removeExecutor(listenerExecutor);
         }
-        // 根据事件类型设置缓存
-        for (Object eventType : eventTypes) {
-            // 特定事件类型的监听器缓存
-            List<ListenerExecutor> theListenerExecutors = new ArrayList<>();
-            // 获取指定事件类型的升序监听器
-            for (ListenerExecutor listenerExecutor : listenerExecutors) {
-                if (listenerExecutor.getEventTypes(true).contains(eventType)) {
-                    theListenerExecutors.add(listenerExecutor);
+    }
+
+    // 分发器
+    private class Dispatcher {
+        // 升序队列
+        private Map<Object, List<ListenerExecutor>> asc = new HashMap<>();
+        // 降序队列
+        private Map<Object, List<ListenerExecutor>> desc = new HashMap<>();
+
+        // 分发事件
+        void dispatch(Object event) throws Throwable {
+            Object eventType = eventTypeResolver.resolve(event);
+            // 向升序队列分发事件
+            doDispatch(asc.get(eventType), event);
+            // 向降序队列分发事件
+            doDispatch(desc.get(eventType), event);
+        }
+
+        // 执行分发事件
+        private void doDispatch(List<ListenerExecutor> executors, Object event) throws Throwable {
+            if (executors != null) {
+                for (ListenerExecutor executor : executors) {
+                    executor.execute(event);
                 }
             }
-            // 获取指定事件类型的降序监听器
-            for (int i = listenerExecutors.size() - 1; i >= 0; i--) {
-                ListenerExecutor listenerExecutor = listenerExecutors.get(i);
-                if (listenerExecutor.getEventTypes(false).contains(eventType)) {
-                    theListenerExecutors.add(listenerExecutor);
-                }
-            }
-            // 设置缓存
-            cache.put(eventType, theListenerExecutors);
         }
-        // 刷新缓存
-        listenerExecutorsCache = cache;
+
+        // 新增监听器执行器（返回新的分发器）
+        Dispatcher addExecutor(ListenerExecutor executor) {
+            Dispatcher nextDispatcher = copy();
+            // 调整升序队列
+            doAddExecutor(nextDispatcher.asc, executor, PriorityType.ASC, Comparator.comparingInt(ListenerExecutor::getPriority));
+            // 调整降序队列
+            doAddExecutor(nextDispatcher.desc, executor, PriorityType.DESC, (left, right) -> right.getPriority() - left.getPriority());
+
+            return nextDispatcher;
+        }
+
+        // 执行新增监听器执行器
+        void doAddExecutor(Map<Object, List<ListenerExecutor>> executorsMap, ListenerExecutor executor, PriorityType priorityType, Comparator<ListenerExecutor> comparator) {
+            for (Object eventType : executor.getEventTypes(priorityType)) {
+                List<ListenerExecutor> executors = executorsMap.computeIfAbsent(eventType, k -> new ArrayList<>());
+                executors.add(executor);
+                executors.sort(comparator);
+            }
+        }
+
+        // 删除监听器执行器（返回新的分发器）
+        Dispatcher removeExecutor(ListenerExecutor executor) {
+            Dispatcher nextDispatcher = copy();
+            // 调整升序队列
+            doRemoveExecutor(nextDispatcher.asc, executor, PriorityType.ASC);
+            // 调整降序队列
+            doRemoveExecutor(nextDispatcher.desc, executor, PriorityType.DESC);
+
+            return nextDispatcher;
+        }
+
+        // 执行监听器执行器
+        private void doRemoveExecutor(Map<Object, List<ListenerExecutor>> executorsMap, ListenerExecutor executor, PriorityType priorityType) {
+            for (Object eventType : executor.getEventTypes(priorityType)) {
+                executorsMap.computeIfPresent(eventType, (k, executors) -> {
+                    executors.remove(executor);
+                    if (executors.isEmpty()) {
+                        executors = null;
+                    }
+                    return executors;
+                });
+            }
+        }
+
+        // 深度复制
+        private Dispatcher copy() {
+            Dispatcher newDispatcher = new Dispatcher();
+            asc.forEach((eventType, executors) -> newDispatcher.asc.put(eventType, new ArrayList<>(executors)));
+            desc.forEach((eventType, executors) -> newDispatcher.desc.put(eventType, new ArrayList<>(executors)));
+            return newDispatcher;
+        }
     }
 }
