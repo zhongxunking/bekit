@@ -8,22 +8,23 @@
  */
 package org.bekit.event.annotation;
 
-import org.bekit.event.extension.support.ListenerType;
+import org.bekit.event.annotation.listener.Listener;
+import org.bekit.event.extension.support.DomainListenerType;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
 /**
- * 监听器
+ * 领域监听器
  */
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@org.bekit.event.annotation.listener.Listener(type = ListenerType.class, priority = Integer.MAX_VALUE)
-public @interface Listener {
+@Listener(type = DomainListenerType.class, priority = Integer.MAX_VALUE)
+public @interface DomainListener {
     /**
      * 优先级
      */
-    @AliasFor(annotation = org.bekit.event.annotation.listener.Listener.class, attribute = "priority")
+    @AliasFor(annotation = Listener.class, attribute = "priority")
     int priority() default Integer.MAX_VALUE;
 }
