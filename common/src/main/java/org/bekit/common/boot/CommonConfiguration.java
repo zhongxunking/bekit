@@ -13,33 +13,37 @@ import org.bekit.common.transaction.support.EmptyTransactionManager;
 import org.bekit.common.transaction.support.SpringTransactionManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * bekit公共配置
+ * 公共配置
  */
 @Configuration
-public class BekitCommonConfiguration {
+public class CommonConfiguration {
     /**
-     * Bekit事务配置
+     * 事务配置
      */
     @Configuration
     @ConditionalOnMissingBean(TransactionManager.class)
-    public static class BekitTransactionManagerConfiguration {
-        // Spring事务管理器
-        @Bean
+    public static class TransactionManagerConfiguration {
+        /**
+         * Spring事务管理器配置
+         */
+        @Configuration
         @ConditionalOnBean(PlatformTransactionManager.class)
-        public TransactionManager bekitSpringTransactionManager(PlatformTransactionManager transactionManager) {
-            return new SpringTransactionManager(transactionManager);
+        @Import(SpringTransactionManager.class)
+        public static class SpringTransactionManagerConfiguration {
         }
 
-        // 空事务管理器
-        @Bean
+        /**
+         * 空事务管理器配置
+         */
+        @Configuration
         @ConditionalOnMissingBean(PlatformTransactionManager.class)
-        public TransactionManager bekitEmptyTransactionManager() {
-            return new EmptyTransactionManager();
+        @Import(EmptyTransactionManager.class)
+        public static class EmptyTransactionManagerConfiguration {
         }
     }
 }
