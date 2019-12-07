@@ -8,15 +8,16 @@
  */
 package org.bekit.event.boot;
 
+import org.bekit.common.boot.CommonAutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
- * 事件总线自动配置类
+ * 事件总线自动配置
  */
 @Configuration
+@AutoConfigureAfter(CommonAutoConfiguration.class)
 @Import(EventBusConfiguration.class)
 public class EventBusAutoConfiguration {
-    // 事件总线由EventBusConfiguration进行配置
-    // 本配置类的作用就是在spring-boot项目中自动导入EventBusConfiguration
 }
