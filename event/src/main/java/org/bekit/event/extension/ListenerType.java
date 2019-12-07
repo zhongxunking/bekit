@@ -9,7 +9,7 @@
 package org.bekit.event.extension;
 
 /**
- * 监听器类型
+ * 监听器类型（实现类需具有默认构造方法）
  */
 public interface ListenerType {
     /**
