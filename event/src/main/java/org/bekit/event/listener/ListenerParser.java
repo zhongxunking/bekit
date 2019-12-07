@@ -76,15 +76,15 @@ public final class ListenerParser {
     }
 
     // 解析监听方法
-    private static ListenExecutor parseListen(Listen listenAnnotation, Method method) {
-        log.debug("解析监听方法：{}", method);
+    private static ListenExecutor parseListen(Listen listenAnnotation, Method listenMethod) {
+        log.debug("解析监听方法：{}", listenMethod);
         // 校验方法类型、返回类型
-        Assert.isTrue(Modifier.isPublic(method.getModifiers()), String.format("监听方法[%s]必须是public类型", method));
-        Assert.isTrue(method.getReturnType() == void.class, String.format("监听方法[%s]的返回必须是void", method));
+        Assert.isTrue(Modifier.isPublic(listenMethod.getModifiers()), String.format("监听方法[%s]必须是public类型", listenMethod));
+        Assert.isTrue(listenMethod.getReturnType() == void.class, String.format("监听方法[%s]的返回必须是void", listenMethod));
         // 创建监听解决器
         ListenResolver resolver = BeanUtils.instantiate(listenAnnotation.resolver());
-        resolver.init(method);
+        resolver.init(listenMethod);
 
-        return new ListenExecutor(resolver, listenAnnotation.priorityType(), method);
+        return new ListenExecutor(resolver, listenAnnotation.priorityType(), listenMethod);
     }
 }

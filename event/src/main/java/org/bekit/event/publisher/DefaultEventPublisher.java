@@ -8,20 +8,18 @@
  */
 package org.bekit.event.publisher;
 
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.bekit.event.EventPublisher;
 import org.bekit.event.bus.EventBus;
 
 /**
- * 事件发布器默认实现类
+ * 事件发布器的默认实现
  */
+@AllArgsConstructor
 public class DefaultEventPublisher implements EventPublisher {
     // 事件总线
     private final EventBus eventBus;
-
-    public DefaultEventPublisher(EventBus eventBus) {
-        this.eventBus = eventBus;
-    }
 
     @Override
     public void publish(Object event) {

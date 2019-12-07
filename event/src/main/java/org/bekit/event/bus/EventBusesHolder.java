@@ -29,7 +29,7 @@ public class EventBusesHolder {
     // 事件总线Map（key：总线类型）
     private final Map<Class, EventBus> eventBusMap = new HashMap<>();
 
-    // 初始化（根据监听器类型创建相应类型的事件总线，spring自动执行）
+    // 初始化（根据监听器类型创建相应类型的事件总线）
     @PostConstruct
     public void init() {
         for (Class<? extends ListenerType> listenerType : listenersHolder.getListenerTypes()) {
@@ -42,8 +42,7 @@ public class EventBusesHolder {
     }
 
     /**
-     * 获取事件总线
-     * （如果不存在该类型的事件总线，则新创建一个）
+     * 获取事件总线（如果不存在该类型的事件总线，则新创建一个）
      *
      * @param type 总线类型
      */

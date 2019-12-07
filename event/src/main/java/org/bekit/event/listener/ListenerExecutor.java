@@ -77,8 +77,8 @@ public class ListenerExecutor {
         @Getter
         private final PriorityType priorityType;
 
-        public ListenExecutor(ListenResolver resolver, PriorityType priorityType, Method targetMethod) {
-            super(targetMethod);
+        public ListenExecutor(ListenResolver resolver, PriorityType priorityType, Method listenMethod) {
+            super(listenMethod);
             this.resolver = resolver;
             this.priorityType = priorityType;
         }
