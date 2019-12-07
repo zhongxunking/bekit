@@ -98,7 +98,7 @@ public class EventBus {
         }
 
         // 执行新增监听器执行器
-        void doAddExecutor(Map<Object, List<ListenerExecutor>> executorsMap, ListenerExecutor executor, PriorityType priorityType, Comparator<ListenerExecutor> comparator) {
+        private void doAddExecutor(Map<Object, List<ListenerExecutor>> executorsMap, ListenerExecutor executor, PriorityType priorityType, Comparator<ListenerExecutor> comparator) {
             for (Object eventType : executor.getEventTypes(priorityType)) {
                 List<ListenerExecutor> executors = executorsMap.computeIfAbsent(eventType, k -> new ArrayList<>());
                 executors.add(executor);
