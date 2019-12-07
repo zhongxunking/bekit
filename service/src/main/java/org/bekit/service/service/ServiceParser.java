@@ -83,7 +83,7 @@ public final class ServiceParser {
         Assert.isTrue(map.containsKey(ServiceExecute.class), String.format("服务[%s]缺少@ServiceExecute类型方法", serviceClass));
         Class<?> orderClass = map.get(ServiceExecute.class).getOrderClass();
         Class<?> resultClass = map.get(ServiceExecute.class).getResultClass();
-        Assert.isTrue(ClassUtils.hasConstructor(resultClass), String.format("@ServiceExecute服务方法[%s]的参数ServiceContext的泛型[%s]必须得有默认构造函数", map.get(ServiceExecute.class).getTargetMethod(), resultClass));
+        Assert.isTrue(ClassUtils.hasConstructor(resultClass), String.format("@ServiceExecute服务方法[%s]的参数ServiceContext的泛型[%s]必须得有默认构造函数", map.get(ServiceExecute.class).getMethod(), resultClass));
         map.forEach((annotationClass, phaseExecutor) -> {
             Assert.isAssignable(phaseExecutor.getOrderClass(), orderClass, String.format("服务[%s]内的ServiceContext的泛型类型不统一", serviceClass));
             Assert.isAssignable(phaseExecutor.getResultClass(), resultClass, String.format("服务[%s]内的ServiceContext的泛型类型不统一", serviceClass));
@@ -92,22 +92,22 @@ public final class ServiceParser {
         return map;
     }
 
-    // 解析服务阶段
-    private static ServicePhaseExecutor parseServicePhase(Method method) {
-        log.debug("解析服务方法：{}", method);
+    // 解析服务阶段方法
+    private static ServicePhaseExecutor parseServicePhase(Method servicePhaseMethod) {
+        log.debug("解析服务方法：{}", servicePhaseMethod);
         // 校验方法类型、返回类型
-        Assert.isTrue(Modifier.isPublic(method.getModifiers()), String.format("服务方法[%s]必须是public类型", method));
-        Assert.isTrue(method.getReturnType() == void.class, String.format("服务方法[%s]的返回类型必须是void", method));
+        Assert.isTrue(Modifier.isPublic(servicePhaseMethod.getModifiers()), String.format("服务方法[%s]必须是public类型", servicePhaseMethod));
+        Assert.isTrue(servicePhaseMethod.getReturnType() == void.class, String.format("服务方法[%s]的返回类型必须是void", servicePhaseMethod));
         // 校验入参
-        Class<?>[] parameterTypes = method.getParameterTypes();
+        Class<?>[] parameterTypes = servicePhaseMethod.getParameterTypes();
         if (parameterTypes.length != 1 || parameterTypes[0] != ServiceContext.class) {
-            throw new IllegalArgumentException(String.format("服务方法[%s]的入参必须是(ServiceContext<O,R> context)", method));
+            throw new IllegalArgumentException(String.format("服务方法[%s]的入参必须是(ServiceContext<O,R> context)", servicePhaseMethod));
         }
         // 获取ServiceContext中泛型O、R的真实类型
-        ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 0);
+        ResolvableType resolvableType = ResolvableType.forMethodParameter(servicePhaseMethod, 0);
         Class<?> orderClass = resolvableType.getGeneric(0).resolve(Object.class);
         Class<?> resultClass = resolvableType.getGeneric(1).resolve(Object.class);
 
-        return new ServicePhaseExecutor(method, orderClass, resultClass);
+        return new ServicePhaseExecutor(servicePhaseMethod, orderClass, resultClass);
     }
 }

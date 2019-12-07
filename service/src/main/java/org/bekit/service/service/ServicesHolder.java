@@ -60,9 +60,10 @@ public class ServicesHolder {
      * @throws IllegalArgumentException 如果不存在该服务
      */
     public ServiceExecutor getRequiredServiceExecutor(String service) {
-        if (!serviceExecutorMap.containsKey(service)) {
-            throw new IllegalArgumentException("不存在服务" + service);
+        ServiceExecutor serviceExecutor = serviceExecutorMap.get(service);
+        if (serviceExecutor == null) {
+            throw new IllegalArgumentException(String.format("服务[%s]不存在", service));
         }
-        return serviceExecutorMap.get(service);
+        return serviceExecutor;
     }
 }

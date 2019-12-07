@@ -100,8 +100,8 @@ public class ServiceExecutor {
         // ServiceContext泛型R的真实类型
         private final Class<?> resultClass;
 
-        public ServicePhaseExecutor(Method targetMethod, Class<?> orderClass, Class<?> resultClass) {
-            super(targetMethod);
+        public ServicePhaseExecutor(Method servicePhaseMethod, Class<?> orderClass, Class<?> resultClass) {
+            super(servicePhaseMethod);
             this.orderClass = orderClass;
             this.resultClass = resultClass;
         }
