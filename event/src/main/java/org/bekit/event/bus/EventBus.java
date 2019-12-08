@@ -117,7 +117,7 @@ public class EventBus {
             return nextDispatcher;
         }
 
-        // 执行监听器执行器
+        // 执行删除监听器执行器
         private void doRemoveExecutor(Map<Object, List<ListenerExecutor>> executorsMap, ListenerExecutor executor, PriorityType priorityType) {
             for (Object eventType : executor.getEventTypes(priorityType)) {
                 executorsMap.computeIfPresent(eventType, (k, executors) -> {
@@ -133,9 +133,18 @@ public class EventBus {
         // 深度复制
         private Dispatcher copy() {
             Dispatcher newDispatcher = new Dispatcher();
-            asc.forEach((eventType, executors) -> newDispatcher.asc.put(eventType, new ArrayList<>(executors)));
-            desc.forEach((eventType, executors) -> newDispatcher.desc.put(eventType, new ArrayList<>(executors)));
+            doCopy(asc, newDispatcher.asc);
+            doCopy(desc, newDispatcher.desc);
             return newDispatcher;
+        }
+
+        // 执行深度复制
+        private void doCopy(Map<Object, List<ListenerExecutor>> source, Map<Object, List<ListenerExecutor>> target) {
+            source.forEach((eventType, executors) -> {
+                List<ListenerExecutor> newExecutors = new ArrayList<>(executors.size() + 1);
+                newExecutors.addAll(executors);
+                target.put(eventType, newExecutors);
+            });
         }
     }
 }
