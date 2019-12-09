@@ -24,6 +24,8 @@ public class SpringTransactionManager implements TransactionManager {
     private static final TransactionDefinition REQUIRED_DEFINITION = new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_REQUIRED);
     // 新事务类型定义
     private static final TransactionDefinition REQUIRES_NEW_DEFINITION = new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+    // 无事务类型定义
+    private static final TransactionDefinition NOT_SUPPORTED_DEFINITION = new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_NOT_SUPPORTED);
 
     // 事务管理器
     private final PlatformTransactionManager transactionManager;
@@ -37,6 +39,9 @@ public class SpringTransactionManager implements TransactionManager {
                 break;
             case REQUIRES_NEW:
                 definition = REQUIRES_NEW_DEFINITION;
+                break;
+            case NOT_SUPPORTED:
+                definition = NOT_SUPPORTED_DEFINITION;
                 break;
             default:
                 throw new IllegalArgumentException("type不能为null");

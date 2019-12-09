@@ -38,9 +38,11 @@ public interface TransactionManager {
      * 事务类型
      */
     enum TransactionType {
-        // 融合事务（如果已存在事务，则使用已有事务；否则创建新事务）
+        // 融合事务（如果已存在事务，则使用已存在事务；否则创建新事务）
         REQUIRED,
         // 新事务（不管是否已存在事务，都创建新事务）
-        REQUIRES_NEW
+        REQUIRES_NEW,
+        // 无事务（如果已存在事务，则挂起已存在事务；否则不做处理）
+        NOT_SUPPORTED
     }
 }
