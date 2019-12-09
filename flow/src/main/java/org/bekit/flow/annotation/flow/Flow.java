@@ -32,9 +32,4 @@ public @interface Flow {
      * 流程名称（默认使用被注解的类名，首字母小写）
      */
     String name() default "";
-
-    /**
-     * 是否开启流程事务（默认开启）
-     */
-    boolean enableFlowTx() default true;
 }

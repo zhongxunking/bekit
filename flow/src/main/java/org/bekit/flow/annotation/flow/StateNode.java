@@ -20,10 +20,10 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Node(newTx = true)
+@Node(name = "", processor = "", autoExecute = true, newTx = true)
 public @interface StateNode {
     /**
-     * 节点名称（默认使用被注解的函数名，在一个流程内节点名称需唯一）
+     * 节点名称（默认使用被注解的函数名）
      */
     @AliasFor(annotation = Node.class, attribute = "name")
     String name() default "";
