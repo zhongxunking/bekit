@@ -4,25 +4,24 @@
 
 /*
  * 修订记录:
- * @author 钟勋 2016-12-28 23:21 创建
+ * @author 钟勋 2019-12-15 22:19 创建
  */
-package org.bekit.flow.annotation.transaction;
+package org.bekit.flow.annotation.locker;
 
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
 
 /**
- * 流程事务
- * （一个流程最多能有一个流程事务类）
+ * 流程加锁器
  */
-@Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 @Component
-public @interface FlowTx {
+public @interface FlowLocker {
     /**
-     * 对应的流程
+     * 加锁的流程
      */
     String flow();
 }

@@ -10,6 +10,7 @@ package org.bekit.flow.annotation.listener;
 
 import org.bekit.event.annotation.listener.Listener;
 import org.bekit.flow.listener.FlowListenerType;
+import org.bekit.flow.listener.TheFlowListenerType;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
@@ -21,7 +22,7 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Listener(type = FlowListenerType.class)
+@Listener(type = TheFlowListenerType.class)
 public @interface FlowListener {
     /**
      * 优先级

@@ -6,7 +6,7 @@
  * 修订记录:
  * @author 钟勋 2016-12-28 20:59 创建
  */
-package org.bekit.flow.annotation.flow;
+package org.bekit.flow.annotation.mapper;
 
 import java.lang.annotation.*;
 
@@ -19,5 +19,5 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TargetMapping {
+public @interface MappingNode {
 }

@@ -4,30 +4,25 @@
 
 /*
  * 修订记录:
- * @author 钟勋 2017-04-04 16:19 创建
+ * @author 钟勋 2017-04-04 20:45 创建
  */
 package org.bekit.flow.annotation.listener;
 
 import org.bekit.event.annotation.listener.Listener;
-import org.bekit.flow.listener.TheFlowListenerType;
+import org.bekit.flow.listener.FlowListenerType;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
 /**
- * 特定流程监听器
- * （监听的是某一个特定流程发生的事件，配合@ListenNodeDecide、@ListenFlowException一起使用）
+ * 流程监听器
+ * （监听的是所有流程发生的事件）
  */
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Listener(type = TheFlowListenerType.class)
-public @interface TheFlowListener {
-    /**
-     * 被监听的流程
-     */
-    String flow();
-
+@Listener(type = FlowListenerType.class)
+public @interface FlowsListener {
     /**
      * 优先级
      */
