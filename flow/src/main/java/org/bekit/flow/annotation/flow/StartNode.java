@@ -14,12 +14,13 @@ import java.lang.annotation.*;
 
 /**
  * 开始节点
- * （每个流程都必须有一个唯一的开始节点，开始节点应该是一个流程象的最开始执行的节点；
- * 对应的节点决策器返回值类型必须为String，入参类型可为：()、(TargetContext)、(T)、(T, TargetContext)————T表示能被对应的处理器返回结果赋值的类型）
+ * <p>
+ * 开始节点是一个流程最开始执行的节点，每个流程都必须有一个唯一的开始节点。
+ * 对应的节点决策器返回值类型必须为String，入参类型可为：()、(TargetContext)、(T)、(T, TargetContext)————T表示能被对应的处理器返回结果赋值的类型。
  */
-@Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 @Node(name = "", processor = "", autoExecute = true, newTx = true)
 public @interface StartNode {
     /**

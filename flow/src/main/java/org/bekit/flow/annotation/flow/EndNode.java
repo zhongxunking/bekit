@@ -14,12 +14,13 @@ import java.lang.annotation.*;
 
 /**
  * 结束节点
- * （每个流程必须至少有一个结束节点，它是流程结束的标志。当流程跳转到结束节点时，流程会自动结束；
- * 对应的节点决策器不能有入参，且返回类型必须是void，决策器的方法体不会被执行）
+ * <p>
+ * 结束节点是流程结束的标志。当流程跳转到结束节点时，流程会自动结束。
+ * 对应的节点决策器返回类型必须是void，且不能有入参。节点决策器的方法体不会被执行。
  */
-@Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 @Node(name = "", processor = "", autoExecute = false, newTx = true)
 public @interface EndNode {
     /**

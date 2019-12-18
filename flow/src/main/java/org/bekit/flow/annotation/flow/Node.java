@@ -13,9 +13,9 @@ import java.lang.annotation.*;
 /**
  * 节点
  */
-@Documented
 @Target(ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 public @interface Node {
     /**
      * 节点名称
@@ -23,7 +23,7 @@ public @interface Node {
     String name();
 
     /**
-     * 节点处理器
+     * 处理器
      */
     String processor();
 

@@ -13,13 +13,14 @@ import org.springframework.core.annotation.AliasFor;
 import java.lang.annotation.*;
 
 /**
- * 短暂节点
- * （短暂节点是一种单纯的处理单元，即使开启了流程事务情况，此类型节点在执行前也不会提交事务；
- * 对应的节点决策器返回值类型必须为String，入参类型可为：()、(TargetContext)、(T)、(T, TargetContext)————T表示能被对应的处理器返回结果赋值的类型）
+ * 瞬态节点
+ * <p>
+ * 瞬态节点是一种单纯的处理单元，执行前不会提交和新建事务。
+ * 对应的节点决策器返回值类型必须为String，入参类型可为：()、(TargetContext)、(T)、(T, TargetContext)————T表示能被对应的处理器返回结果赋值的类型。
  */
-@Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 @Node(name = "", processor = "", autoExecute = true, newTx = false)
 public @interface TransientNode {
     /**
