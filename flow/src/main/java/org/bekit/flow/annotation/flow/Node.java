@@ -28,12 +28,12 @@ public @interface Node {
     String processor();
 
     /**
-     * 是否自动执行本节点
+     * 是否自动执行
      */
     boolean autoExecute();
 
     /**
-     * 本节点执行前是否创建新事务
+     * 是否有状态
      */
-    boolean newTx();
+    boolean haveState();
 }

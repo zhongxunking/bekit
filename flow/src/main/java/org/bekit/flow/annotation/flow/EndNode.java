@@ -21,7 +21,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Node(name = "", processor = "", autoExecute = false, newTx = true)
+@Node(name = "", processor = "", autoExecute = false, haveState = true)
 public @interface EndNode {
     /**
      * 节点名称（默认使用被注解的函数名）

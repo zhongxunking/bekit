@@ -16,12 +16,12 @@ import java.lang.annotation.*;
  * 瞬态节点
  * <p>
  * 瞬态节点是一种单纯的处理单元，执行前不会提交和新建事务。
- * 对应的节点决策器返回值类型必须为String，入参类型可为：()、(TargetContext)、(T)、(T, TargetContext)————T表示能被对应的处理器返回结果赋值的类型。
+ * 对应的节点决策器返回值类型必须为String，入参类型可为：()、(FlowContext)、(T)、(T, FlowContext)————T表示能被对应的处理器返回结果赋值的类型。
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Node(name = "", processor = "", autoExecute = true, newTx = false)
+@Node(name = "", processor = "", autoExecute = true, haveState = false)
 public @interface TransientNode {
     /**
      * 节点名称（默认使用被注解的函数名）
