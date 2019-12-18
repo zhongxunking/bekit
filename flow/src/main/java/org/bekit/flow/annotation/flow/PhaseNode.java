@@ -13,16 +13,16 @@ import org.springframework.core.annotation.AliasFor;
 import java.lang.annotation.*;
 
 /**
- * 状态节点
+ * 阶段节点
  * <p>
- * 状态节点是一个状态开始的标志（需要新事务来执行），也是上一个状态结束的标志（需要提交老事务），所以在状态节点执行前会先提交事务然后开启新事务并调用流程锁加锁。
+ * 阶段节点是一个阶段开始的标志（需要新事务来执行），也是上一个阶段结束的标志（需要提交老事务），所以在阶段节点执行前会先提交事务然后开启新事务。
  * 对应的节点决策器返回值类型必须为String，入参类型可为：()、(TargetContext)、(T)、(T, TargetContext)————T表示能被对应的处理器返回结果赋值的类型。
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Node(name = "", processor = "", autoExecute = true, newTx = true)
-public @interface StateNode {
+public @interface PhaseNode {
     /**
      * 节点名称（默认使用被注解的函数名）
      */
