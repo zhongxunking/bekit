@@ -10,19 +10,17 @@ package org.bekit.flow.annotation.listener;
 
 import org.bekit.event.annotation.listener.Listener;
 import org.bekit.flow.listener.FlowListenerType;
-import org.bekit.flow.listener.TheFlowListenerType;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
 /**
- * 流程监听器
- * （监听的是所有流程发生的事件）
+ * 流程监听器（监听所有流程发生的事件）
  */
-@Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Listener(type = TheFlowListenerType.class)
+@Documented
+@Listener(type = FlowListenerType.class, priority = Integer.MAX_VALUE)
 public @interface FlowListener {
     /**
      * 优先级
