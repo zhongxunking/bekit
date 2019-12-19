@@ -17,9 +17,9 @@ import java.lang.annotation.*;
 /**
  * 领域监听器
  */
-@Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 @Listener(type = DomainListenerType.class, priority = Integer.MAX_VALUE)
 public @interface DomainListener {
     /**

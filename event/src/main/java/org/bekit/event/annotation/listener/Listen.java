@@ -16,9 +16,9 @@ import java.lang.annotation.*;
 /**
  * 监听
  */
-@Documented
 @Target(ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 public @interface Listen {
     /**
      * 监听解决器

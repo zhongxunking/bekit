@@ -17,9 +17,9 @@ import java.lang.annotation.*;
 /**
  * 监听
  */
-@Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 @org.bekit.event.annotation.listener.Listen(resolver = ClassListenResolver.class, priorityType = PriorityType.ASC)
 public @interface Listen {
     /**

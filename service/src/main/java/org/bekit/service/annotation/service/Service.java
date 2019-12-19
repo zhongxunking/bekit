@@ -18,9 +18,9 @@ import java.lang.annotation.*;
  * 执行顺序：@ServiceBefore（如果存在）、@ServiceExecute、@ServiceAfter（如果存在）
  * 如果enableTx为true，则在执行@ServiceExecute前先开启融合事务，如果@ServiceExecute标注的方法无异常抛出，则会提交事务，否则会回滚事务
  */
-@Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 @Component
 public @interface Service {
     /**

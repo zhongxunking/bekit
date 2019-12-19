@@ -13,8 +13,8 @@ import java.lang.annotation.*;
 /**
  * 服务后置处理（执行中不会有事务）
  */
-@Documented
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 public @interface ServiceAfter {
 }

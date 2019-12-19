@@ -17,9 +17,9 @@ import java.lang.annotation.*;
 /**
  * 服务监听器
  */
-@Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 @Listener(type = ServiceListenerType.class, priority = Integer.MAX_VALUE)
 public @interface ServiceListener {
     /**
