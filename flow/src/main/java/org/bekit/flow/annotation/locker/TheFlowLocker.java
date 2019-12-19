@@ -6,22 +6,22 @@
  * 修订记录:
  * @author 钟勋 2019-12-15 22:19 创建
  */
-package org.bekit.flow.annotation.mapper;
+package org.bekit.flow.annotation.locker;
 
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
 
 /**
- * 流程映射器
+ * 特定流程加锁器
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Component
-public @interface FlowMapper {
+public @interface TheFlowLocker {
     /**
-     * 映射的流程
+     * 加锁的流程
      */
     String flow();
 }
