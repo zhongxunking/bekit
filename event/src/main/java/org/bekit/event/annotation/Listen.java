@@ -23,7 +23,7 @@ import java.lang.annotation.*;
 @org.bekit.event.annotation.listener.Listen(resolver = ClassListenResolver.class, priorityType = PriorityType.ASC)
 public @interface Listen {
     /**
-     * 优先级类型
+     * 优先级类型（默认为升序）
      */
     @AliasFor(annotation = org.bekit.event.annotation.listener.Listen.class, attribute = "priorityType")
     PriorityType priorityType() default PriorityType.ASC;
