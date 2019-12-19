@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.lang.annotation.*;
 
 /**
- *
+ * 流程映射器
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -21,7 +21,7 @@ import java.lang.annotation.*;
 @Component
 public @interface FlowMapper {
     /**
-     * 加锁的流程
+     * 映射的流程
      */
     String flow();
 }

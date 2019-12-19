@@ -34,7 +34,7 @@ import java.lang.annotation.*;
 @Component
 public @interface Flow {
     /**
-     * 流程名称（默认使用被注解的类名，首字母小写）
+     * 流程名称（默认使用被注解的类名且首字母小写）
      */
     String name() default "";
 }

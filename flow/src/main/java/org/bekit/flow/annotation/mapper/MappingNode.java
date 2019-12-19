@@ -11,13 +11,13 @@ package org.bekit.flow.annotation.mapper;
 import java.lang.annotation.*;
 
 /**
- * 目标对象映射
+ * 映射出节点
  * <p>
- * 流程开启执行前会自动调用此注解对应的方法，将目标对象映射到开始执行的流程节点。
- * 每次开启新事务时都会调用它将目标对象映射到流程节点
+ * 流程刚开始执行以及流程加锁器每次加锁后都会调用映射出节点，映射出接下来要执行的节点。
+ * 被标记的方法入参为FlowContext，返回类型值为要执行的节点
  */
-@Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 public @interface MappingNode {
 }
