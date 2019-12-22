@@ -11,12 +11,12 @@ package org.bekit.flow.annotation.locker;
 import java.lang.annotation.*;
 
 /**
- * 状态节点加锁
+ * 状态解锁
  * <p>
- * 被标记的方法入参为FlowContext，返回值为加锁后的目标对象。
+ * 被标记的方法入参为FlowContext，返回类型为void。
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface StateNodeLock {
+public @interface StateUnlock {
 }
