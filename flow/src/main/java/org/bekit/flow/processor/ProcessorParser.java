@@ -54,8 +54,9 @@ public final class ProcessorParser {
             if (AnnotatedElementUtils.findMergedAnnotation(method, ProcessorExecute.class) == null) {
                 continue;
             }
-            // 校验
+            // 校验方法类型
             Assert.isTrue(Modifier.isPublic(method.getModifiers()), String.format("@ProcessorExecute方法[%s]必须是public类型", method));
+            // 校验入参类型
             Class<?>[] parameterTypes = method.getParameterTypes();
             if (parameterTypes.length != 1 || parameterTypes[0] != FlowContext.class) {
                 throw new IllegalArgumentException(String.format("@ProcessorExecute方法[%s]的入参必须是(FlowContext<T> context)", method));

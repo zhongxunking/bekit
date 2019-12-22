@@ -98,7 +98,7 @@ public final class ServiceParser {
         // 校验方法类型、返回类型
         Assert.isTrue(Modifier.isPublic(servicePhaseMethod.getModifiers()), String.format("服务方法[%s]必须是public类型", servicePhaseMethod));
         Assert.isTrue(servicePhaseMethod.getReturnType() == void.class, String.format("服务方法[%s]的返回类型必须是void", servicePhaseMethod));
-        // 校验入参
+        // 校验入参类型
         Class<?>[] parameterTypes = servicePhaseMethod.getParameterTypes();
         if (parameterTypes.length != 1 || parameterTypes[0] != ServiceContext.class) {
             throw new IllegalArgumentException(String.format("服务方法[%s]的入参必须是(ServiceContext<O,R> context)", servicePhaseMethod));
