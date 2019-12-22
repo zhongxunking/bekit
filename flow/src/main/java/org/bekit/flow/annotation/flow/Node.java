@@ -23,11 +23,6 @@ public @interface Node {
     String name();
 
     /**
-     * 处理器
-     */
-    String processor();
-
-    /**
      * 是否自动执行
      */
     boolean autoExecute();
@@ -36,4 +31,9 @@ public @interface Node {
      * 是否有状态
      */
     boolean haveState();
+
+    /**
+     * 处理器
+     */
+    String processor();
 }
