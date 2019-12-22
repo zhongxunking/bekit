@@ -48,7 +48,7 @@ public class EventBusesHolder {
      */
     public synchronized EventBus getEventBus(Class<? extends ListenerType> type) {
         if (!eventBusMap.containsKey(type)) {
-            eventBusMap.put(type, new EventBus(ListenerParser.parseEventTypeResolver(type)));
+            eventBusMap.put(type, new EventBus(ListenerParser.parseToEventTypeResolver(type)));
         }
         return eventBusMap.get(type);
     }

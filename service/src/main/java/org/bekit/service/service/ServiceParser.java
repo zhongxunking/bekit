@@ -61,14 +61,14 @@ public final class ServiceParser {
         if (serviceAnnotation.enableTx()) {
             txExecutor = new TxExecutor(transactionManager, TransactionManager.TransactionType.REQUIRED);
         }
-        // 解析所有服务阶段
-        Map<Class<?>, ServicePhaseExecutor> phaseExecutorMap = parsePhaseExecutors(serviceClass);
+        // 解析出所有服务阶段
+        Map<Class<?>, ServicePhaseExecutor> phaseExecutorMap = parseToPhaseExecutors(serviceClass);
 
         return new ServiceExecutor(serviceName, service, phaseExecutorMap, txExecutor);
     }
 
-    // 解析所有服务阶段
-    private static Map<Class<?>, ServicePhaseExecutor> parsePhaseExecutors(Class serviceClass) {
+    // 解析出所有服务阶段
+    private static Map<Class<?>, ServicePhaseExecutor> parseToPhaseExecutors(Class serviceClass) {
         Map<Class<?>, ServicePhaseExecutor> map = new HashMap<>();
         // 解析
         ReflectionUtils.doWithLocalMethods(serviceClass, method -> {

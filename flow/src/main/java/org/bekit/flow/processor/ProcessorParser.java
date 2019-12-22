@@ -42,14 +42,14 @@ public final class ProcessorParser {
         if (StringUtils.isEmpty(processorName)) {
             processorName = ClassUtils.getShortNameAsProperty(processorClass);
         }
-        // 解析处理器方法
-        Method executeMethod = parseExecuteMethod(processorClass);
+        // 解析出@ProcessorExecute方法
+        Method executeMethod = parseToExecuteMethod(processorClass);
 
         return new ProcessorExecutor(processorName, processor, executeMethod);
     }
 
-    // 解析@ProcessorExecute方法
-    private static Method parseExecuteMethod(Class<?> processorClass) {
+    // 解析出@ProcessorExecute方法
+    private static Method parseToExecuteMethod(Class<?> processorClass) {
         for (Method method : processorClass.getDeclaredMethods()) {
             if (AnnotatedElementUtils.findMergedAnnotation(method, ProcessorExecute.class) == null) {
                 continue;

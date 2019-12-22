@@ -43,24 +43,24 @@ public final class ListenerParser {
         log.debug("解析监听器：{}", listenerClass);
         Listener listenerAnnotation = AnnotatedElementUtils.findMergedAnnotation(listenerClass, Listener.class);
         // 解析
-        EventTypeResolver resolver = parseEventTypeResolver(listenerAnnotation.type());
-        Map<Object, ListenExecutor> listenExecutorMap = parseListenExecutors(listenerClass);
+        EventTypeResolver resolver = parseToEventTypeResolver(listenerAnnotation.type());
+        Map<Object, ListenExecutor> listenExecutorMap = parseToListenExecutors(listenerClass);
 
         return new ListenerExecutor(listenerAnnotation.type(), listenerAnnotation.priority(), listener, resolver, listenExecutorMap);
     }
 
     /**
-     * 通过监听器类型解析得到事件类型解决器
+     * 解析出事件类型解决器
      *
      * @param type 监听器类型
      */
-    public static EventTypeResolver parseEventTypeResolver(Class<? extends ListenerType> type) {
+    public static EventTypeResolver parseToEventTypeResolver(Class<? extends ListenerType> type) {
         ListenerType listenerType = BeanUtils.instantiate(type);
         return listenerType.getResolver();
     }
 
-    // 解析所有监听方法
-    private static Map<Object, ListenExecutor> parseListenExecutors(Class<?> listenerClass) {
+    // 解析出所有监听方法
+    private static Map<Object, ListenExecutor> parseToListenExecutors(Class<?> listenerClass) {
         Map<Object, ListenExecutor> map = new HashMap<>();
         // 解析
         ReflectionUtils.doWithLocalMethods(listenerClass, method -> {
