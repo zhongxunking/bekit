@@ -40,4 +40,14 @@ public class TheFlowMappersHolder {
             theFlowMapperExecutorMap.put(theFlowMapperExecutor.getFlow(), theFlowMapperExecutor);
         }
     }
+
+    /**
+     * 获取特定流程映射器执行器
+     *
+     * @param flow 映射的流程名称
+     * @return 特定流程映射器执行器
+     */
+    public TheFlowMapperExecutor getTheFlowMapperExecutor(String flow) {
+        return theFlowMapperExecutorMap.get(flow);
+    }
 }
