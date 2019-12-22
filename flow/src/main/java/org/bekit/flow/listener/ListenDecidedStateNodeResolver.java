@@ -11,7 +11,6 @@ package org.bekit.flow.listener;
 import org.bekit.event.extension.ListenResolver;
 import org.bekit.flow.annotation.listener.TheFlowListener;
 import org.bekit.flow.engine.FlowContext;
-import org.bekit.flow.event.DecidedNodeEvent;
 import org.bekit.flow.event.DecidedStateNodeEvent;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.Assert;
@@ -46,7 +45,7 @@ public class ListenDecidedStateNodeResolver implements ListenResolver {
     }
 
     @Override
-    public Object[] resolveArgs(Object event) {
+    public Object[] resolveParams(Object event) {
         DecidedStateNodeEvent decidedStateNodeEvent = (DecidedStateNodeEvent) event;
         return new Object[]{decidedStateNodeEvent.getStateNode(), decidedStateNodeEvent.getContext()};
     }

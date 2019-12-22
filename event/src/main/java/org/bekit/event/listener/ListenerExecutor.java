@@ -91,7 +91,7 @@ public class ListenerExecutor {
          * @throws Throwable 执行过程中发生任何异常都会往外抛
          */
         public void execute(Object listener, Object event) throws Throwable {
-            execute(listener, resolver.resolveArgs(event));
+            execute(listener, resolver.resolveParams(event));
         }
 
         /**

@@ -45,7 +45,7 @@ public class ListenFlowExceptionResolver implements ListenResolver {
     }
 
     @Override
-    public Object[] resolveArgs(Object event) {
+    public Object[] resolveParams(Object event) {
         FlowExceptionEvent flowExceptionEvent = (FlowExceptionEvent) event;
         return new Object[]{flowExceptionEvent.getThrowable(), flowExceptionEvent.getContext()};
     }

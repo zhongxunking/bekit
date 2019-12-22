@@ -32,5 +32,5 @@ public interface ListenResolver {
      * @param event 事件
      * @return 调用监听方法的入参
      */
-    Object[] resolveArgs(Object event);
+    Object[] resolveParams(Object event);
 }

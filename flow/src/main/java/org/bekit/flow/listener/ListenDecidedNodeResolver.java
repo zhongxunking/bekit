@@ -45,7 +45,7 @@ public class ListenDecidedNodeResolver implements ListenResolver {
     }
 
     @Override
-    public Object[] resolveArgs(Object event) {
+    public Object[] resolveParams(Object event) {
         DecidedNodeEvent decidedNodeEvent = (DecidedNodeEvent) event;
         return new Object[]{decidedNodeEvent.getNode(), decidedNodeEvent.getContext()};
     }

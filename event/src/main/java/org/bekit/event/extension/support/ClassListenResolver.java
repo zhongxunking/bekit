@@ -35,7 +35,7 @@ public class ClassListenResolver implements ListenResolver {
     }
 
     @Override
-    public Object[] resolveArgs(Object event) {
+    public Object[] resolveParams(Object event) {
         return new Object[]{event};
     }
 }
