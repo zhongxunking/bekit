@@ -10,8 +10,9 @@ package org.bekit.flow.listener;
 
 import org.bekit.event.extension.EventTypeResolver;
 import org.bekit.event.extension.ListenerType;
+import org.bekit.flow.event.DecidedNodeEvent;
+import org.bekit.flow.event.DecidedStateNodeEvent;
 import org.bekit.flow.event.FlowExceptionEvent;
-import org.bekit.flow.event.NodeDecidedEvent;
 
 /**
  * 特定流程监听器类型
@@ -29,8 +30,11 @@ public class TheFlowListenerType implements ListenerType {
 
         @Override
         public Object resolve(Object event) {
-            if (event instanceof NodeDecidedEvent) {
-                return new TheFlowEventType(((NodeDecidedEvent) event).getFlow(), NodeDecidedEvent.class);
+            if (event instanceof DecidedNodeEvent) {
+                return new TheFlowEventType(((DecidedNodeEvent) event).getFlow(), DecidedNodeEvent.class);
+            }
+            if (event instanceof DecidedStateNodeEvent) {
+                return new TheFlowEventType(((DecidedStateNodeEvent) event).getFlow(), DecidedStateNodeEvent.class);
             }
             if (event instanceof FlowExceptionEvent) {
                 return new TheFlowEventType(((FlowExceptionEvent) event).getFlow(), FlowExceptionEvent.class);

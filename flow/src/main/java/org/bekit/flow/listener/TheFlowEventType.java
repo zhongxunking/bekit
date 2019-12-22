@@ -8,6 +8,7 @@
  */
 package org.bekit.flow.listener;
 
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
@@ -15,16 +16,12 @@ import java.util.Objects;
 /**
  * 特定流程事件类型
  */
+@AllArgsConstructor
 public class TheFlowEventType {
     // 流程
     private final String flow;
     // 类型
     private final Class eventClass;
-
-    public TheFlowEventType(String flow, Class eventClass) {
-        this.flow = flow;
-        this.eventClass = eventClass;
-    }
 
     @Override
     public int hashCode() {

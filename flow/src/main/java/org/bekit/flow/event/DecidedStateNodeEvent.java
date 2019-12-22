@@ -4,7 +4,7 @@
 
 /*
  * 修订记录:
- * @author 钟勋 2017-04-04 20:21 创建
+ * @author 钟勋 2017-04-04 20:16 创建
  */
 package org.bekit.flow.event;
 
@@ -13,15 +13,15 @@ import lombok.Getter;
 import org.bekit.flow.engine.FlowContext;
 
 /**
- * 流程异常事件
+ * 状态节点选择事件
  */
 @AllArgsConstructor
 @Getter
-public class FlowExceptionEvent {
+public class DecidedStateNodeEvent {
     // 流程名称
     private final String flow;
-    // 发生的异常
-    private final Throwable throwable;
+    // 被选择的状态节点
+    private final String stateNode;
     // 流程上下文
-    private final FlowContext context;
+    private final FlowContext<?> context;
 }
