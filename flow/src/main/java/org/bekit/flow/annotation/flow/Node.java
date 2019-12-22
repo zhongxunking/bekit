@@ -23,14 +23,14 @@ public @interface Node {
     String name();
 
     /**
-     * 是否自动执行
-     */
-    boolean autoExecute();
-
-    /**
      * 是否有状态
      */
     boolean haveState();
+
+    /**
+     * 是否自动执行
+     */
+    boolean autoExecute();
 
     /**
      * 处理器

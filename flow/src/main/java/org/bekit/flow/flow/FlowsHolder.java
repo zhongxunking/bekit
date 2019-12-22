@@ -8,13 +8,16 @@
  */
 package org.bekit.flow.flow;
 
+import org.bekit.common.transaction.TransactionManager;
 import org.bekit.event.bus.EventBusesHolder;
 import org.bekit.flow.annotation.flow.Flow;
+import org.bekit.flow.locker.TheFlowLockersHolder;
+import org.bekit.flow.mapper.TheFlowMappersHolder;
 import org.bekit.flow.processor.ProcessorsHolder;
-import org.bekit.flow.transaction.FlowTxsHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -31,7 +34,11 @@ public class FlowsHolder {
     @Autowired
     private ProcessorsHolder processorsHolder;
     @Autowired
-    private FlowTxsHolder flowTxsHolder;
+    private TheFlowMappersHolder mappersHolder;
+    @Autowired
+    private TheFlowLockersHolder lockersHolder;
+    @Autowired
+    private TransactionManager transactionManager;
     @Autowired
     private EventBusesHolder eventBusesHolder;
     // 流程执行器Map（key：流程名称）
@@ -43,10 +50,14 @@ public class FlowsHolder {
         String[] beanNames = applicationContext.getBeanNamesForAnnotation(Flow.class);
         for (String beanName : beanNames) {
             // 解析流程
-            FlowExecutor flowExecutor = FlowParser.parseFlow(applicationContext.getBean(beanName), processorsHolder, flowTxsHolder, eventBusesHolder);
-            if (flowExecutorMap.containsKey(flowExecutor.getFlowName())) {
-                throw new RuntimeException("存在重名的流程" + flowExecutor.getFlowName());
-            }
+            FlowExecutor flowExecutor = FlowParser.parseFlow(
+                    applicationContext.getBean(beanName),
+                    processorsHolder,
+                    mappersHolder,
+                    lockersHolder,
+                    transactionManager,
+                    eventBusesHolder);
+            Assert.isTrue(!flowExecutorMap.containsKey(flowExecutor.getFlowName()), String.format("存在重名的流程[%s]", flowExecutor.getFlowName()));
             // 将执行器放入持有器中
             flowExecutorMap.put(flowExecutor.getFlowName(), flowExecutor);
         }
@@ -66,9 +77,10 @@ public class FlowsHolder {
      * @throws IllegalArgumentException 如果不存在该流程执行器
      */
     public FlowExecutor getRequiredFlowExecutor(String flow) {
-        if (!flowExecutorMap.containsKey(flow)) {
-            throw new IllegalArgumentException("不存在流程" + flow);
+        FlowExecutor flowExecutor = flowExecutorMap.get(flow);
+        if (flowExecutor == null) {
+            throw new IllegalArgumentException(String.format("不存在流程[%s]", flow));
         }
-        return flowExecutorMap.get(flow);
+        return flowExecutor;
     }
 }

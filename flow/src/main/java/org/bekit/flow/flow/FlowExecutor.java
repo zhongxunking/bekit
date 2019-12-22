@@ -186,12 +186,12 @@ public class FlowExecutor {
         // 节点名称
         @Getter
         private final String nodeName;
-        // 是否自动执行
-        @Getter
-        private final boolean autoExecute;
         // 是否有状态
         @Getter
         private final boolean haveState;
+        // 是否自动执行
+        @Getter
+        private final boolean autoExecute;
         // 处理器执行器
         private final ProcessorExecutor processorExecutor;
         // 节点决策器执行器
