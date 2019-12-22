@@ -43,14 +43,14 @@ public abstract class MethodExecutor {
     /**
      * 获取方法入参类型
      */
-    public Class[] getParameterTypes() {
+    public Class<?>[] getParameterTypes() {
         return method.getParameterTypes();
     }
 
     /**
      * 获取方法返回类型
      */
-    public Class getReturnType() {
+    public Class<?> getReturnType() {
         return method.getReturnType();
     }
 }

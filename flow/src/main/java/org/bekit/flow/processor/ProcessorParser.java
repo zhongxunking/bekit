@@ -8,15 +8,14 @@
  */
 package org.bekit.flow.processor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bekit.flow.annotation.processor.Processor;
 import org.bekit.flow.annotation.processor.ProcessorExecute;
-import org.bekit.flow.engine.TargetContext;
-import org.bekit.flow.processor.ProcessorExecutor.ProcessorMethodExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.bekit.flow.engine.FlowContext;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.core.ResolvableType;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
@@ -25,10 +24,8 @@ import java.lang.reflect.Modifier;
 /**
  * 处理器解析器
  */
-public class ProcessorParser {
-    // 日志记录器
-    private static final Logger logger = LoggerFactory.getLogger(ProcessorParser.class);
-
+@Slf4j
+public final class ProcessorParser {
     /**
      * 解析处理器
      *
@@ -38,53 +35,34 @@ public class ProcessorParser {
     public static ProcessorExecutor parseProcessor(Object processor) {
         // 获取目标class（应对AOP代理情况）
         Class<?> processorClass = AopUtils.getTargetClass(processor);
-        logger.debug("解析处理器：{}", ClassUtils.getQualifiedName(processorClass));
+        log.debug("解析处理器：{}", processorClass);
         // 获取处理器名称
-        String processorName = processorClass.getAnnotation(Processor.class).name();
+        Processor processorAnnotation = AnnotatedElementUtils.findMergedAnnotation(processorClass, Processor.class);
+        String processorName = processorAnnotation.name();
         if (StringUtils.isEmpty(processorName)) {
             processorName = ClassUtils.getShortNameAsProperty(processorClass);
         }
-        // 创建处理器执行器
-        ProcessorExecutor processorExecutor = new ProcessorExecutor(processorName, processor);
-        for (Method method : processorClass.getDeclaredMethods()) {
-            for (Class clazz : ProcessorExecutor.PROCESSOR_METHOD_ANNOTATIONS) {
-                if (method.isAnnotationPresent(clazz)) {
-                    // 设置处理器方法执行器
-                    processorExecutor.setMethodExecutor(clazz, parseProcessorMethod(clazz, method));
-                    break;
-                }
-            }
-        }
-        processorExecutor.validate();
+        // 解析处理器方法
+        Method executeMethod = parseExecuteMethod(processorClass);
 
-        return processorExecutor;
+        return new ProcessorExecutor(processorName, processor, executeMethod);
     }
 
-    /**
-     * 解析处理器方法
-     */
-    private static ProcessorMethodExecutor parseProcessorMethod(Class clazz, Method method) {
-        logger.debug("解析处理器方法：{}", method);
-        // 校验方法类型
-        if (!Modifier.isPublic(method.getModifiers())) {
-            throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "必须是public类型");
-        }
-        // 校验入参
-        Class[] parameterTypes = method.getParameterTypes();
-        if (parameterTypes.length != 1) {
-            throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "入参必须是（TargetContext）");
-        }
-        if (parameterTypes[0] != TargetContext.class) {
-            throw new IllegalArgumentException("处理器方法" + ClassUtils.getQualifiedMethodName(method) + "入参必须是（TargetContext）");
-        }
-        // 校验返回类型
-        if (clazz != ProcessorExecute.class && method.getReturnType() != void.class) {
-            throw new IllegalArgumentException("非@ProcessorExecute类型的处理器方法" + ClassUtils.getQualifiedMethodName(method) + "的返回类型必须是void");
-        }
-        // 获取目标对象类型
-        ResolvableType resolvableType = ResolvableType.forMethodParameter(method, 0);
-        Class classOfTarget = resolvableType.getGeneric(0).resolve(Object.class);
+    // 解析@ProcessorExecute方法
+    private static Method parseExecuteMethod(Class<?> processorClass) {
+        for (Method method : processorClass.getDeclaredMethods()) {
+            if (AnnotatedElementUtils.findMergedAnnotation(method, ProcessorExecute.class) == null) {
+                continue;
+            }
+            // 校验
+            Assert.isTrue(Modifier.isPublic(method.getModifiers()), String.format("@ProcessorExecute方法[%s]必须是public类型", method));
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            if (parameterTypes.length != 1 || parameterTypes[0] != FlowContext.class) {
+                throw new IllegalArgumentException(String.format("@ProcessorExecute方法[%s]的入参必须是(FlowContext<T> context)", method));
+            }
 
-        return new ProcessorMethodExecutor(method, classOfTarget);
+            return method;
+        }
+        throw new IllegalArgumentException(String.format("处理器[%s]不存在@ProcessorExecute方法", processorClass));
     }
 }

@@ -12,8 +12,10 @@ import org.bekit.flow.annotation.processor.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -35,9 +37,7 @@ public class ProcessorsHolder {
         for (String beanName : beanNames) {
             // 解析处理器
             ProcessorExecutor processorExecutor = ProcessorParser.parseProcessor(applicationContext.getBean(beanName));
-            if (processorExecutorMap.containsKey(processorExecutor.getProcessorName())) {
-                throw new RuntimeException("存在重名的处理器：" + processorExecutor.getProcessorName());
-            }
+            Assert.isTrue(!processorExecutorMap.containsKey(processorExecutor.getProcessorName()), String.format("存在重名的处理器[%s]", processorExecutor.getProcessorName()));
             // 将执行器放入持有器中
             processorExecutorMap.put(processorExecutor.getProcessorName(), processorExecutor);
         }
@@ -47,7 +47,7 @@ public class ProcessorsHolder {
      * 获取所有处理器名称
      */
     public Set<String> getProcessorNames() {
-        return processorExecutorMap.keySet();
+        return Collections.unmodifiableSet(processorExecutorMap.keySet());
     }
 
     /**
@@ -57,9 +57,10 @@ public class ProcessorsHolder {
      * @throws IllegalArgumentException 如果不存在该处理器执行器
      */
     public ProcessorExecutor getRequiredProcessorExecutor(String processor) {
-        if (!processorExecutorMap.containsKey(processor)) {
-            throw new IllegalArgumentException("不存在处理器：" + processor);
+        ProcessorExecutor processorExecutor = processorExecutorMap.get(processor);
+        if (processorExecutor == null) {
+            throw new IllegalArgumentException(String.format("不存在处理器[%s]", processor));
         }
-        return processorExecutorMap.get(processor);
+        return processorExecutor;
     }
 }
