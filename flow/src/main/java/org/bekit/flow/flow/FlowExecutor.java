@@ -53,7 +53,7 @@ public class FlowExecutor {
     // 事务执行器
     private final TxExecutor txExecutor;
     // 事件发布器
-    private EventPublisher eventPublisher;
+    private final EventPublisher eventPublisher;
 
     /**
      * 执行
