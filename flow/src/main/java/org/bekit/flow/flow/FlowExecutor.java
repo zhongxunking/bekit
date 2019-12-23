@@ -258,12 +258,12 @@ public class FlowExecutor {
                     case PROCESS_RESULT_AND_TARGET_CONTEXT:
                         return (String) execute(flow, new Object[]{processResult, context});
                     default:
-                        throw new IllegalStateException("下个节点选择方法执行器内部状态不对");
+                        throw new IllegalStateException("节点决策器执行器内部要素不对");
                 }
             }
 
             /**
-             * 下个节点选择方法参数类型
+             * 节点决策器方法参数类型
              */
             public enum ParameterType {
                 /**
