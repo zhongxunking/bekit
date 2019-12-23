@@ -18,9 +18,7 @@ import org.bekit.flow.annotation.locker.FlowUnlock;
 import org.bekit.flow.annotation.locker.StateLock;
 import org.bekit.flow.annotation.locker.StateUnlock;
 import org.bekit.flow.engine.FlowContext;
-import org.bekit.flow.event.DecidedNodeEvent;
-import org.bekit.flow.event.DecidedStateNodeEvent;
-import org.bekit.flow.event.FlowExceptionEvent;
+import org.bekit.flow.event.*;
 import org.bekit.flow.locker.TheFlowLockerExecutor;
 import org.bekit.flow.mapper.TheFlowMapperExecutor;
 import org.bekit.flow.processor.ProcessorExecutor;
@@ -63,15 +61,22 @@ public class FlowExecutor {
      */
     public void execute(FlowContext<?> context) throws Throwable {
         try {
+            // 发布流程开始事件
+            eventPublisher.publish(new FlowStartEvent(flowName, context));
+            // 映射出节点
             String node = mappingNode(context, startNode);
             try {
+                // 流程前置处理
                 node = beforeFlow(context, node);
                 try {
+                    // 状态前置处理
                     node = beforeState(context, node);
                     if (!endNodes.contains(node)) {
                         // 获取节点执行器
                         NodeExecutor nodeExecutor = getRequiredNodeExecutor(node);
                         do {
+                            // 发布正在执行的节点事件
+                            eventPublisher.publish(new ExecutingNodeEvent(flowName, node, context));
                             // 执行节点
                             node = nodeExecutor.execute(flow, context);
                             // 是否中断流程
@@ -80,11 +85,11 @@ public class FlowExecutor {
                             }
                             // 获取下个节点执行器
                             nodeExecutor = getRequiredNodeExecutor(node);
-                            // 发送节点选择事件
+                            // 发布节点选择事件
                             eventPublisher.publish(new DecidedNodeEvent(flowName, node, context));
                             // 下个节点是否是状态节点
                             if (nodeExecutor.isHaveState()) {
-                                // 发送状态节点选择事件
+                                // 发布状态节点选择事件
                                 eventPublisher.publish(new DecidedStateNodeEvent(flowName, node, context));
                                 // 下个节点是否自动执行
                                 if (nodeExecutor.isAutoExecute()) {
@@ -96,18 +101,24 @@ public class FlowExecutor {
                             }
                         } while (nodeExecutor.isAutoExecute());
                     }
+                    // 状态后置处理
                     afterState(context);
                 } catch (Throwable e) {
+                    // 状态异常处理
                     afterStateException(context);
                     throw e;
                 }
             } finally {
+                // 流程后置处理
                 afterFlow(context);
             }
         } catch (Throwable e) {
-            // 发送流程异常事件
+            // 发布流程异常事件
             eventPublisher.publish(new FlowExceptionEvent(flowName, e, context));
             throw e;
+        } finally {
+            // 发布流程结束事件
+            eventPublisher.publish(new FlowEndEvent(flowName, context));
         }
     }
 
