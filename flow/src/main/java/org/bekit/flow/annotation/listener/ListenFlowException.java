@@ -19,7 +19,7 @@ import java.lang.annotation.*;
  * 监听流程异常
  * <p>
  * 配合@TheFlowListener一起使用；当流程发生异常时，都会调用本注解标注的方法。
- * 对应的方法入参类型必须为（Throwable, TargetContext）。
+ * 对应的方法入参类型必须为（Throwable, FlowContext）。
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

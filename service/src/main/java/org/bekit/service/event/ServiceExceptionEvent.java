@@ -20,8 +20,8 @@ import org.bekit.service.engine.ServiceContext;
 public class ServiceExceptionEvent {
     // 服务名称
     private final String service;
-    // 服务上下文
-    private final ServiceContext serviceContext;
     // 发生的异常
     private final Throwable throwable;
+    // 服务上下文
+    private final ServiceContext context;
 }

@@ -39,30 +39,30 @@ public class ServiceExecutor {
     /**
      * 执行服务
      *
-     * @param serviceContext 服务上下文
+     * @param context 服务上下文
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
-    public void execute(ServiceContext serviceContext) throws Throwable {
+    public void execute(ServiceContext context) throws Throwable {
         // 执行服务前置阶段（如果存在）
         if (phaseExecutorMap.containsKey(ServiceBefore.class)) {
-            phaseExecutorMap.get(ServiceBefore.class).execute(service, serviceContext);
+            phaseExecutorMap.get(ServiceBefore.class).execute(service, context);
         }
         // 执行服务执行阶段
-        executeServiceExecute(serviceContext);
+        executeServiceExecute(context);
         // 执行服务后置阶段（如果存在）
         if (phaseExecutorMap.containsKey(ServiceAfter.class)) {
-            phaseExecutorMap.get(ServiceAfter.class).execute(service, serviceContext);
+            phaseExecutorMap.get(ServiceAfter.class).execute(service, context);
         }
     }
 
     // 执行服务执行阶段
-    private void executeServiceExecute(ServiceContext serviceContext) throws Throwable {
+    private void executeServiceExecute(ServiceContext context) throws Throwable {
         if (txExecutor != null) {
             // 开启事务
             txExecutor.createTx();
         }
         try {
-            phaseExecutorMap.get(ServiceExecute.class).execute(service, serviceContext);
+            phaseExecutorMap.get(ServiceExecute.class).execute(service, context);
             if (txExecutor != null) {
                 // 提交事务
                 txExecutor.commitTx();
@@ -109,12 +109,12 @@ public class ServiceExecutor {
         /**
          * 执行服务阶段
          *
-         * @param service        服务
-         * @param serviceContext 服务上下文
+         * @param service 服务
+         * @param context 服务上下文
          * @throws Throwable 执行过程中发生任何异常都会往外抛
          */
-        public void execute(Object service, ServiceContext serviceContext) throws Throwable {
-            execute(service, new Object[]{serviceContext});
+        public void execute(Object service, ServiceContext context) throws Throwable {
+            execute(service, new Object[]{context});
         }
     }
 }

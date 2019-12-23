@@ -42,11 +42,11 @@ public class DefaultServiceEngine implements ServiceEngine {
         // 校验order
         checkOrder(order, service);
         // 构建服务上下文
-        ServiceContext<O, R> serviceContext = new ServiceContext<>(order, (R) newResult(service), reviseAttachment(attachment));
+        ServiceContext<O, R> context = new ServiceContext<>(order, (R) newResult(service), reviseAttachment(attachment));
         // 执行服务
-        executeService(service, serviceContext);
+        executeService(service, context);
 
-        return serviceContext.getResult();
+        return context.getResult();
     }
 
     // 校验入参order
@@ -70,20 +70,20 @@ public class DefaultServiceEngine implements ServiceEngine {
     }
 
     // 执行服务
-    private void executeService(String service, ServiceContext serviceContext) {
+    private void executeService(String service, ServiceContext context) {
         // 获取服务执行器
         ServiceExecutor serviceExecutor = servicesHolder.getRequiredServiceExecutor(service);
         try {
             // 发布服务申请事件
-            eventPublisher.publish(new ServiceApplyEvent(service, serviceContext));
+            eventPublisher.publish(new ServiceApplyEvent(service, context));
             // 执行服务
-            serviceExecutor.execute(serviceContext);
+            serviceExecutor.execute(context);
         } catch (Throwable e) {
             // 发布服务异常事件
-            eventPublisher.publish(new ServiceExceptionEvent(service, serviceContext, e));
+            eventPublisher.publish(new ServiceExceptionEvent(service, e, context));
         } finally {
             // 发布服务结束事件
-            eventPublisher.publish(new ServiceFinishEvent(service, serviceContext));
+            eventPublisher.publish(new ServiceFinishEvent(service, context));
         }
     }
 }
