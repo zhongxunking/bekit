@@ -20,10 +20,10 @@ import org.bekit.flow.annotation.flow.Node;
 import org.bekit.flow.annotation.flow.StartNode;
 import org.bekit.flow.engine.FlowContext;
 import org.bekit.flow.listener.FlowListenerType;
-import org.bekit.flow.locker.TheFlowLockersHolder;
-import org.bekit.flow.mapper.TheFlowMappersHolder;
+import org.bekit.flow.locker.TheFlowLockerRegistrar;
+import org.bekit.flow.mapper.TheFlowMapperRegistrar;
 import org.bekit.flow.processor.ProcessorExecutor;
-import org.bekit.flow.processor.ProcessorsHolder;
+import org.bekit.flow.processor.ProcessorRegistrar;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.Assert;
@@ -44,17 +44,17 @@ public class FlowParser {
      * 解析流程
      *
      * @param flow               流程
-     * @param processorsHolder   处理器持有器
-     * @param mappersHolder      映射器持有器
-     * @param lockersHolder      加锁器持有器
+     * @param processorRegistrar 处理器注册器
+     * @param mapperRegistrar    映射器注册器
+     * @param lockerRegistrar    加锁器注册器
      * @param transactionManager 事务管理器
      * @param eventBusesHolder   事件总线持有器
      * @return 流程执行器
      */
     public static FlowExecutor parseFlow(Object flow,
-                                         ProcessorsHolder processorsHolder,
-                                         TheFlowMappersHolder mappersHolder,
-                                         TheFlowLockersHolder lockersHolder,
+                                         ProcessorRegistrar processorRegistrar,
+                                         TheFlowMapperRegistrar mapperRegistrar,
+                                         TheFlowLockerRegistrar lockerRegistrar,
                                          TransactionManager transactionManager,
                                          EventBusesHolder eventBusesHolder) {
         // 获取目标class（应对AOP代理情况）
@@ -67,7 +67,7 @@ public class FlowParser {
             flowName = ClassUtils.getShortNameAsProperty(flowClass);
         }
         // 解析出所有节点执行器
-        Map<Class<?>, Map<String, FlowExecutor.NodeExecutor>> map = parseToNodeExecutors(flowClass, processorsHolder);
+        Map<Class<?>, Map<String, FlowExecutor.NodeExecutor>> map = parseToNodeExecutors(flowClass, processorRegistrar);
 
         return new FlowExecutor(
                 flowName,
@@ -75,14 +75,14 @@ public class FlowParser {
                 map.get(StartNode.class).keySet().iterator().next(),
                 map.get(EndNode.class).keySet(),
                 map.get(Node.class),
-                mappersHolder.getTheFlowMapperExecutor(flowName),
-                lockersHolder.getTheFlowLockerExecutor(flowName),
+                mapperRegistrar.getTheFlowMapper(flowName),
+                lockerRegistrar.getTheFlowLocker(flowName),
                 new TxExecutor(transactionManager, TransactionManager.TransactionType.REQUIRED),
                 new DefaultEventPublisher(eventBusesHolder.getEventBus(FlowListenerType.class)));
     }
 
     // 解析出所有节点执行器
-    private static Map<Class<?>, Map<String, FlowExecutor.NodeExecutor>> parseToNodeExecutors(Class<?> flowClass, ProcessorsHolder processorsHolder) {
+    private static Map<Class<?>, Map<String, FlowExecutor.NodeExecutor>> parseToNodeExecutors(Class<?> flowClass, ProcessorRegistrar processorRegistrar) {
         Map<Class<?>, Map<String, FlowExecutor.NodeExecutor>> map = new HashMap<>();
         map.put(Node.class, new HashMap<>());
         map.put(StartNode.class, new HashMap<>());
@@ -91,7 +91,7 @@ public class FlowParser {
         ReflectionUtils.doWithLocalMethods(flowClass, method -> {
             Node nodeAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, Node.class);
             if (nodeAnnotation != null) {
-                FlowExecutor.NodeExecutor nodeExecutor = parseNode(nodeAnnotation, method, processorsHolder);
+                FlowExecutor.NodeExecutor nodeExecutor = parseNode(nodeAnnotation, method, processorRegistrar);
                 Map<String, FlowExecutor.NodeExecutor> nodeExecutorMap = map.get(Node.class);
                 Assert.isTrue(!nodeExecutorMap.containsKey(nodeExecutor.getNodeName()), String.format("流程[%s]存在重名的节点[%s]", flowClass, nodeExecutor.getNodeName()));
                 nodeExecutorMap.put(nodeExecutor.getNodeName(), nodeExecutor);
@@ -109,7 +109,7 @@ public class FlowParser {
     }
 
     // 解析节点
-    private static FlowExecutor.NodeExecutor parseNode(Node nodeAnnotation, Method nodeMethod, ProcessorsHolder processorsHolder) {
+    private static FlowExecutor.NodeExecutor parseNode(Node nodeAnnotation, Method nodeMethod, ProcessorRegistrar processorRegistrar) {
         log.debug("解析流程节点：node={}，method={}", nodeAnnotation, nodeMethod);
         // 获取节点名称
         String nodeName = nodeAnnotation.name();
@@ -119,7 +119,8 @@ public class FlowParser {
         // 获取处理器
         ProcessorExecutor processorExecutor = null;
         if (StringUtils.isNotEmpty(nodeAnnotation.processor())) {
-            processorExecutor = processorsHolder.getRequiredProcessorExecutor(nodeAnnotation.processor());
+            processorExecutor = processorRegistrar.getProcessor(nodeAnnotation.processor());
+            Assert.notNull(processorExecutor, String.format("不存在处理器[%s]", processorExecutor.getProcessorName()));
         }
         // 解析节点决策器
         FlowExecutor.NodeExecutor.NodeDeciderExecutor nodeDeciderExecutor = parseNodeDecider(nodeMethod, processorExecutor);

@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.bekit.flow.FlowEngine;
 import org.bekit.flow.flow.FlowExecutor;
-import org.bekit.flow.flow.FlowsHolder;
+import org.bekit.flow.flow.FlowRegistrar;
 import org.springframework.util.Assert;
 
 import java.util.HashMap;
@@ -23,8 +23,8 @@ import java.util.Map;
  */
 @AllArgsConstructor
 public class DefaultFlowEngine implements FlowEngine {
-    // 流程持有器
-    private final FlowsHolder flowsHolder;
+    // 流程注册器
+    private final FlowRegistrar flowRegistrar;
 
     @Override
     public <T> T execute(String flow, T target) {
@@ -38,7 +38,10 @@ public class DefaultFlowEngine implements FlowEngine {
         // 构建流程上下文
         FlowContext<T> context = new FlowContext<>(target, attachment);
         // 获取流程执行器
-        FlowExecutor flowExecutor = flowsHolder.getRequiredFlowExecutor(flow);
+        FlowExecutor flowExecutor = flowRegistrar.getFlow(flow);
+        if (flowExecutor == null) {
+            throw new IllegalArgumentException(String.format("流程[%s]不存在", flow));
+        }
         try {
             // 执行流程
             flowExecutor.execute(context);
