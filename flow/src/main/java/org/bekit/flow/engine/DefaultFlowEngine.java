@@ -38,7 +38,7 @@ public class DefaultFlowEngine implements FlowEngine {
         // 构建流程上下文
         FlowContext<T> context = new FlowContext<>(target, attachment);
         // 获取流程执行器
-        FlowExecutor flowExecutor = flowRegistrar.getFlow(flow);
+        FlowExecutor flowExecutor = flowRegistrar.get(flow);
         if (flowExecutor == null) {
             throw new IllegalArgumentException(String.format("流程[%s]不存在", flow));
         }

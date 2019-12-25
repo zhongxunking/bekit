@@ -74,7 +74,7 @@ public class FlowEngineConfiguration {
             // 解析
             ProcessorExecutor processorExecutor = ProcessorParser.parseProcessor(obj);
             // 注册
-            ProcessorExecutor existedOne = processorRegistrar.registerProcessor(processorExecutor);
+            ProcessorExecutor existedOne = processorRegistrar.register(processorExecutor);
             Assert.isNull(existedOne, String.format("存在重名的处理器[%s]", processorExecutor.getProcessorName()));
         }
     }
@@ -97,7 +97,7 @@ public class FlowEngineConfiguration {
             // 解析
             TheFlowMapperExecutor theFlowMapperExecutor = TheFlowMapperParser.parseTheFlowMapper(obj);
             // 注册
-            TheFlowMapperExecutor existedOne = theFlowMapperRegistrar.registerTheFlowMapper(theFlowMapperExecutor);
+            TheFlowMapperExecutor existedOne = theFlowMapperRegistrar.register(theFlowMapperExecutor);
             Assert.isNull(existedOne, String.format("流程[%s]存在重复的特定流程映射器", theFlowMapperExecutor.getFlow()));
         }
     }
@@ -120,7 +120,7 @@ public class FlowEngineConfiguration {
             // 解析
             TheFlowLockerExecutor theFlowLockerExecutor = TheFlowLockerParser.parseTheFlowLocker(obj);
             // 注册
-            TheFlowLockerExecutor existedOne = theFlowLockerRegistrar.registerTheFlowLocker(theFlowLockerExecutor);
+            TheFlowLockerExecutor existedOne = theFlowLockerRegistrar.register(theFlowLockerExecutor);
             Assert.isNull(existedOne, String.format("流程[%s]存在重复的特定流程加锁器", theFlowLockerExecutor.getFlow()));
         }
     }
@@ -170,7 +170,7 @@ public class FlowEngineConfiguration {
                     transactionManager,
                     eventBusesHolder);
             // 注册
-            FlowExecutor existedOne = flowRegistrar.registerFlow(flowExecutor);
+            FlowExecutor existedOne = flowRegistrar.register(flowExecutor);
             Assert.isNull(existedOne, String.format("存在重名的流程[%s]", flowExecutor.getFlowName()));
         }
     }

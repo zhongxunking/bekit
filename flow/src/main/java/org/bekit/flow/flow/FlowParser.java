@@ -75,8 +75,8 @@ public class FlowParser {
                 map.get(StartNode.class).keySet().iterator().next(),
                 map.get(EndNode.class).keySet(),
                 map.get(Node.class),
-                mapperRegistrar.getTheFlowMapper(flowName),
-                lockerRegistrar.getTheFlowLocker(flowName),
+                mapperRegistrar.get(flowName),
+                lockerRegistrar.get(flowName),
                 new TxExecutor(transactionManager, TransactionManager.TransactionType.REQUIRED),
                 new DefaultEventPublisher(eventBusesHolder.getEventBus(FlowListenerType.class)));
     }
@@ -119,7 +119,7 @@ public class FlowParser {
         // 获取处理器
         ProcessorExecutor processorExecutor = null;
         if (StringUtils.isNotEmpty(nodeAnnotation.processor())) {
-            processorExecutor = processorRegistrar.getProcessor(nodeAnnotation.processor());
+            processorExecutor = processorRegistrar.get(nodeAnnotation.processor());
             Assert.notNull(processorExecutor, String.format("不存在处理器[%s]", processorExecutor.getProcessorName()));
         }
         // 解析节点决策器
