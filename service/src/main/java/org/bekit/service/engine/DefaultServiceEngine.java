@@ -9,11 +9,7 @@
 package org.bekit.service.engine;
 
 import lombok.AllArgsConstructor;
-import org.bekit.event.EventPublisher;
 import org.bekit.service.ServiceEngine;
-import org.bekit.service.event.ServiceApplyEvent;
-import org.bekit.service.event.ServiceExceptionEvent;
-import org.bekit.service.event.ServiceFinishEvent;
 import org.bekit.service.service.ServiceExecutor;
 import org.bekit.service.service.ServiceRegistrar;
 import org.springframework.beans.BeanUtils;
@@ -29,8 +25,6 @@ import java.util.Map;
 public class DefaultServiceEngine implements ServiceEngine {
     // 服务注册器
     private final ServiceRegistrar serviceRegistrar;
-    // 服务事件发布器
-    private final EventPublisher eventPublisher;
 
     @Override
     public <O, R> R execute(String service, O order) {
@@ -47,7 +41,7 @@ public class DefaultServiceEngine implements ServiceEngine {
         // 构建服务上下文
         ServiceContext<O, R> context = new ServiceContext<>(order, (R) newResult(serviceExecutor), reviseAttachment(attachment));
         // 执行服务
-        executeService(serviceExecutor, context);
+        serviceExecutor.execute(context);
 
         return context.getResult();
     }
@@ -68,21 +62,5 @@ public class DefaultServiceEngine implements ServiceEngine {
     // 修正附件
     private Map<Object, Object> reviseAttachment(Map<Object, Object> attachment) {
         return attachment != null ? attachment : new HashMap<>();
-    }
-
-    // 执行服务
-    private void executeService(ServiceExecutor serviceExecutor, ServiceContext context) {
-        try {
-            // 发布服务申请事件
-            eventPublisher.publish(new ServiceApplyEvent(serviceExecutor.getServiceName(), context));
-            // 执行服务
-            serviceExecutor.execute(context);
-        } catch (Throwable e) {
-            // 发布服务异常事件
-            eventPublisher.publish(new ServiceExceptionEvent(serviceExecutor.getServiceName(), e, context));
-        } finally {
-            // 发布服务结束事件
-            eventPublisher.publish(new ServiceFinishEvent(serviceExecutor.getServiceName(), context));
-        }
     }
 }

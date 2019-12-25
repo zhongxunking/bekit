@@ -12,10 +12,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bekit.common.method.MethodExecutor;
 import org.bekit.common.transaction.TxExecutor;
+import org.bekit.event.EventPublisher;
 import org.bekit.service.annotation.service.ServiceAfter;
 import org.bekit.service.annotation.service.ServiceBefore;
 import org.bekit.service.annotation.service.ServiceExecute;
 import org.bekit.service.engine.ServiceContext;
+import org.bekit.service.event.ServiceApplyEvent;
+import org.bekit.service.event.ServiceExceptionEvent;
+import org.bekit.service.event.ServiceFinishEvent;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -33,16 +37,34 @@ public class ServiceExecutor {
     private final Object service;
     // 服务阶段执行器Map（key：服务阶段注解的Class）
     private final Map<Class<?>, ServicePhaseExecutor> phaseExecutorMap;
+    // 事件发布器
+    private final EventPublisher eventPublisher;
     // 事务执行器
     private final TxExecutor txExecutor;
 
     /**
-     * 执行服务
+     * 执行
      *
      * @param context 服务上下文
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
-    public void execute(ServiceContext context) throws Throwable {
+    public void execute(ServiceContext context) {
+        try {
+            // 发布服务申请事件
+            eventPublisher.publish(new ServiceApplyEvent(serviceName, context));
+            // 执行所有服务阶段
+            executePhases(context);
+        } catch (Throwable e) {
+            // 发布服务异常事件
+            eventPublisher.publish(new ServiceExceptionEvent(serviceName, e, context));
+        } finally {
+            // 发布服务结束事件
+            eventPublisher.publish(new ServiceFinishEvent(serviceName, context));
+        }
+    }
+
+    // 执行所有服务阶段
+    private void executePhases(ServiceContext context) throws Throwable {
         // 执行服务前置阶段（如果存在）
         if (phaseExecutorMap.containsKey(ServiceBefore.class)) {
             phaseExecutorMap.get(ServiceBefore.class).execute(service, context);

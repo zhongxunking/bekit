@@ -12,11 +12,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bekit.common.transaction.TransactionManager;
 import org.bekit.common.transaction.TxExecutor;
+import org.bekit.event.bus.EventBusesHolder;
+import org.bekit.event.publisher.DefaultEventPublisher;
 import org.bekit.service.annotation.service.Service;
 import org.bekit.service.annotation.service.ServiceAfter;
 import org.bekit.service.annotation.service.ServiceBefore;
 import org.bekit.service.annotation.service.ServiceExecute;
 import org.bekit.service.engine.ServiceContext;
+import org.bekit.service.listener.ServiceListenerType;
 import org.bekit.service.service.ServiceExecutor.ServicePhaseExecutor;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
@@ -43,10 +46,13 @@ public final class ServiceParser {
      * 解析服务
      *
      * @param service            服务
+     * @param eventBusesHolder   事件总线持有器
      * @param transactionManager 事务管理器
      * @return 服务执行器
      */
-    public static ServiceExecutor parseService(Object service, TransactionManager transactionManager) {
+    public static ServiceExecutor parseService(Object service,
+                                               EventBusesHolder eventBusesHolder,
+                                               TransactionManager transactionManager) {
         // 获取目标class（应对AOP代理情况）
         Class<?> serviceClass = AopUtils.getTargetClass(service);
         log.debug("解析服务：{}", serviceClass);
@@ -64,7 +70,12 @@ public final class ServiceParser {
         // 解析出所有服务阶段
         Map<Class<?>, ServicePhaseExecutor> phaseExecutorMap = parseToPhaseExecutors(serviceClass);
 
-        return new ServiceExecutor(serviceName, service, phaseExecutorMap, txExecutor);
+        return new ServiceExecutor(
+                serviceName,
+                service,
+                phaseExecutorMap,
+                new DefaultEventPublisher(eventBusesHolder.getEventBus(ServiceListenerType.class)),
+                txExecutor);
     }
 
     // 解析出所有服务阶段
