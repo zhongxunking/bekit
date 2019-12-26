@@ -49,14 +49,14 @@ public class DefaultServiceEngine implements ServiceEngine {
     // 校验入参order
     private void checkOrder(Object order, ServiceExecutor serviceExecutor) {
         Assert.notNull(order, "order不能为null");
-        if (!serviceExecutor.getOrderClass().isAssignableFrom(order.getClass())) {
+        if (!serviceExecutor.getOrderType().isAssignableFrom(order.getClass())) {
             throw new IllegalArgumentException(String.format("入参order的类型[%s]和服务[%s]期望的类型不匹配", order.getClass(), serviceExecutor.getServiceName()));
         }
     }
 
     // 创建result
     private Object newResult(ServiceExecutor serviceExecutor) {
-        return BeanUtils.instantiate(serviceExecutor.getResultClass());
+        return BeanUtils.instantiate(serviceExecutor.getResultType());
     }
 
     // 修正附件

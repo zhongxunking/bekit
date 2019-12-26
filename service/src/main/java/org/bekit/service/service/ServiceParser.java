@@ -92,12 +92,12 @@ public final class ServiceParser {
         });
         // 校验
         Assert.isTrue(map.containsKey(ServiceExecute.class), String.format("服务[%s]缺少@ServiceExecute类型方法", serviceClass));
-        Class<?> orderClass = map.get(ServiceExecute.class).getOrderClass();
-        Class<?> resultClass = map.get(ServiceExecute.class).getResultClass();
-        Assert.isTrue(ClassUtils.hasConstructor(resultClass), String.format("@ServiceExecute服务方法[%s]的参数ServiceContext的泛型[%s]必须得有默认构造函数", map.get(ServiceExecute.class).getMethod(), resultClass));
+        Class<?> orderType = map.get(ServiceExecute.class).getOrderType();
+        Class<?> resultType = map.get(ServiceExecute.class).getResultType();
+        Assert.isTrue(ClassUtils.hasConstructor(resultType), String.format("@ServiceExecute服务方法[%s]的参数ServiceContext的泛型[%s]必须得有默认构造函数", map.get(ServiceExecute.class).getMethod(), resultType));
         map.forEach((annotationClass, phaseExecutor) -> {
-            Assert.isAssignable(phaseExecutor.getOrderClass(), orderClass, String.format("服务[%s]内的ServiceContext的泛型类型不统一", serviceClass));
-            Assert.isAssignable(phaseExecutor.getResultClass(), resultClass, String.format("服务[%s]内的ServiceContext的泛型类型不统一", serviceClass));
+            Assert.isAssignable(phaseExecutor.getOrderType(), orderType, String.format("服务[%s]内的ServiceContext的泛型类型不统一", serviceClass));
+            Assert.isAssignable(phaseExecutor.getReturnType(), resultType, String.format("服务[%s]内的ServiceContext的泛型类型不统一", serviceClass));
         });
 
         return map;
@@ -116,9 +116,9 @@ public final class ServiceParser {
         }
         // 获取ServiceContext中泛型O、R的真实类型
         ResolvableType resolvableType = ResolvableType.forMethodParameter(servicePhaseMethod, 0);
-        Class<?> orderClass = resolvableType.getGeneric(0).resolve(Object.class);
-        Class<?> resultClass = resolvableType.getGeneric(1).resolve(Object.class);
+        Class<?> orderType = resolvableType.getGeneric(0).resolve(Object.class);
+        Class<?> resultType = resolvableType.getGeneric(1).resolve(Object.class);
 
-        return new ServicePhaseExecutor(servicePhaseMethod, orderClass, resultClass);
+        return new ServicePhaseExecutor(servicePhaseMethod, orderType, resultType);
     }
 }

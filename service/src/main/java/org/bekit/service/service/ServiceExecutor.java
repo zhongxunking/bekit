@@ -99,17 +99,17 @@ public class ServiceExecutor {
     }
 
     /**
-     * 获取Order的真实类型
+     * 获取Order的类型
      */
-    public Class<?> getOrderClass() {
-        return phaseExecutorMap.get(ServiceExecute.class).getOrderClass();
+    public Class<?> getOrderType() {
+        return phaseExecutorMap.get(ServiceExecute.class).getOrderType();
     }
 
     /**
-     * 获取Result的真实类型
+     * 获取Result的类型
      */
-    public Class<?> getResultClass() {
-        return phaseExecutorMap.get(ServiceExecute.class).getResultClass();
+    public Class<?> getResultType() {
+        return phaseExecutorMap.get(ServiceExecute.class).getResultType();
     }
 
     /**
@@ -118,14 +118,14 @@ public class ServiceExecutor {
     @Getter
     public static class ServicePhaseExecutor extends MethodExecutor {
         // ServiceContext泛型O的真实类型
-        private final Class<?> orderClass;
+        private final Class<?> orderType;
         // ServiceContext泛型R的真实类型
-        private final Class<?> resultClass;
+        private final Class<?> resultType;
 
-        public ServicePhaseExecutor(Method servicePhaseMethod, Class<?> orderClass, Class<?> resultClass) {
+        public ServicePhaseExecutor(Method servicePhaseMethod, Class<?> orderType, Class<?> resultType) {
             super(servicePhaseMethod);
-            this.orderClass = orderClass;
-            this.resultClass = resultClass;
+            this.orderType = orderType;
+            this.resultType = resultType;
         }
 
         /**
