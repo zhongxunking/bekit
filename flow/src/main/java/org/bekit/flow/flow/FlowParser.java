@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bekit.common.transaction.TransactionManager;
 import org.bekit.common.transaction.TxExecutor;
-import org.bekit.event.bus.EventBusesHolder;
+import org.bekit.event.bus.EventBusHub;
 import org.bekit.event.publisher.DefaultEventPublisher;
 import org.bekit.flow.annotation.flow.EndNode;
 import org.bekit.flow.annotation.flow.Flow;
@@ -48,7 +48,7 @@ public class FlowParser {
      * @param mapperRegistrar    映射器注册器
      * @param lockerRegistrar    加锁器注册器
      * @param transactionManager 事务管理器
-     * @param eventBusesHolder   事件总线持有器
+     * @param eventBusHub        事件总线中心
      * @return 流程执行器
      */
     public static FlowExecutor parseFlow(Object flow,
@@ -56,7 +56,7 @@ public class FlowParser {
                                          TheFlowMapperRegistrar mapperRegistrar,
                                          TheFlowLockerRegistrar lockerRegistrar,
                                          TransactionManager transactionManager,
-                                         EventBusesHolder eventBusesHolder) {
+                                         EventBusHub eventBusHub) {
         // 获取目标class（应对AOP代理情况）
         Class<?> flowClass = AopUtils.getTargetClass(flow);
         log.debug("解析流程：{}", flowClass);
@@ -78,7 +78,7 @@ public class FlowParser {
                 mapperRegistrar.get(flowName),
                 lockerRegistrar.get(flowName),
                 new TxExecutor(transactionManager, TransactionManager.TransactionType.REQUIRED),
-                new DefaultEventPublisher(eventBusesHolder.getEventBus(FlowListenerType.class)));
+                new DefaultEventPublisher(eventBusHub.getEventBus(FlowListenerType.class)));
     }
 
     // 解析出所有节点执行器

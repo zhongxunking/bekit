@@ -11,7 +11,7 @@ package org.bekit.service.boot;
 import org.bekit.common.scanner.AbstractScanner;
 import org.bekit.common.transaction.TransactionManager;
 import org.bekit.event.boot.EventBusConfiguration;
-import org.bekit.event.bus.EventBusesHolder;
+import org.bekit.event.bus.EventBusHub;
 import org.bekit.service.annotation.service.Service;
 import org.bekit.service.engine.DefaultServiceEngine;
 import org.bekit.service.service.ServiceExecutor;
@@ -43,24 +43,24 @@ public class ServiceEngineConfiguration {
     public static class ServiceScanner extends AbstractScanner {
         // 服务注册器
         private final ServiceRegistrar serviceRegistrar;
-        // 事件总线持有器
-        private final EventBusesHolder eventBusesHolder;
+        // 事件总线中心
+        private final EventBusHub eventBusHub;
         // 事务管理器
         private final TransactionManager transactionManager;
 
         public ServiceScanner(ServiceRegistrar serviceRegistrar,
-                              EventBusesHolder eventBusesHolder,
+                              EventBusHub eventBusHub,
                               TransactionManager transactionManager) {
             super(Service.class);
             this.serviceRegistrar = serviceRegistrar;
-            this.eventBusesHolder = eventBusesHolder;
+            this.eventBusHub = eventBusHub;
             this.transactionManager = transactionManager;
         }
 
         @Override
         protected void onScan(Object obj) {
             // 解析
-            ServiceExecutor serviceExecutor = ServiceParser.parseService(obj, eventBusesHolder, transactionManager);
+            ServiceExecutor serviceExecutor = ServiceParser.parseService(obj, eventBusHub, transactionManager);
             // 注册
             ServiceExecutor existedOne = serviceRegistrar.register(serviceExecutor);
             Assert.isNull(existedOne, String.format("存在重名的服务[%s]", serviceExecutor.getServiceName()));

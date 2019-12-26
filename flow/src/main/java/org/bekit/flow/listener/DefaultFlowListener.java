@@ -10,13 +10,12 @@ package org.bekit.flow.listener;
 
 import org.bekit.event.EventPublisher;
 import org.bekit.event.annotation.Listen;
-import org.bekit.event.bus.EventBusesHolder;
+import org.bekit.event.bus.EventBusHub;
 import org.bekit.event.publisher.DefaultEventPublisher;
 import org.bekit.flow.annotation.listener.FlowListener;
 import org.bekit.flow.event.DecidedNodeEvent;
 import org.bekit.flow.event.DecidedStateNodeEvent;
 import org.bekit.flow.event.FlowExceptionEvent;
-import org.springframework.context.annotation.DependsOn;
 
 /**
  * 默认的流程监听器
@@ -24,13 +23,12 @@ import org.springframework.context.annotation.DependsOn;
  * 监听所有流程发生的事件，然后将事件转发给对应流程的特定流程监听器（@TheFlowListener）
  */
 @FlowListener
-@DependsOn("org.bekit.event.bus.EventBusesHolder")      // 保证出现循环引用时不会出错
 public class DefaultFlowListener {
     // 特定流程事件发布器
     private final EventPublisher eventPublisher;
 
-    public DefaultFlowListener(EventBusesHolder eventBusesHolder) {
-        eventPublisher = new DefaultEventPublisher(eventBusesHolder.getEventBus(TheFlowListenerType.class));
+    public DefaultFlowListener(EventBusHub eventBusHub) {
+        eventPublisher = new DefaultEventPublisher(eventBusHub.getEventBus(TheFlowListenerType.class));
     }
 
     // 监听节点选择事件

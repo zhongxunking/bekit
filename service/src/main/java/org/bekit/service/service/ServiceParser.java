@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bekit.common.transaction.TransactionManager;
 import org.bekit.common.transaction.TxExecutor;
-import org.bekit.event.bus.EventBusesHolder;
+import org.bekit.event.bus.EventBusHub;
 import org.bekit.event.publisher.DefaultEventPublisher;
 import org.bekit.service.annotation.service.Service;
 import org.bekit.service.annotation.service.ServiceAfter;
@@ -46,12 +46,12 @@ public final class ServiceParser {
      * 解析服务
      *
      * @param service            服务
-     * @param eventBusesHolder   事件总线持有器
+     * @param eventBusHub        事件总线中心
      * @param transactionManager 事务管理器
      * @return 服务执行器
      */
     public static ServiceExecutor parseService(Object service,
-                                               EventBusesHolder eventBusesHolder,
+                                               EventBusHub eventBusHub,
                                                TransactionManager transactionManager) {
         // 获取目标class（应对AOP代理情况）
         Class<?> serviceClass = AopUtils.getTargetClass(service);
@@ -74,7 +74,7 @@ public final class ServiceParser {
                 serviceName,
                 service,
                 phaseExecutorMap,
-                new DefaultEventPublisher(eventBusesHolder.getEventBus(ServiceListenerType.class)),
+                new DefaultEventPublisher(eventBusHub.getEventBus(ServiceListenerType.class)),
                 txExecutor);
     }
 

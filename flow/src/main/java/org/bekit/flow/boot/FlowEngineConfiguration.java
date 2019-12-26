@@ -11,7 +11,7 @@ package org.bekit.flow.boot;
 import org.bekit.common.scanner.AbstractScanner;
 import org.bekit.common.transaction.TransactionManager;
 import org.bekit.event.boot.EventBusConfiguration;
-import org.bekit.event.bus.EventBusesHolder;
+import org.bekit.event.bus.EventBusHub;
 import org.bekit.flow.annotation.flow.Flow;
 import org.bekit.flow.annotation.locker.TheFlowLocker;
 import org.bekit.flow.annotation.mapper.TheFlowMapper;
@@ -141,22 +141,22 @@ public class FlowEngineConfiguration {
         private final TheFlowLockerRegistrar theFlowLockerRegistrar;
         // 事务管理器
         private final TransactionManager transactionManager;
-        // 事件总线持有器
-        private final EventBusesHolder eventBusesHolder;
+        // 事件总线中心
+        private final EventBusHub eventBusHub;
 
         public FlowScanner(FlowRegistrar flowRegistrar,
                            ProcessorRegistrar processorRegistrar,
                            TheFlowMapperRegistrar theFlowMapperRegistrar,
                            TheFlowLockerRegistrar theFlowLockerRegistrar,
                            TransactionManager transactionManager,
-                           EventBusesHolder eventBusesHolder) {
+                           EventBusHub eventBusHub) {
             super(Flow.class);
             this.flowRegistrar = flowRegistrar;
             this.processorRegistrar = processorRegistrar;
             this.theFlowMapperRegistrar = theFlowMapperRegistrar;
             this.theFlowLockerRegistrar = theFlowLockerRegistrar;
             this.transactionManager = transactionManager;
-            this.eventBusesHolder = eventBusesHolder;
+            this.eventBusHub = eventBusHub;
         }
 
         @Override
@@ -168,7 +168,7 @@ public class FlowEngineConfiguration {
                     theFlowMapperRegistrar,
                     theFlowLockerRegistrar,
                     transactionManager,
-                    eventBusesHolder);
+                    eventBusHub);
             // 注册
             FlowExecutor existedOne = flowRegistrar.register(flowExecutor);
             Assert.isNull(existedOne, String.format("存在重名的流程[%s]", flowExecutor.getFlowName()));
