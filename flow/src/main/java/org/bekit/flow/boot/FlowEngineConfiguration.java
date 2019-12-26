@@ -54,7 +54,7 @@ public class FlowEngineConfiguration {
     /**
      * 优先级
      */
-    public static final int ORDER = 0;
+    public static final int ORDER = 1000;
 
     /**
      * 处理器扫描器

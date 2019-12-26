@@ -34,7 +34,7 @@ public class ServiceEngineConfiguration {
     /**
      * 优先级
      */
-    public static final int ORDER = 0;
+    public static final int ORDER = 2000;
 
     /**
      * 服务扫描器
