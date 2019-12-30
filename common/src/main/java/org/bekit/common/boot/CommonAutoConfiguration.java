@@ -8,6 +8,8 @@
  */
 package org.bekit.common.boot;
 
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -15,6 +17,7 @@ import org.springframework.context.annotation.Import;
  * 公共自动配置
  */
 @Configuration
+@AutoConfigureAfter(TransactionAutoConfiguration.class)
 @Import(CommonConfiguration.class)
 public class CommonAutoConfiguration {
 }

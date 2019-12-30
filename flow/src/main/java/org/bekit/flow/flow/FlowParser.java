@@ -159,7 +159,7 @@ public class FlowParser {
                 // 入参类型：(T, FlowContext)
                 Assert.isTrue(processorExecutor != null, String.format("节点决策器[%s]不能有非FlowContext入参，因为这个节点没有处理器", nodeDeciderMethod));
                 Assert.isAssignable(parameterTypes[0], processorExecutor.getReturnType(), String.format("节点决策器[%s]的第一个入参类型必须能被其处理器返回类型赋值", nodeDeciderMethod));
-                Assert.isTrue(parameterTypes[1] == FlowContext.class, String.format("节点决策器[%s]的第二个入参类型必须是FlowContext"));
+                Assert.isTrue(parameterTypes[1] == FlowContext.class, String.format("节点决策器[%s]的第二个入参类型必须是FlowContext", nodeDeciderMethod));
                 parameterType = FlowExecutor.NodeExecutor.NodeDeciderExecutor.ParameterType.PROCESS_RESULT_AND_TARGET_CONTEXT;
             } else {
                 throw new IllegalArgumentException(String.format("节点决策器[%s]的入参类型必须为：()、(FlowContext)、(T)、(T, FlowContext)————T表示能被处理器返回结果赋值的类型", nodeDeciderMethod));
