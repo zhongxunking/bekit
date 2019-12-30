@@ -12,7 +12,9 @@ import org.bekit.common.transaction.TransactionManager;
 import org.bekit.common.transaction.support.EmptyTransactionManager;
 import org.bekit.common.transaction.support.SpringTransactionManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -29,21 +31,37 @@ public class CommonConfiguration {
     @ConditionalOnMissingBean(TransactionManager.class)
     public static class TransactionManagerConfiguration {
         /**
-         * Spring事务管理器配置
+         * PlatformTransactionManager存在
          */
         @Configuration
-        @ConditionalOnBean(PlatformTransactionManager.class)
-        @Import(SpringTransactionManager.class)
-        public static class SpringTransactionManagerConfiguration {
+        @ConditionalOnClass(PlatformTransactionManager.class)
+        public static class PlatformTransactionManagerClassExists {
+            /**
+             * Spring事务管理器配置
+             */
+            @Configuration
+            @ConditionalOnBean(PlatformTransactionManager.class)
+            @Import(SpringTransactionManager.class)
+            public static class SpringTransactionManagerConfiguration {
+            }
+
+            /**
+             * 空事务管理器配置
+             */
+            @Configuration
+            @ConditionalOnMissingBean(PlatformTransactionManager.class)
+            @Import(EmptyTransactionManager.class)
+            public static class EmptyTransactionManagerConfiguration {
+            }
         }
 
         /**
-         * 空事务管理器配置
+         * PlatformTransactionManager不存在
          */
         @Configuration
-        @ConditionalOnMissingBean(PlatformTransactionManager.class)
+        @ConditionalOnMissingClass("org.springframework.transaction.PlatformTransactionManager")
         @Import(EmptyTransactionManager.class)
-        public static class EmptyTransactionManagerConfiguration {
+        public static class PlatformTransactionManagerClassNotExists {
         }
     }
 }
