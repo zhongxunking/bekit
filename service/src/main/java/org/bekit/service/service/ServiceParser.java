@@ -97,7 +97,7 @@ public final class ServiceParser {
         Assert.isTrue(ClassUtils.hasConstructor(resultType), String.format("@ServiceExecute服务方法[%s]的参数ServiceContext的泛型[%s]必须得有默认构造函数", map.get(ServiceExecute.class).getMethod(), resultType));
         map.forEach((annotationClass, phaseExecutor) -> {
             Assert.isAssignable(phaseExecutor.getOrderType(), orderType, String.format("服务[%s]内的ServiceContext的泛型类型不统一", serviceClass));
-            Assert.isAssignable(phaseExecutor.getReturnType(), resultType, String.format("服务[%s]内的ServiceContext的泛型类型不统一", serviceClass));
+            Assert.isAssignable(phaseExecutor.getResultType(), resultType, String.format("服务[%s]内的ServiceContext的泛型类型不统一", serviceClass));
         });
 
         return map;
