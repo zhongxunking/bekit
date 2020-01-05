@@ -23,5 +23,5 @@ public class FlowExceptionEvent {
     // 发生的异常
     private final Throwable throwable;
     // 流程上下文
-    private final FlowContext context;
+    private final FlowContext<?> context;
 }

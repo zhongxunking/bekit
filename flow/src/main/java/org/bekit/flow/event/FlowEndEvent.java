@@ -21,5 +21,5 @@ public class FlowEndEvent {
     // 流程名称
     private final String flow;
     // 流程上下文
-    private final FlowContext context;
+    private final FlowContext<?> context;
 }

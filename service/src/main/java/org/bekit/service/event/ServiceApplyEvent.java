@@ -21,5 +21,5 @@ public class ServiceApplyEvent {
     // 服务名称
     private final String service;
     // 服务上下文
-    private final ServiceContext context;
+    private final ServiceContext<?, ?> context;
 }

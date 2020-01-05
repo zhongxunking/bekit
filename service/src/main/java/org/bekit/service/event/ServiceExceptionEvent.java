@@ -23,5 +23,5 @@ public class ServiceExceptionEvent {
     // 发生的异常
     private final Throwable throwable;
     // 服务上下文
-    private final ServiceContext context;
+    private final ServiceContext<?, ?> context;
 }
