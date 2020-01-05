@@ -16,12 +16,17 @@ import org.bekit.flow.engine.FlowContext;
  * 正在执行的节点事件
  */
 @AllArgsConstructor
-@Getter
 public class ExecutingNodeEvent {
     // 流程名称
+    @Getter
     private final String flow;
     // 被选择的节点
+    @Getter
     private final String node;
     // 流程上下文
     private final FlowContext<?> context;
+
+    public <T> FlowContext<T> getContext() {
+        return (FlowContext<T>) context;
+    }
 }

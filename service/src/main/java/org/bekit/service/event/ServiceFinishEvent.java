@@ -16,10 +16,14 @@ import org.bekit.service.engine.ServiceContext;
  * 服务完成事件
  */
 @AllArgsConstructor
-@Getter
 public class ServiceFinishEvent {
     // 服务名称
+    @Getter
     private final String service;
     // 服务上下文
     private final ServiceContext<?, ?> context;
+
+    public <O, R> ServiceContext<O, R> getContext() {
+        return (ServiceContext<O, R>) context;
+    }
 }

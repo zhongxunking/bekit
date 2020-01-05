@@ -16,12 +16,17 @@ import org.bekit.flow.engine.FlowContext;
  * 状态节点选择事件
  */
 @AllArgsConstructor
-@Getter
 public class DecidedStateNodeEvent {
     // 流程名称
+    @Getter
     private final String flow;
     // 被选择的状态节点
+    @Getter
     private final String stateNode;
     // 流程上下文
     private final FlowContext<?> context;
+
+    public <T> FlowContext<T> getContext() {
+        return (FlowContext<T>) context;
+    }
 }

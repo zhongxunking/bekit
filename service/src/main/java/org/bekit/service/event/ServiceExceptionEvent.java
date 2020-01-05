@@ -16,12 +16,17 @@ import org.bekit.service.engine.ServiceContext;
  * 服务异常事件
  */
 @AllArgsConstructor
-@Getter
 public class ServiceExceptionEvent {
     // 服务名称
+    @Getter
     private final String service;
     // 发生的异常
+    @Getter
     private final Throwable throwable;
     // 服务上下文
     private final ServiceContext<?, ?> context;
+
+    public <O, R> ServiceContext<O, R> getContext() {
+        return (ServiceContext<O, R>) context;
+    }
 }
