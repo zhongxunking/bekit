@@ -25,25 +25,10 @@ public final class EnumUtils {
      *
      * @param enumType      枚举类型
      * @param camelCaseName 驼峰命名
-     * @return null 如果不存在该枚举
-     */
-    public static <T extends Enum<T>> T getEnum(Class<T> enumType, String camelCaseName) {
-        try {
-            return getRequiredEnum(enumType, camelCaseName);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
-
-    /**
-     * 获取枚举
-     *
-     * @param enumType      枚举类型
-     * @param camelCaseName 驼峰命名
      * @return 枚举
      * @throws IllegalArgumentException 如果不存在该枚举
      */
-    public static <T extends Enum<T>> T getRequiredEnum(Class<T> enumType, String camelCaseName) {
+    public static <T extends Enum<T>> T getEnum(Class<T> enumType, String camelCaseName) {
         return Enum.valueOf(enumType, toEnumName(camelCaseName));
     }
 
