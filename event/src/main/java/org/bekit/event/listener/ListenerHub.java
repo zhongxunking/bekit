@@ -9,7 +9,6 @@
 package org.bekit.event.listener;
 
 import org.bekit.event.extension.ListenerType;
-import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 监听器中心
  */
-@Component
 public class ListenerHub {
     // 监听器执行器Map（key：监听器的类型）
     private final Map<Class<? extends ListenerType>, Set<ListenerExecutor>> listenerExecutorMap = new ConcurrentHashMap<>();

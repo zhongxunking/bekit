@@ -10,7 +10,6 @@ package org.bekit.event.bus;
 
 import org.bekit.event.extension.ListenerType;
 import org.bekit.event.listener.ListenerParser;
-import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.Map;
@@ -20,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 事件总线中心
  */
-@Component
 public class EventBusHub {
     // 事件总线Map（key：总线类型）
     private final Map<Class<? extends ListenerType>, EventBus> eventBusMap = new ConcurrentHashMap<>();
