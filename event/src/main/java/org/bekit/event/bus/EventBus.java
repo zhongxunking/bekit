@@ -64,9 +64,9 @@ public class EventBus {
     // 分发器
     private class Dispatcher {
         // 升序队列
-        private Map<Object, List<ListenerExecutor>> asc = new HashMap<>();
+        private final Map<Object, List<ListenerExecutor>> asc = new HashMap<>();
         // 降序队列
-        private Map<Object, List<ListenerExecutor>> desc = new HashMap<>();
+        private final Map<Object, List<ListenerExecutor>> desc = new HashMap<>();
 
         // 分发事件
         void dispatch(Object event) throws Throwable {
