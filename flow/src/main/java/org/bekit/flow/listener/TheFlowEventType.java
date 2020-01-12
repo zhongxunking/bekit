@@ -36,4 +36,9 @@ public class TheFlowEventType {
         TheFlowEventType other = (TheFlowEventType) obj;
         return StringUtils.equals(flow, other.flow) && eventClass == other.eventClass;
     }
+
+    @Override
+    public String toString() {
+        return String.format("TheFlowEventType{flow=\"%s\",eventClass=%s}", flow, eventClass);
+    }
 }

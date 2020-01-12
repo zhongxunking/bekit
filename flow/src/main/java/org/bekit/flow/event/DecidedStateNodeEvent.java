@@ -22,7 +22,7 @@ public class DecidedStateNodeEvent {
     private final String flow;
     // 被选择的状态节点
     @Getter
-    private final String stateNode;
+    private final String node;
     // 流程上下文
     private final FlowContext<?> context;
 

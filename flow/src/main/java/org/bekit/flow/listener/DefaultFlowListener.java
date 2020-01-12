@@ -13,9 +13,7 @@ import org.bekit.event.annotation.Listen;
 import org.bekit.event.bus.EventBusHub;
 import org.bekit.event.publisher.DefaultEventPublisher;
 import org.bekit.flow.annotation.listener.FlowListener;
-import org.bekit.flow.event.DecidedNodeEvent;
-import org.bekit.flow.event.DecidedStateNodeEvent;
-import org.bekit.flow.event.FlowExceptionEvent;
+import org.bekit.flow.event.*;
 
 /**
  * 默认的流程监听器
@@ -31,9 +29,21 @@ public class DefaultFlowListener {
         eventPublisher = new DefaultEventPublisher(eventBusHub.getEventBus(TheFlowListenerType.class));
     }
 
+    // 监听流程开始事件
+    @Listen
+    public void listenFlowStartEvent(FlowStartEvent event) {
+        eventPublisher.publish(event);
+    }
+
+    // 监听正在执行的节点事件
+    @Listen
+    public void listenExecutingNodeEvent(ExecutingNodeEvent event) {
+        eventPublisher.publish(event);
+    }
+
     // 监听节点选择事件
     @Listen
-    public void listenNodeDecidedEvent(DecidedNodeEvent event) {
+    public void listenDecidedNodeEvent(DecidedNodeEvent event) {
         eventPublisher.publish(event);
     }
 
@@ -46,6 +56,12 @@ public class DefaultFlowListener {
     // 监听流程异常事件
     @Listen
     public void listenFlowExceptionEvent(FlowExceptionEvent event) {
+        eventPublisher.publish(event);
+    }
+
+    // 监听流程结束事件
+    @Listen
+    public void listenFlowEndEvent(FlowEndEvent event) {
         eventPublisher.publish(event);
     }
 }

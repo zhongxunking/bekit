@@ -20,7 +20,7 @@ public class ExecutingNodeEvent {
     // 流程名称
     @Getter
     private final String flow;
-    // 被选择的节点
+    // 正在执行的节点
     @Getter
     private final String node;
     // 流程上下文

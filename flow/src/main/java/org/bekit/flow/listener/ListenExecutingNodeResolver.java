@@ -11,16 +11,16 @@ package org.bekit.flow.listener;
 import org.bekit.event.extension.ListenResolver;
 import org.bekit.flow.annotation.listener.TheFlowListener;
 import org.bekit.flow.engine.FlowContext;
-import org.bekit.flow.event.DecidedStateNodeEvent;
+import org.bekit.flow.event.ExecutingNodeEvent;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.Assert;
 
 import java.lang.reflect.Method;
 
 /**
- * 监听注解@ListenDecidedNode的解决器
+ * 监听注解@ListenExecutingNode的解决器
  */
-public class ListenDecidedStateNodeResolver implements ListenResolver {
+public class ListenExecutingNodeResolver implements ListenResolver {
     // 监听的事件类型
     private TheFlowEventType eventType;
 
@@ -28,15 +28,15 @@ public class ListenDecidedStateNodeResolver implements ListenResolver {
     public void init(Method listenMethod) {
         TheFlowListener theFlowListenerAnnotation = AnnotatedElementUtils.findMergedAnnotation(listenMethod.getDeclaringClass(), TheFlowListener.class);
         if (theFlowListenerAnnotation == null) {
-            throw new IllegalArgumentException("@ListenDecidedStateNode只能标注在特定流程监听器（@TheFlowListener）的方法上");
+            throw new IllegalArgumentException("@ListenExecutingNode只能标注在特定流程监听器（@TheFlowListener）的方法上");
         }
         // 校验入参类型
         Class[] parameterTypes = listenMethod.getParameterTypes();
         Assert.isTrue(parameterTypes.length == 2
                 && parameterTypes[0] == String.class
-                && parameterTypes[1] == FlowContext.class, String.format("@ListenDecidedStateNode方法[%s]的入参类型必须是(String, FlowContext<T>)", listenMethod));
+                && parameterTypes[1] == FlowContext.class, String.format("@ListenExecutingNode方法[%s]的入参类型必须是(String, FlowContext<T>)", listenMethod));
 
-        eventType = new TheFlowEventType(theFlowListenerAnnotation.flow(), DecidedStateNodeEvent.class);
+        eventType = new TheFlowEventType(theFlowListenerAnnotation.flow(), ExecutingNodeEvent.class);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ListenDecidedStateNodeResolver implements ListenResolver {
 
     @Override
     public Object[] resolveParams(Object event) {
-        DecidedStateNodeEvent decidedStateNodeEvent = (DecidedStateNodeEvent) event;
-        return new Object[]{decidedStateNodeEvent.getNode(), decidedStateNodeEvent.getContext()};
+        ExecutingNodeEvent executingNodeEvent = (ExecutingNodeEvent) event;
+        return new Object[]{executingNodeEvent.getNode(), executingNodeEvent.getContext()};
     }
 }

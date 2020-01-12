@@ -10,9 +10,7 @@ package org.bekit.flow.listener;
 
 import org.bekit.event.extension.EventTypeResolver;
 import org.bekit.event.extension.ListenerType;
-import org.bekit.flow.event.DecidedNodeEvent;
-import org.bekit.flow.event.DecidedStateNodeEvent;
-import org.bekit.flow.event.FlowExceptionEvent;
+import org.bekit.flow.event.*;
 
 /**
  * 特定流程监听器类型
@@ -30,6 +28,12 @@ public class TheFlowListenerType implements ListenerType {
 
         @Override
         public Object resolve(Object event) {
+            if (event instanceof FlowStartEvent) {
+                return new TheFlowEventType(((FlowStartEvent) event).getFlow(), FlowStartEvent.class);
+            }
+            if (event instanceof ExecutingNodeEvent) {
+                return new TheFlowEventType(((ExecutingNodeEvent) event).getFlow(), ExecutingNodeEvent.class);
+            }
             if (event instanceof DecidedNodeEvent) {
                 return new TheFlowEventType(((DecidedNodeEvent) event).getFlow(), DecidedNodeEvent.class);
             }
@@ -38,6 +42,9 @@ public class TheFlowListenerType implements ListenerType {
             }
             if (event instanceof FlowExceptionEvent) {
                 return new TheFlowEventType(((FlowExceptionEvent) event).getFlow(), FlowExceptionEvent.class);
+            }
+            if (event instanceof FlowEndEvent) {
+                return new TheFlowEventType(((FlowEndEvent) event).getFlow(), FlowEndEvent.class);
             }
             throw new IllegalArgumentException("无法识别的流程事件：" + event);
         }
