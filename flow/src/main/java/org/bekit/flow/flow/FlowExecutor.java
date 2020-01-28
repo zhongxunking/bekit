@@ -253,9 +253,9 @@ public class FlowExecutor {
                         return (String) execute(flow, new Object[]{});
                     case ONLY_PROCESS_RESULT:
                         return (String) execute(flow, new Object[]{processResult});
-                    case ONLY_TARGET_CONTEXT:
+                    case ONLY_FLOW_CONTEXT:
                         return (String) execute(flow, new Object[]{context});
-                    case PROCESS_RESULT_AND_TARGET_CONTEXT:
+                    case PROCESS_RESULT_AND_FLOW_CONTEXT:
                         return (String) execute(flow, new Object[]{processResult, context});
                     default:
                         throw new IllegalStateException("节点决策器执行器内部要素不对");
@@ -275,13 +275,13 @@ public class FlowExecutor {
                  */
                 ONLY_PROCESS_RESULT,
                 /**
-                 * 只有目标上下文
+                 * 只有流程上下文
                  */
-                ONLY_TARGET_CONTEXT,
+                ONLY_FLOW_CONTEXT,
                 /**
-                 * 处理结果和目标上下文都有
+                 * 处理结果和流程上下文都有
                  */
-                PROCESS_RESULT_AND_TARGET_CONTEXT,;
+                PROCESS_RESULT_AND_FLOW_CONTEXT,;
             }
         }
     }
