@@ -34,8 +34,7 @@ public class DefaultServiceEngine implements ServiceEngine {
     @Override
     public <O, R> R execute(String service, O order, Map<Object, Object> attachment) {
         // 获取服务执行器
-        ServiceExecutor serviceExecutor = serviceRegistrar.get(service);
-        Assert.notNull(serviceExecutor, String.format("服务[%s]不存在", service));
+        ServiceExecutor serviceExecutor = getServiceExecutor(service);
         // 校验order
         checkOrder(order, serviceExecutor);
         // 构建服务上下文
@@ -44,6 +43,15 @@ public class DefaultServiceEngine implements ServiceEngine {
         serviceExecutor.execute(context);
 
         return context.getResult();
+    }
+
+    // 获取服务执行器
+    private ServiceExecutor getServiceExecutor(String service) {
+        ServiceExecutor serviceExecutor = serviceRegistrar.get(service);
+        if (serviceExecutor == null) {
+            throw new IllegalArgumentException(String.format("服务[%s]不存在", service));
+        }
+        return serviceExecutor;
     }
 
     // 校验入参order
