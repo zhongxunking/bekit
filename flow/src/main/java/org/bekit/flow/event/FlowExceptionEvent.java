@@ -8,43 +8,25 @@
  */
 package org.bekit.flow.event;
 
-import org.bekit.flow.engine.TargetContext;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.bekit.flow.engine.FlowContext;
 
 /**
  * 流程异常事件
  */
+@AllArgsConstructor
 public class FlowExceptionEvent {
     // 流程名称
+    @Getter
     private final String flow;
     // 发生的异常
+    @Getter
     private final Throwable throwable;
-    // 目标上下文
-    private final TargetContext targetContext;
+    // 流程上下文
+    private final FlowContext<?> context;
 
-    public FlowExceptionEvent(String flow, Throwable throwable, TargetContext targetContext) {
-        this.flow = flow;
-        this.throwable = throwable;
-        this.targetContext = targetContext;
-    }
-
-    /**
-     * 获取流程名称
-     */
-    public String getFlow() {
-        return flow;
-    }
-
-    /**
-     * 获取发生的异常
-     */
-    public Throwable getThrowable() {
-        return throwable;
-    }
-
-    /**
-     * 获取目标上下文
-     */
-    public TargetContext getTargetContext() {
-        return targetContext;
+    public <T> FlowContext<T> getContext() {
+        return (FlowContext<T>) context;
     }
 }

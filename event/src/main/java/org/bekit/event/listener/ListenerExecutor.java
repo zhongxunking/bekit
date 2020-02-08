@@ -8,13 +8,14 @@
  */
 package org.bekit.event.listener;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bekit.common.method.MethodExecutor;
 import org.bekit.event.extension.EventTypeResolver;
 import org.bekit.event.extension.ListenResolver;
-import org.springframework.util.ClassUtils;
+import org.bekit.event.extension.ListenerType;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -22,24 +23,21 @@ import java.util.Set;
 /**
  * 监听器执行器
  */
-public class ListenerExecutor implements Comparable<ListenerExecutor> {
+@AllArgsConstructor
+public class ListenerExecutor {
     // 监听器类型
-    private final Class type;
+    @Getter
+    private final Class<? extends ListenerType> type;
     // 优先级
+    @Getter
     private final int priority;
     // 监听器
+    @Getter
     private final Object listener;
     // 事件类型解决器
     private final EventTypeResolver resolver;
     // 监听执行器map（key：被监听的事件类型）
-    private final Map<Object, ListenExecutor> listenExecutorMap = new HashMap<>();
-
-    public ListenerExecutor(Class type, int priority, Object listener, EventTypeResolver resolver) {
-        this.type = type;
-        this.priority = priority;
-        this.listener = listener;
-        this.resolver = resolver;
-    }
+    private final Map<Object, ListenExecutor> listenExecutorMap;
 
     /**
      * 执行监听事件
@@ -55,62 +53,18 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
     }
 
     /**
-     * 添加监听执行器
-     *
-     * @param listenExecutor 监听执行器
-     * @throws IllegalStateException 如果已存在相同事件类型的监听执行器
-     */
-    public void addListenExecutor(ListenExecutor listenExecutor) {
-        if (listenExecutorMap.containsKey(listenExecutor.getEventType())) {
-            throw new IllegalStateException("监听器" + ClassUtils.getShortName(listener.getClass()) + "存在多个监听" + listenExecutor.getEventType() + "事件的方法");
-        }
-        listenExecutorMap.put(listenExecutor.getEventType(), listenExecutor);
-    }
-
-    /**
-     * 获取监听器类型
-     */
-    public Class getType() {
-        return type;
-    }
-
-    /**
-     * 获取监听器
-     */
-    public Object getListener() {
-        return listener;
-    }
-
-    /**
      * 获取指定优先级顺序的监听事件类型
      *
-     * @param priorityAsc 是否优先级升序（true：升序，false：降序）
+     * @param priorityType 优先级类型
      */
-    public Set<Object> getEventTypes(boolean priorityAsc) {
+    public Set<Object> getEventTypes(PriorityType priorityType) {
         Set<Object> eventTypes = new HashSet<>();
-        for (Object eventType : listenExecutorMap.keySet()) {
-            ListenExecutor listenExecutor = listenExecutorMap.get(eventType);
-            if (listenExecutor.isPriorityAsc() == priorityAsc) {
+        listenExecutorMap.forEach((eventType, listenExecutor) -> {
+            if (listenExecutor.getPriorityType() == priorityType) {
                 eventTypes.add(eventType);
             }
-        }
+        });
         return eventTypes;
-    }
-
-    @Override
-    public int compareTo(ListenerExecutor listenerExecutor) {
-        return priority - listenerExecutor.priority;
-    }
-
-    /**
-     * 校验监听器执行器是否有效
-     *
-     * @throws IllegalStateException 如果校验不通过
-     */
-    public void validate() {
-        if (listener == null || type == null || resolver == null) {
-            throw new IllegalStateException("监听器内部要素不全");
-        }
     }
 
     /**
@@ -120,12 +74,13 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
         // 监听解决器
         private final ListenResolver resolver;
         // 是否优先级升序
-        private final boolean priorityAsc;
+        @Getter
+        private final PriorityType priorityType;
 
-        public ListenExecutor(ListenResolver resolver, boolean priorityAsc, Method targetMethod) {
-            super(targetMethod);
+        public ListenExecutor(ListenResolver resolver, PriorityType priorityType, Method listenMethod) {
+            super(listenMethod);
             this.resolver = resolver;
-            this.priorityAsc = priorityAsc;
+            this.priorityType = priorityType;
         }
 
         /**
@@ -136,7 +91,7 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
          * @throws Throwable 执行过程中发生任何异常都会往外抛
          */
         public void execute(Object listener, Object event) throws Throwable {
-            execute(listener, resolver.resolveArgs(event));
+            execute(listener, resolver.resolveParams(event));
         }
 
         /**
@@ -144,13 +99,6 @@ public class ListenerExecutor implements Comparable<ListenerExecutor> {
          */
         public Object getEventType() {
             return resolver.getEventType();
-        }
-
-        /**
-         * 是否是优先级升序
-         */
-        public boolean isPriorityAsc() {
-            return priorityAsc;
         }
     }
 }

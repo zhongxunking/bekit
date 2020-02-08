@@ -8,54 +8,21 @@
  */
 package org.bekit.service.engine;
 
-import java.util.HashMap;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.util.Map;
 
 /**
  * 服务上下文
  */
+@AllArgsConstructor
+@Getter
 public class ServiceContext<O, R> {
     // 入参
     private final O order;
     // 结果
     private final R result;
     // 附件（可往里面设值，可传递一些附加信息）
-    private Map<Object, Object> attachment;
-
-    public ServiceContext(O order, R result, Map<Object, Object> attachment) {
-        this.order = order;
-        this.result = result;
-        this.attachment = attachment;
-        if (this.attachment == null) {
-            this.attachment = new HashMap<>();
-        }
-    }
-
-    /**
-     * 获取order
-     */
-    public O getOrder() {
-        return order;
-    }
-
-    /**
-     * 获取result
-     */
-    public R getResult() {
-        return result;
-    }
-
-    /**
-     * 获取附件属性
-     */
-    public <V> V getAttachmentAttr(Object key) {
-        return (V) attachment.get(key);
-    }
-
-    /**
-     * 设置附件属性
-     */
-    public void setAttachmentAttr(Object key, Object value) {
-        attachment.put(key, value);
-    }
+    private final Map<Object, Object> attachment;
 }

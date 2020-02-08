@@ -8,27 +8,22 @@
  */
 package org.bekit.service.event;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bekit.service.engine.ServiceContext;
 
 /**
  * 服务完成事件
  */
+@AllArgsConstructor
 public class ServiceFinishEvent {
     // 服务名称
+    @Getter
     private final String service;
     // 服务上下文
-    private final ServiceContext serviceContext;
+    private final ServiceContext<?, ?> context;
 
-    public ServiceFinishEvent(String service, ServiceContext serviceContext) {
-        this.service = service;
-        this.serviceContext = serviceContext;
-    }
-
-    public String getService() {
-        return service;
-    }
-
-    public ServiceContext getServiceContext() {
-        return serviceContext;
+    public <O, R> ServiceContext<O, R> getContext() {
+        return (ServiceContext<O, R>) context;
     }
 }

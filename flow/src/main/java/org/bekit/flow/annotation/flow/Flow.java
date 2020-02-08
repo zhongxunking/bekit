@@ -15,26 +15,27 @@ import java.lang.annotation.*;
 /**
  * 流程
  * <p>
- * 流程包含的节点类型：开始节点（@StartNode）、状态节点（@StateNode）、处理节点（@ProcessNode）、等待节点（@WaitNode）、结束节点（@EndNode）
- * 一：开启了流程事务情况
- * 流程在刚开始执行时会自动的开启一个新事务并调用流程事务锁住目标对象；
- * 当流程被正常中断或正常执行结束（无异常抛出），则会提交事务；否则如果有任何异常抛出，则会回滚事务（当然已经提交的那些事务是不会回滚的）。
- * <p>
- * 二：未开启流程事务情况
- * 整个执行过程中流程引擎不会对事务做任何操作（既不会主动开启事务，也不会主动提交事务），也不会调用流程事务锁住目标对象；@StateNode节点效果也会跟@ProcessNode节点效果一样
+ * 流程包含的节点类型：开始节点（@StartNode）、阶段节点（@PhaseNode）、瞬态节点（@TransientNode）、暂停节点（@PauseNode）、结束节点（@EndNode）
+ * 执行步骤：
+ * 1、节点初始化为开始节点（@StartNode）
+ * 2、调用流程映射器映射出要真正执行的节点（如果存在）
+ * 3、调用流程加锁器流程加锁（如果存在，并调用流程映射器映射出要真正执行的节点（如果存在））
+ * 4、开启事务
+ * 5、调用流程加锁器状态加锁（如果存在，并调用流程映射器映射出要真正执行的节点（如果存在））
+ * 6、执行节点并得到下一个节点
+ * 7、下一个节点是瞬态节点（@TransientNode）则进入步骤6；否则进入步骤8
+ * 8、调用流程加锁器状态解锁（如果存在）
+ * 9、提交事务
+ * 10、下一个节点是暂停节点（@PauseNode）或结束节点（@EndNode），则进入步骤11；否则进入步骤4
+ * 11、调用流程加锁器流程解锁（如果存在）
  */
-@Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 @Component
 public @interface Flow {
     /**
-     * 流程名称（默认使用被注解的类名，首字母小写）
+     * 流程名称（默认使用被注解的类名且首字母小写）
      */
     String name() default "";
-
-    /**
-     * 是否开启流程事务（默认开启）
-     */
-    boolean enableFlowTx() default true;
 }

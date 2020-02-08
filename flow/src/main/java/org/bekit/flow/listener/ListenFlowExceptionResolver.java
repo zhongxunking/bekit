@@ -10,10 +10,10 @@ package org.bekit.flow.listener;
 
 import org.bekit.event.extension.ListenResolver;
 import org.bekit.flow.annotation.listener.TheFlowListener;
-import org.bekit.flow.engine.TargetContext;
+import org.bekit.flow.engine.FlowContext;
 import org.bekit.flow.event.FlowExceptionEvent;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.util.ClassUtils;
+import org.springframework.util.Assert;
 
 import java.lang.reflect.Method;
 
@@ -30,14 +30,12 @@ public class ListenFlowExceptionResolver implements ListenResolver {
         if (theFlowListenerAnnotation == null) {
             throw new IllegalArgumentException("@ListenFlowException只能标注在特定流程监听器（@TheFlowListener）的方法上");
         }
-        // 校验入参
+        // 校验入参类型
         Class[] parameterTypes = listenMethod.getParameterTypes();
-        if (parameterTypes.length != 2) {
-            throw new RuntimeException("监听流程异常方法" + ClassUtils.getQualifiedMethodName(listenMethod) + "的入参必须是（Throwable, TargetContext）");
-        }
-        if (parameterTypes[0] != Throwable.class || parameterTypes[1] != TargetContext.class) {
-            throw new RuntimeException("监听流程异常方法" + ClassUtils.getQualifiedMethodName(listenMethod) + "的入参必须是（Throwable, TargetContext）");
-        }
+        Assert.isTrue(parameterTypes.length == 2
+                && parameterTypes[0] == Throwable.class
+                && parameterTypes[1] == FlowContext.class, String.format("@ListenFlowException方法[%s]的入参类型必须是(Throwable, FlowContext<T>)", listenMethod));
+
         eventType = new TheFlowEventType(theFlowListenerAnnotation.flow(), FlowExceptionEvent.class);
     }
 
@@ -47,8 +45,8 @@ public class ListenFlowExceptionResolver implements ListenResolver {
     }
 
     @Override
-    public Object[] resolveArgs(Object event) {
+    public Object[] resolveParams(Object event) {
         FlowExceptionEvent flowExceptionEvent = (FlowExceptionEvent) event;
-        return new Object[]{flowExceptionEvent.getThrowable(), flowExceptionEvent.getTargetContext()};
+        return new Object[]{flowExceptionEvent.getThrowable(), flowExceptionEvent.getContext()};
     }
 }

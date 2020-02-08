@@ -17,14 +17,13 @@ import java.lang.annotation.*;
 /**
  * 服务监听器
  */
-@Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Listener(type = ServiceListenerType.class)
+@Documented
+@Listener(type = ServiceListenerType.class, priority = Integer.MAX_VALUE)
 public @interface ServiceListener {
     /**
      * 优先级
-     * （具体执行顺序需要结合@Listen注解的priorityAsc属性共同决定）
      */
     @AliasFor(annotation = Listener.class, attribute = "priority")
     int priority() default Integer.MAX_VALUE;

@@ -16,15 +16,16 @@ import java.lang.annotation.*;
 
 /**
  * 特定流程监听器
- * （监听的是某一个特定流程发生的事件，配合@ListenNodeDecide、@ListenFlowException一起使用）
+ * <p>
+ * 监听某一个特定流程发生的事件，配合@ListenDecidedNode、@ListenDecidedStateNode、@ListenFlowException一起使用。
  */
-@Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Listener(type = TheFlowListenerType.class)
+@Documented
+@Listener(type = TheFlowListenerType.class, priority = Integer.MAX_VALUE)
 public @interface TheFlowListener {
     /**
-     * 被监听的流程
+     * 监听的流程
      */
     String flow();
 

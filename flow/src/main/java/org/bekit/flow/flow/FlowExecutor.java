@@ -8,380 +8,234 @@
  */
 package org.bekit.flow.flow;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bekit.common.method.MethodExecutor;
+import org.bekit.common.transaction.TxExecutor;
 import org.bekit.event.EventPublisher;
-import org.bekit.flow.engine.TargetContext;
-import org.bekit.flow.event.FlowExceptionEvent;
-import org.bekit.flow.event.NodeDecidedEvent;
+import org.bekit.flow.annotation.locker.FlowLock;
+import org.bekit.flow.annotation.locker.FlowUnlock;
+import org.bekit.flow.annotation.locker.StateLock;
+import org.bekit.flow.annotation.locker.StateUnlock;
+import org.bekit.flow.engine.FlowContext;
+import org.bekit.flow.event.*;
+import org.bekit.flow.locker.TheFlowLockerExecutor;
+import org.bekit.flow.mapper.TheFlowMapperExecutor;
 import org.bekit.flow.processor.ProcessorExecutor;
-import org.bekit.flow.transaction.FlowTxExecutor;
-import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * 流程执行器
  */
+@AllArgsConstructor
 public class FlowExecutor {
     // 流程名称
+    @Getter
     private final String flowName;
-    // 是否开启流程事务
-    private final boolean enableFlowTx;
     // 流程
+    @Getter
     private final Object flow;
     // 开始节点
-    private String startNode;
+    private final String startNode;
     // 结束节点
-    private final Set<String> endNodes = new HashSet<>();
+    private final Set<String> endNodes;
     // 节点执行器Map（key：节点名称）
-    private final Map<String, NodeExecutor> nodeExecutorMap = new HashMap<>();
-    // 目标对象映射执行器
-    private TargetMappingExecutor mappingExecutor;
-    // 流程事务执行器
-    private FlowTxExecutor flowTxExecutor;
+    private final Map<String, NodeExecutor> nodeExecutorMap;
+    // 映射器执行器
+    private final TheFlowMapperExecutor mapperExecutor;
+    // 加锁器执行器
+    private final TheFlowLockerExecutor lockerExecutor;
+    // 事务执行器
+    private final TxExecutor txExecutor;
     // 事件发布器
-    private EventPublisher eventPublisher;
-
-    public FlowExecutor(String flowName, boolean enableFlowTx, Object flow, EventPublisher eventPublisher) {
-        this.flowName = flowName;
-        this.enableFlowTx = enableFlowTx;
-        this.flow = flow;
-        this.eventPublisher = eventPublisher;
-    }
+    private final EventPublisher eventPublisher;
 
     /**
-     * 执行流程
+     * 执行
      *
-     * @param targetContext 目标上下文
+     * @param context 流程上下文
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
-    public void execute(TargetContext targetContext) throws Throwable {
+    public void execute(FlowContext<?> context) throws Throwable {
         try {
-            // 获取即将执行的节点
-            String node = beforeStep(targetContext);
-            if (!endNodes.contains(node)) {
-                // 获取节点执行器
-                NodeExecutor nodeExecutor = nodeExecutorMap.get(node);
-                do {
-                    // 执行节点
-                    node = nodeExecutor.execute(flow, targetContext);
-                    // 判断是否中断流程
-                    if (node == null) {
-                        break;
+            // 发布流程开始事件
+            eventPublisher.publish(new FlowStartEvent(flowName, context));
+            // 映射出节点
+            String node = mappingNode(context, startNode);
+            try {
+                // 流程前置处理
+                node = beforeFlow(context, node);
+                try {
+                    // 状态前置处理
+                    node = beforeState(context, node);
+                    if (!endNodes.contains(node)) {
+                        // 获取节点执行器
+                        NodeExecutor nodeExecutor = getRequiredNodeExecutor(node);
+                        do {
+                            // 发布正在执行的节点事件
+                            eventPublisher.publish(new ExecutingNodeEvent(flowName, node, context));
+                            // 执行节点
+                            node = nodeExecutor.execute(flow, context);
+                            // 是否中断流程
+                            if (node == null) {
+                                break;
+                            }
+                            // 获取下个节点执行器
+                            nodeExecutor = getRequiredNodeExecutor(node);
+                            // 发布节点选择事件
+                            eventPublisher.publish(new DecidedNodeEvent(flowName, node, context));
+                            // 下个节点是否是状态节点
+                            if (nodeExecutor.isHaveState()) {
+                                // 发布状态节点选择事件
+                                eventPublisher.publish(new DecidedStateNodeEvent(flowName, node, context));
+                                // 下个节点是否自动执行
+                                if (nodeExecutor.isAutoExecute()) {
+                                    afterState(context);
+                                    // 刷新下个节点（防止状态锁解锁后目标对象被其他线程抢占并执行到其他节点，此处更新到最新节点）
+                                    node = beforeState(context, node);
+                                    nodeExecutor = getRequiredNodeExecutor(node);
+                                }
+                            }
+                        } while (nodeExecutor.isAutoExecute());
                     }
-                    // 判断节点是否存在
-                    if (!nodeExecutorMap.containsKey(node)) {
-                        throw new RuntimeException("流程" + flowName + "不存在节点" + node);
-                    }
-                    // 发送节点选择事件
-                    eventPublisher.publish(new NodeDecidedEvent(flowName, node, targetContext));
-                    // 获取下一个节点执行器
-                    nodeExecutor = nodeExecutorMap.get(node);
-                    // 判断是否提交事务
-                    if (enableFlowTx && nodeExecutor.isNewTx() && nodeExecutor.isAutoExecute()) {
-                        afterStep();
-                        // 刷新即将执行的节点（防止事务提交后目标对象被其他线程抢占被执行到其他节点，此处就是更新到最新节点）
-                        node = beforeStep(targetContext);
-                        nodeExecutor = nodeExecutorMap.get(node);
-                    }
-                } while (nodeExecutor.isAutoExecute());
+                    // 状态后置处理
+                    afterState(context);
+                } catch (Throwable e) {
+                    // 状态异常处理
+                    afterStateException(context);
+                    throw e;
+                }
+            } finally {
+                // 流程后置处理
+                afterFlow(context);
             }
-            afterStep();
         } catch (Throwable e) {
-            afterThrowing(e, targetContext);
+            // 发布流程异常事件
+            eventPublisher.publish(new FlowExceptionEvent(flowName, e, context));
             throw e;
-        }
-    }
-
-    // 在每一个步骤执行前执行
-    private String beforeStep(TargetContext targetContext) throws Throwable {
-        if (enableFlowTx) {
-            // 创建事务
-            flowTxExecutor.createTx();
-            // 锁目标对象
-            flowTxExecutor.lockTarget(targetContext);
-        }
-        // 返回接下来需要执行的节点
-        return targetMappingToNode(targetContext);
-    }
-
-    // 在每一个步骤执行后执行
-    private void afterStep() {
-        if (enableFlowTx) {
-            // 提交事务
-            flowTxExecutor.commitTx();
-        }
-    }
-
-    // 在发生异常后执行
-    private void afterThrowing(Throwable throwable, TargetContext targetContext) {
-        try {
-            if (enableFlowTx) {
-                // 回滚事务
-                flowTxExecutor.rollbackTx();
-            }
         } finally {
-            // 发送流程异常事件
-            eventPublisher.publish(new FlowExceptionEvent(flowName, throwable, targetContext));
+            // 发布流程结束事件
+            eventPublisher.publish(new FlowEndEvent(flowName, context));
         }
     }
 
-    // 目标对象映射到节点
-    private String targetMappingToNode(TargetContext targetContext) throws Throwable {
-        // 执行映射执行器
-        String node = mappingExecutor.execute(flow, targetContext);
-        if (!nodeExecutorMap.containsKey(node)) {
-            throw new RuntimeException("流程" + flowName + "不存在节点" + node);
+    // 映射出节点
+    private String mappingNode(FlowContext<?> context, String defaultNode) throws Throwable {
+        String node = defaultNode;
+        if (mapperExecutor != null) {
+            node = mapperExecutor.execute(context);
         }
-
         return node;
     }
 
-    /**
-     * 添加节点
-     *
-     * @param nodeExecutor 节点执行器
-     * @throws IllegalStateException 如果存在同名的节点
-     */
-    public void addNode(NodeExecutor nodeExecutor) {
-        if (nodeExecutorMap.containsKey(nodeExecutor.getNodeName())) {
-            throw new IllegalStateException("流程" + flowName + "存在同名的节点" + nodeExecutor.getNodeName());
+    // 流程前置处理
+    private String beforeFlow(FlowContext<?> context, String defaultNode) throws Throwable {
+        String node = defaultNode;
+        if (lockerExecutor != null && lockerExecutor.contain(FlowLock.class)) {
+            Object newTarget = lockerExecutor.execute(FlowLock.class, context);
+            ((FlowContext<Object>) context).refreshTarget(newTarget);
+            node = mappingNode(context, node);
         }
-        nodeExecutorMap.put(nodeExecutor.getNodeName(), nodeExecutor);
+        return node;
     }
 
-    /**
-     * 设置开始节点
-     *
-     * @throws IllegalStateException 如果开始节点已存在
-     */
-    public void setStartNode(String startNode) {
-        if (this.startNode != null) {
-            throw new IllegalStateException("流程" + flowName + "存在多个开始节点");
+    // 状态前置处理
+    private String beforeState(FlowContext<?> context, String defaultNode) throws Throwable {
+        String node = defaultNode;
+        txExecutor.createTx();
+        if (lockerExecutor != null && lockerExecutor.contain(StateLock.class)) {
+            Object newTarget = lockerExecutor.execute(StateLock.class, context);
+            ((FlowContext<Object>) context).refreshTarget(newTarget);
+            node = mappingNode(context, node);
         }
-        this.startNode = startNode;
+        return node;
     }
 
-    /**
-     * 添加结束节点
-     */
-    public void addEndNode(String endNode) {
-        endNodes.add(endNode);
+    // 获取节点执行器
+    private NodeExecutor getRequiredNodeExecutor(String node) {
+        NodeExecutor nodeExecutor = nodeExecutorMap.get(node);
+        if (nodeExecutor == null) {
+            throw new IllegalStateException(String.format("流程[%s]不存在节点[%s]", flowName, node));
+        }
+        return nodeExecutor;
     }
 
-    /**
-     * 设置目标对象映射执行器
-     *
-     * @param mappingExecutor 目标对象映射执行器
-     * @throws IllegalStateException 如果目标对象映射执行器已经被设置过
-     */
-    public void setMappingExecutor(TargetMappingExecutor mappingExecutor) {
-        if (this.mappingExecutor != null) {
-            throw new IllegalStateException("流程" + flowName + "存在多个目标对象映射方法（@TargetMapping类型方法）");
+    // 状态后置处理
+    private void afterState(FlowContext<?> context) throws Throwable {
+        if (lockerExecutor != null && lockerExecutor.contain(StateUnlock.class)) {
+            lockerExecutor.execute(StateUnlock.class, context);
         }
-        this.mappingExecutor = mappingExecutor;
+        txExecutor.commitTx();
     }
 
-    /**
-     * 设置流程事务执行器
-     *
-     * @param flowTxExecutor 流程事务执行器
-     * @throws IllegalStateException 如果流程事务执行器不能被设置或已经被设置
-     */
-    public void setFlowTxExecutor(FlowTxExecutor flowTxExecutor) {
-        if (!enableFlowTx) {
-            throw new IllegalStateException("流程" + flowName + "的enableFlowTx属性为关闭状态，不能设置流程事务");
-        }
-        if (this.flowTxExecutor != null) {
-            throw new IllegalStateException("流程" + flowName + "的流程事务执行器已被设置，不能重复设置");
-        }
-        this.flowTxExecutor = flowTxExecutor;
-    }
-
-    /**
-     * 获取流程名称
-     */
-    public String getFlowName() {
-        return flowName;
-    }
-
-    /**
-     * 获取流程
-     */
-    public Object getFlow() {
-        return flow;
-    }
-
-    /**
-     * 获取目标对象类型
-     */
-    public Class getClassOfTarget() {
-        return mappingExecutor.getClassOfTarget();
-    }
-
-    /**
-     * 校验流程执行器是否有效
-     *
-     * @throws IllegalStateException 如果校验不通过
-     */
-    public void validate() {
-        if (flowName == null || flow == null || eventPublisher == null) {
-            throw new IllegalStateException("流程" + flowName + "内部要素不全");
-        }
-        if (startNode == null) {
-            throw new IllegalStateException("流程" + flowName + "缺少开始节点");
-        }
-        if (endNodes.isEmpty()) {
-            throw new IllegalStateException("流程" + flowName + "没有结束节点");
-        }
-        if (mappingExecutor == null) {
-            throw new IllegalStateException("流程" + flowName + "缺少目标对象映射方法（@TargetMapping类型方法）");
-        }
-        if (enableFlowTx) {
-            if (flowTxExecutor == null) {
-                throw new IllegalStateException("流程" + flowName + "的enableFlowTx属性为开启状态，但未设置对应的流程事务");
+    // 状态异常处理
+    private void afterStateException(FlowContext<?> context) throws Throwable {
+        try {
+            if (lockerExecutor != null && lockerExecutor.contain(StateUnlock.class)) {
+                lockerExecutor.execute(StateUnlock.class, context);
             }
-        } else {
-            if (flowTxExecutor != null) {
-                throw new IllegalStateException("流程" + flowName + "的enableFlowTx属性为关闭状态，但设置了流程事务");
-            }
+        } finally {
+            txExecutor.rollbackTx();
         }
-        // 校验流程节点的处理器的目标对象类型是否匹配
-        for (NodeExecutor nodeExecutor : nodeExecutorMap.values()) {
-            Class classOfTargetOfProcessor = nodeExecutor.getClassOfTargetOfProcessor();
-            if (classOfTargetOfProcessor != null && !classOfTargetOfProcessor.isAssignableFrom(getClassOfTarget())) {
-                throw new IllegalStateException("流程" + flowName + "内" + nodeExecutor.getNodeName() + "节点的处理器的目标对象类型和流程的目标对象类型不匹配");
-            }
-            Class classOfTargetOfNodeDecider = nodeExecutor.getClassOfTargetOfNodeDecider();
-            if (classOfTargetOfNodeDecider != null && classOfTargetOfNodeDecider != getClassOfTarget()) {
-                throw new IllegalStateException("流程" + flowName + "内目标对象类型不统一");
-            }
-        }
-        // 校验流程事务的目标对象类型是否匹配
-        if (flowTxExecutor != null) {
-            if (!flowTxExecutor.getClassOfTarget().isAssignableFrom(getClassOfTarget())) {
-                throw new IllegalStateException("流程事务" + ClassUtils.getShortName(flowTxExecutor.getClass()) + "的目标对象类型与流程" + flowName + "的目标对象类型不匹配");
-            }
+    }
+
+    // 流程后置处理
+    private void afterFlow(FlowContext<?> context) throws Throwable {
+        if (lockerExecutor != null && lockerExecutor.contain(FlowUnlock.class)) {
+            lockerExecutor.execute(FlowUnlock.class, context);
         }
     }
 
     /**
      * 节点执行器
      */
+    @AllArgsConstructor
     public static class NodeExecutor {
         // 节点名称
+        @Getter
         private final String nodeName;
+        // 是否有状态
+        @Getter
+        private final boolean haveState;
+        // 是否自动执行
+        @Getter
+        private final boolean autoExecute;
         // 处理器执行器
         private final ProcessorExecutor processorExecutor;
-        // 是否自动执行本节点
-        private final boolean autoExecute;
-        // 本节点执行前是否创建新事务
-        private final boolean newTx;
         // 节点决策器执行器
-        private NodeDeciderExecutor nodeDeciderExecutor;
-
-        public NodeExecutor(String nodeName, ProcessorExecutor processorExecutor, boolean autoExecute, boolean newTx) {
-            this.nodeName = nodeName;
-            this.processorExecutor = processorExecutor;
-            this.autoExecute = autoExecute;
-            this.newTx = newTx;
-        }
+        private final NodeDeciderExecutor nodeDeciderExecutor;
 
         /**
-         * 执行节点
+         * 执行
          *
-         * @param flow          流程
-         * @param targetContext 目标上下文
+         * @param flow    流程
+         * @param context 流程上下文
          * @return 下个节点
          * @throws Throwable 执行过程中发生任何异常都会往外抛
          */
-        public String execute(Object flow, TargetContext targetContext) throws Throwable {
+        public String execute(Object flow, FlowContext<?> context) throws Throwable {
             Object processResult = null;
             if (processorExecutor != null) {
                 // 执行节点处理器
-                processResult = processorExecutor.execute(targetContext);
+                processResult = processorExecutor.execute(context);
             }
             // 执行节点决策器
-            return nodeDeciderExecutor.execute(flow, processResult, targetContext);
+            return nodeDeciderExecutor.execute(flow, processResult, context);
         }
 
         /**
-         * 设置节点决策器执行器
-         */
-        public void setNodeDeciderExecutor(NodeDeciderExecutor nodeDeciderExecutor) {
-            if (this.nodeDeciderExecutor != null) {
-                throw new IllegalStateException("节点" + nodeName + "已设置节点决策器执行器，不能重复设置");
-            }
-            this.nodeDeciderExecutor = nodeDeciderExecutor;
-        }
-
-        /**
-         * 本节点是否自动执行
-         */
-        public boolean isAutoExecute() {
-            return autoExecute;
-        }
-
-        /**
-         * 本节点执行前是否创建新事务
-         */
-        public boolean isNewTx() {
-            return newTx;
-        }
-
-        /**
-         * 获取节点名称
-         */
-        public String getNodeName() {
-            return nodeName;
-        }
-
-        /**
-         * 获取处理器的目标对象类型
-         *
-         * @return null 如果该节点没有处理器
-         */
-        public Class getClassOfTargetOfProcessor() {
-            return processorExecutor != null ? processorExecutor.getClassOfTarget() : null;
-        }
-
-        /**
-         * 获取节点决策器的目标对象类型
-         *
-         * @return null 如果节点决策器没有TargetContext参数
-         */
-        public Class getClassOfTargetOfNodeDecider() {
-            return nodeDeciderExecutor.getClassOfTarget();
-        }
-
-        /**
-         * 校验节点执行器是否有效
-         *
-         * @throws IllegalStateException 如果校验不通过
-         */
-        public void validate() {
-            if (nodeName == null || nodeDeciderExecutor == null) {
-                throw new IllegalStateException("节点" + nodeName + "内部要素不全");
-            }
-        }
-
-        /**
-         * 节点决策器执行器（选出下一个节点）
+         * 节点决策器执行器
          */
         public static class NodeDeciderExecutor extends MethodExecutor {
             // 参数类型
-            private final ParametersType parametersType;
-            // 目标对象类型
-            private final Class classOfTarget;
+            private final ParameterType parameterType;
 
-            public NodeDeciderExecutor(Method targetMethod, ParametersType parametersType, Class classOfTarget) {
-                super(targetMethod);
-                this.parametersType = parametersType;
-                this.classOfTarget = classOfTarget;
+            public NodeDeciderExecutor(ParameterType parameterType, Method nodeDeciderMethod) {
+                super(nodeDeciderMethod);
+                this.parameterType = parameterType;
             }
 
             /**
@@ -389,38 +243,29 @@ public class FlowExecutor {
              *
              * @param flow          流程
              * @param processResult 处理器执行结果
-             * @param targetContext 目标上下文
+             * @param context       流程上下文
              * @return 下个节点名称
              * @throws Throwable 执行过程中发生任何异常都会往外抛
              */
-            public String execute(Object flow, Object processResult, TargetContext targetContext) throws Throwable {
-                switch (parametersType) {
+            public String execute(Object flow, Object processResult, FlowContext<?> context) throws Throwable {
+                switch (parameterType) {
                     case NONE:
                         return (String) execute(flow, new Object[]{});
                     case ONLY_PROCESS_RESULT:
                         return (String) execute(flow, new Object[]{processResult});
-                    case ONLY_TARGET_CONTEXT:
-                        return (String) execute(flow, new Object[]{targetContext});
-                    case PROCESS_RESULT_AND_TARGET_CONTEXT:
-                        return (String) execute(flow, new Object[]{processResult, targetContext});
+                    case ONLY_FLOW_CONTEXT:
+                        return (String) execute(flow, new Object[]{context});
+                    case PROCESS_RESULT_AND_FLOW_CONTEXT:
+                        return (String) execute(flow, new Object[]{processResult, context});
                     default:
-                        throw new IllegalStateException("下个节点选择方法执行器内部状态不对");
+                        throw new IllegalStateException("节点决策器执行器内部要素不对");
                 }
             }
 
             /**
-             * 获取目标对象类型
-             *
-             * @return null 如果节点决策器没有TargetContext参数
+             * 节点决策器方法参数类型
              */
-            public Class getClassOfTarget() {
-                return classOfTarget;
-            }
-
-            /**
-             * 下个节点选择方法参数类型
-             */
-            public enum ParametersType {
+            public enum ParameterType {
                 /**
                  * 无参数
                  */
@@ -430,46 +275,14 @@ public class FlowExecutor {
                  */
                 ONLY_PROCESS_RESULT,
                 /**
-                 * 只有目标上下文
+                 * 只有流程上下文
                  */
-                ONLY_TARGET_CONTEXT,
+                ONLY_FLOW_CONTEXT,
                 /**
-                 * 处理结果和目标上下文都有
+                 * 处理结果和流程上下文都有
                  */
-                PROCESS_RESULT_AND_TARGET_CONTEXT,;
+                PROCESS_RESULT_AND_FLOW_CONTEXT,;
             }
-        }
-    }
-
-    /**
-     * 目标对象映射执行器
-     */
-    public static class TargetMappingExecutor extends MethodExecutor {
-        // 目标对象类型
-        private final Class classOfTarget;
-
-        public TargetMappingExecutor(Method targetMethod, Class classOfTarget) {
-            super(targetMethod);
-            this.classOfTarget = classOfTarget;
-        }
-
-        /**
-         * 执行节点映射方法
-         *
-         * @param flow          流程
-         * @param targetContext 目标上下文
-         * @return 映射到的流程节点名称
-         * @throws Throwable 执行过程中发生任何异常都会往外抛
-         */
-        public String execute(Object flow, TargetContext targetContext) throws Throwable {
-            return (String) execute(flow, new Object[]{targetContext.getTarget()});
-        }
-
-        /**
-         * 获取目标对象类型
-         */
-        public Class getClassOfTarget() {
-            return classOfTarget;
         }
     }
 }

@@ -11,7 +11,7 @@ package org.bekit.event.extension;
 import java.lang.reflect.Method;
 
 /**
- * 监听解决器
+ * 监听解决器（实现类需具有默认构造方法）
  */
 public interface ListenResolver {
     /**
@@ -32,5 +32,5 @@ public interface ListenResolver {
      * @param event 事件
      * @return 调用监听方法的入参
      */
-    Object[] resolveArgs(Object event);
+    Object[] resolveParams(Object event);
 }

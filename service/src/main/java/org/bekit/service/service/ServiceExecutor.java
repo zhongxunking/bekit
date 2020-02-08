@@ -8,78 +8,89 @@
  */
 package org.bekit.service.service;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bekit.common.method.MethodExecutor;
 import org.bekit.common.transaction.TxExecutor;
+import org.bekit.event.EventPublisher;
 import org.bekit.service.annotation.service.ServiceAfter;
 import org.bekit.service.annotation.service.ServiceBefore;
 import org.bekit.service.annotation.service.ServiceExecute;
 import org.bekit.service.engine.ServiceContext;
-import org.springframework.util.ClassUtils;
+import org.bekit.service.event.ServiceApplyEvent;
+import org.bekit.service.event.ServiceExceptionEvent;
+import org.bekit.service.event.ServiceFinishEvent;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 服务执行器
  */
+@AllArgsConstructor
 public class ServiceExecutor {
-    /**
-     * 服务阶段注解
-     */
-    public static final Class[] SERVICE_PHASE_ANNOTATIONS = {ServiceBefore.class, ServiceExecute.class, ServiceAfter.class};
-
     // 服务名称
+    @Getter
     private final String serviceName;
-    // 是否开启事务
-    private final boolean enableTx;
     // 服务
+    @Getter
     private final Object service;
     // 服务阶段执行器Map（key：服务阶段注解的Class）
-    private final Map<Class, ServicePhaseExecutor> phaseExecutorMap = new HashMap<>();
+    private final Map<Class<?>, ServicePhaseExecutor> phaseExecutorMap;
+    // 事件发布器
+    private final EventPublisher eventPublisher;
     // 事务执行器
-    private TxExecutor txExecutor;
-
-    public ServiceExecutor(String serviceName, boolean enableTx, Object service) {
-        this.serviceName = serviceName;
-        this.enableTx = enableTx;
-        this.service = service;
-    }
+    private final TxExecutor txExecutor;
 
     /**
-     * 执行服务
+     * 执行
      *
-     * @param serviceContext 服务上下文
+     * @param context 服务上下文
      * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
-    public void execute(ServiceContext serviceContext) throws Throwable {
+    public void execute(ServiceContext context) {
+        try {
+            // 发布服务申请事件
+            eventPublisher.publish(new ServiceApplyEvent(serviceName, context));
+            // 执行所有服务阶段
+            executePhases(context);
+        } catch (Throwable e) {
+            // 发布服务异常事件
+            eventPublisher.publish(new ServiceExceptionEvent(serviceName, e, context));
+        } finally {
+            // 发布服务结束事件
+            eventPublisher.publish(new ServiceFinishEvent(serviceName, context));
+        }
+    }
+
+    // 执行所有服务阶段
+    private void executePhases(ServiceContext context) throws Throwable {
         // 执行服务前置阶段（如果存在）
         if (phaseExecutorMap.containsKey(ServiceBefore.class)) {
-            phaseExecutorMap.get(ServiceBefore.class).execute(service, serviceContext);
+            phaseExecutorMap.get(ServiceBefore.class).execute(service, context);
         }
         // 执行服务执行阶段
-        executeServiceExecute(serviceContext);
+        executeServiceExecute(context);
         // 执行服务后置阶段（如果存在）
         if (phaseExecutorMap.containsKey(ServiceAfter.class)) {
-            phaseExecutorMap.get(ServiceAfter.class).execute(service, serviceContext);
+            phaseExecutorMap.get(ServiceAfter.class).execute(service, context);
         }
     }
 
     // 执行服务执行阶段
-    private void executeServiceExecute(ServiceContext serviceContext) throws Throwable {
-        if (enableTx) {
+    private void executeServiceExecute(ServiceContext context) throws Throwable {
+        if (txExecutor != null) {
             // 开启事务
             txExecutor.createTx();
         }
         try {
-            phaseExecutorMap.get(ServiceExecute.class).execute(service, serviceContext);
-            if (enableTx) {
+            phaseExecutorMap.get(ServiceExecute.class).execute(service, context);
+            if (txExecutor != null) {
                 // 提交事务
                 txExecutor.commitTx();
             }
         } catch (Throwable e) {
-            if (enableTx) {
+            if (txExecutor != null) {
                 // 回滚事务
                 txExecutor.rollbackTx();
             }
@@ -88,137 +99,44 @@ public class ServiceExecutor {
     }
 
     /**
-     * 设置服务阶段执行器
-     *
-     * @param clazz         服务阶段注解的class
-     * @param phaseExecutor 服务阶段执行器
-     * @throws IllegalArgumentException 如果入参class不是服务阶段注解
-     * @throws IllegalStateException    如果已存在该类型的服务阶段执行器
+     * 获取Order的类型
      */
-    public void setPhaseExecutor(Class clazz, ServicePhaseExecutor phaseExecutor) {
-        if (!Arrays.asList(SERVICE_PHASE_ANNOTATIONS).contains(clazz)) {
-            throw new IllegalArgumentException(ClassUtils.getShortName(clazz) + "不是服务阶段注解");
-        }
-        if (phaseExecutorMap.containsKey(clazz)) {
-            throw new IllegalStateException("服务" + serviceName + "存在多个@" + ClassUtils.getShortName(clazz) + "类型方法");
-        }
-        phaseExecutorMap.put(clazz, phaseExecutor);
+    public Class<?> getOrderType() {
+        return phaseExecutorMap.get(ServiceExecute.class).getOrderType();
     }
 
     /**
-     * 设置事务执行器
-     *
-     * @param txExecutor 事务执行器
+     * 获取Result的类型
      */
-    public void setTxExecutor(TxExecutor txExecutor) {
-        if (!enableTx) {
-            throw new IllegalStateException("服务" + serviceName + "的enableTx属性为关闭状态，不能设置事务执行器");
-        }
-        if (this.txExecutor != null) {
-            throw new IllegalStateException("服务" + serviceName + "的事务执行器已经被设置，不能重复设置");
-        }
-        this.txExecutor = txExecutor;
-    }
-
-    /**
-     * 获取服务名称
-     */
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    /**
-     * 获取服务
-     */
-    public Object getService() {
-        return service;
-    }
-
-    /**
-     * 获取Order的真实类型
-     */
-    public Class getOrderClass() {
-        return phaseExecutorMap.get(ServiceExecute.class).getOrderClass();
-    }
-
-    /**
-     * 获取Result的真实类型
-     */
-    public Class getResultClass() {
-        return phaseExecutorMap.get(ServiceExecute.class).getResultClass();
-    }
-
-    /**
-     * 校验服务执行器是否有效
-     *
-     * @throws IllegalStateException 校验不通过
-     */
-    public void validate() {
-        if (serviceName == null || service == null) {
-            throw new IllegalStateException("服务" + serviceName + "内部要素不全");
-        }
-        if (enableTx) {
-            if (txExecutor == null) {
-                throw new IllegalStateException("服务" + serviceName + "的enableTx属性为开启状态，但未设置事务执行器");
-            }
-            txExecutor.validate();
-        } else {
-            if (txExecutor != null) {
-                throw new IllegalStateException("服务" + serviceName + "的enableTx属性为关闭状态，但设置了事务执行器");
-            }
-        }
-        if (!phaseExecutorMap.containsKey(ServiceExecute.class)) {
-            throw new IllegalStateException("服务" + serviceName + "缺少@ServiceExecute类型方法");
-        }
-        // 校验服务内的ServiceContext泛型类型是否统一
-        for (ServicePhaseExecutor phaseExecutor : phaseExecutorMap.values()) {
-            if (phaseExecutor.getOrderClass() != getOrderClass()) {
-                throw new IllegalStateException("服务" + serviceName + "内的ServiceContext的泛型类型不统一");
-            }
-            if (phaseExecutor.getResultClass() != getResultClass()) {
-                throw new IllegalStateException("服务" + serviceName + "内的ServiceContext的泛型类型不统一");
-            }
-        }
+    public Class<?> getResultType() {
+        return phaseExecutorMap.get(ServiceExecute.class).getResultType();
     }
 
     /**
      * 服务阶段执行器
      */
+    @Getter
     public static class ServicePhaseExecutor extends MethodExecutor {
         // ServiceContext泛型O的真实类型
-        private final Class orderClass;
+        private final Class<?> orderType;
         // ServiceContext泛型R的真实类型
-        private final Class resultClass;
+        private final Class<?> resultType;
 
-        public ServicePhaseExecutor(Method targetMethod, Class orderClass, Class resultClass) {
-            super(targetMethod);
-            this.orderClass = orderClass;
-            this.resultClass = resultClass;
+        public ServicePhaseExecutor(Method servicePhaseMethod, Class<?> orderType, Class<?> resultType) {
+            super(servicePhaseMethod);
+            this.orderType = orderType;
+            this.resultType = resultType;
         }
 
         /**
          * 执行服务阶段
          *
-         * @param service        服务
-         * @param serviceContext 服务上下文
+         * @param service 服务
+         * @param context 服务上下文
          * @throws Throwable 执行过程中发生任何异常都会往外抛
          */
-        public void execute(Object service, ServiceContext serviceContext) throws Throwable {
-            execute(service, new Object[]{serviceContext});
-        }
-
-        /**
-         * 获取ServiceContext泛型O的真实类型
-         */
-        public Class getOrderClass() {
-            return orderClass;
-        }
-
-        /**
-         * 获取ServiceContext泛型R的真实类型
-         */
-        public Class getResultClass() {
-            return resultClass;
+        public void execute(Object service, ServiceContext context) throws Throwable {
+            execute(service, new Object[]{context});
         }
     }
 }

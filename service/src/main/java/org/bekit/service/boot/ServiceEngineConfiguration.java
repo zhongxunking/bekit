@@ -8,31 +8,62 @@
  */
 package org.bekit.service.boot;
 
-import org.bekit.event.EventPublisher;
+import org.bekit.common.scanner.AbstractScanner;
+import org.bekit.common.transaction.TransactionManager;
 import org.bekit.event.boot.EventBusConfiguration;
-import org.bekit.event.bus.EventBusesHolder;
-import org.bekit.event.publisher.DefaultEventPublisher;
-import org.bekit.service.ServiceEngine;
+import org.bekit.event.bus.EventBusHub;
+import org.bekit.service.annotation.service.Service;
 import org.bekit.service.engine.DefaultServiceEngine;
-import org.bekit.service.listener.ServiceListenerType;
-import org.bekit.service.service.ServicesHolder;
-import org.springframework.context.annotation.Bean;
+import org.bekit.service.service.ServiceExecutor;
+import org.bekit.service.service.ServiceParser;
+import org.bekit.service.service.ServiceRegistrar;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.Order;
+import org.springframework.util.Assert;
 
 /**
- * 服务引擎配置类
- * （非spring-boot项目需手动引入本配置类完成服务引擎配置）
+ * 服务引擎配置
  */
 @Configuration
-@Import({EventBusConfiguration.class, ServicesHolder.class})
+@Import({EventBusConfiguration.class,
+        DefaultServiceEngine.class,
+        ServiceRegistrar.class,
+        ServiceEngineConfiguration.ServiceScanner.class})
 public class ServiceEngineConfiguration {
-    // 服务引擎
-    @Bean
-    @DependsOn({"org.bekit.service.service.ServicesHolder", "org.bekit.event.bus.EventBusesHolder"})    // 保证出现循环引用时不会出错
-    public ServiceEngine serviceEngine(ServicesHolder servicesHolder, EventBusesHolder eventBusesHolder) {
-        EventPublisher eventPublisher = new DefaultEventPublisher(eventBusesHolder.getEventBus(ServiceListenerType.class));
-        return new DefaultServiceEngine(servicesHolder, eventPublisher);
+    /**
+     * 优先级
+     */
+    public static final int ORDER = 2000;
+
+    /**
+     * 服务扫描器
+     */
+    @Order(ORDER)
+    public static class ServiceScanner extends AbstractScanner {
+        // 服务注册器
+        private final ServiceRegistrar serviceRegistrar;
+        // 事件总线中心
+        private final EventBusHub eventBusHub;
+        // 事务管理器
+        private final TransactionManager transactionManager;
+
+        public ServiceScanner(ServiceRegistrar serviceRegistrar,
+                              EventBusHub eventBusHub,
+                              TransactionManager transactionManager) {
+            super(Service.class);
+            this.serviceRegistrar = serviceRegistrar;
+            this.eventBusHub = eventBusHub;
+            this.transactionManager = transactionManager;
+        }
+
+        @Override
+        protected void onScan(Object obj) {
+            // 解析
+            ServiceExecutor serviceExecutor = ServiceParser.parseService(obj, eventBusHub, transactionManager);
+            // 注册
+            ServiceExecutor existedOne = serviceRegistrar.register(serviceExecutor);
+            Assert.isNull(existedOne, String.format("存在重名的服务[%s]", serviceExecutor.getServiceName()));
+        }
     }
 }

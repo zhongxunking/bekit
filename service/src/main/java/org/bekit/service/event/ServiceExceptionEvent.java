@@ -8,34 +8,25 @@
  */
 package org.bekit.service.event;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bekit.service.engine.ServiceContext;
 
 /**
  * 服务异常事件
  */
+@AllArgsConstructor
 public class ServiceExceptionEvent {
     // 服务名称
+    @Getter
     private final String service;
-    // 服务上下文
-    private final ServiceContext serviceContext;
     // 发生的异常
+    @Getter
     private final Throwable throwable;
+    // 服务上下文
+    private final ServiceContext<?, ?> context;
 
-    public ServiceExceptionEvent(String service, ServiceContext serviceContext, Throwable throwable) {
-        this.service = service;
-        this.serviceContext = serviceContext;
-        this.throwable = throwable;
-    }
-
-    public String getService() {
-        return service;
-    }
-
-    public ServiceContext getServiceContext() {
-        return serviceContext;
-    }
-
-    public Throwable getThrowable() {
-        return throwable;
+    public <O, R> ServiceContext<O, R> getContext() {
+        return (ServiceContext<O, R>) context;
     }
 }
