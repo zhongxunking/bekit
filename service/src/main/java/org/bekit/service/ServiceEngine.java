@@ -19,7 +19,9 @@ public interface ServiceEngine {
      *
      * @param service 服务名称
      * @param order   入参
-     * @return 结果
+     * @param <O>     入参类型
+     * @param <R>     出参类型
+     * @return 出参
      */
     <O, R> R execute(String service, O order);
 
@@ -29,7 +31,9 @@ public interface ServiceEngine {
      * @param service    服务名称
      * @param order      入参
      * @param attachment 附件
-     * @return 结果
+     * @param <O>        入参类型
+     * @param <R>        出参类型
+     * @return 出参
      */
     <O, R> R execute(String service, O order, Map<Object, Object> attachment);
 }
