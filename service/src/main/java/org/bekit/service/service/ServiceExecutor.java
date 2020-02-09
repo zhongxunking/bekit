@@ -46,7 +46,6 @@ public class ServiceExecutor {
      * 执行
      *
      * @param context 服务上下文
-     * @throws Throwable 执行过程中发生任何异常都会往外抛
      */
     public void execute(ServiceContext context) {
         try {
